@@ -1,0 +1,2178 @@
+<!DOCTYPE html>
+<html lang="da" id="html-root">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Clinlog – Klinisk læringsdagbog for sundhedsprofessionelle</title>
+  <meta name="description" content="Clinlog hjælper læger, sygeplejersker, studerende og andre sundhedspersoner med at dokumentere og lære fra kliniske oplevelser — struktureret af AI, specialitetsspecifik og GDPR-sikker." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&display=swap" rel="stylesheet" />
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js" async></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --navy:    #0b1120;
+      --navy2:   #111827;
+      --navy3:   #1a2740;
+      --teal:    #0ea5c5;
+      --teal2:   #38bdf8;
+      --gold:    #f0c060;
+      --white:   #f0f4f8;
+      --muted:   #8a9ab5;
+      --card-bg: #131e30;
+      --border:  rgba(14,165,197,0.18);
+      --success: #22c55e;
+      --error:   #ef4444;
+    }
+    html { scroll-behavior: smooth; }
+    body {
+      background: var(--navy); color: var(--white);
+      font-family: 'DM Sans', sans-serif; font-weight: 400;
+      line-height: 1.65; overflow-x: hidden;
+    }
+    body::before {
+      content: ''; position: fixed; inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.035'/%3E%3C/svg%3E");
+      pointer-events: none; z-index: 0; opacity: .4;
+    }
+
+    /* ── COOKIE ── */
+    #cookie-banner {
+      position: fixed; bottom: 0; left: 0; right: 0; z-index: 9999;
+      background: var(--navy2); border-top: 1px solid var(--border);
+      padding: 1.2rem 2rem;
+      display: flex; align-items: center; justify-content: space-between; gap: 1.5rem;
+      flex-wrap: wrap; backdrop-filter: blur(12px);
+      box-shadow: 0 -4px 30px rgba(0,0,0,0.4);
+      transform: translateY(0); transition: transform 0.4s ease;
+    }
+    #cookie-banner.hidden { transform: translateY(120%); }
+    .cookie-text { font-size: .875rem; color: var(--muted); flex: 1; min-width: 200px; }
+    .cookie-text a { color: var(--teal2); text-decoration: underline; }
+    .cookie-buttons { display: flex; gap: .75rem; flex-shrink: 0; }
+    .cookie-accept {
+      background: var(--teal); color: #fff; border: none; border-radius: 6px;
+      padding: .5rem 1.2rem; cursor: pointer;
+      font-family: inherit; font-size: .875rem; font-weight: 500; transition: background .2s;
+    }
+    .cookie-accept:hover { background: var(--teal2); }
+    .cookie-decline {
+      background: transparent; color: var(--muted);
+      border: 1px solid var(--border); border-radius: 6px;
+      padding: .5rem 1.2rem; cursor: pointer;
+      font-family: inherit; font-size: .875rem;
+      transition: color .2s, border-color .2s;
+    }
+    .cookie-decline:hover { color: var(--white); border-color: var(--muted); }
+
+    /* ── NAV ── */
+    nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 1rem 2.5rem;
+      background: rgba(11,17,32,0.88); backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--border);
+    }
+    .nav-logo { display: inline-flex; align-items: center; gap: 10px; text-decoration: none; }
+    .logo-icon {
+      width: 36px; height: 36px; background: var(--teal); border-radius: 9px;
+      display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+      box-shadow: 0 0 12px rgba(14,165,197,0.45);
+    }
+    .logo-wordmark { font-family: 'DM Serif Display', serif; font-size: 1.45rem; color: var(--white); letter-spacing: -0.02em; line-height: 1; }
+    .logo-wordmark span { color: var(--teal); }
+    .nav-links { display: flex; list-style: none; gap: 2rem; align-items: center; }
+    .nav-links a { color: var(--muted); text-decoration: none; font-size: .9rem; transition: color .2s; }
+    .nav-links a:hover { color: var(--white); }
+    .nav-cta { background: var(--teal) !important; color: #fff !important; padding: .5rem 1.2rem; border-radius: 6px; font-weight: 500; transition: background .2s !important; }
+    .nav-cta:hover { background: var(--teal2) !important; }
+    .lang-switcher { display: flex; gap: .35rem; align-items: center; }
+    .lang-switch {
+      display: flex; align-items: center; justify-content: center;
+      width: 36px; height: 28px;
+      background: rgba(255,255,255,0.06); border: 1px solid var(--border);
+      border-radius: 6px; cursor: pointer;
+      transition: border-color .2s, background .2s, transform .15s;
+      padding: 0; overflow: hidden;
+    }
+    .lang-switch:hover { border-color: var(--teal); background: rgba(14,165,197,0.08); transform: scale(1.08); }
+    .lang-switch.active { border-color: var(--teal); background: rgba(14,165,197,0.15); }
+    .lang-switch svg { width: 24px; height: 16px; display: block; }
+
+    /* Mobile lang bar — fixed bottom */
+    .mobile-lang-bar {
+      display: none;
+      position: fixed; bottom: 0; left: 0; right: 0; z-index: 9998;
+      background: rgba(11,17,32,0.96);
+      border-top: 1px solid var(--border);
+      backdrop-filter: blur(12px);
+      justify-content: center; gap: .75rem;
+      padding: .6rem 1rem;
+    }
+    .mobile-lang-btn {
+      display: flex; align-items: center; gap: .5rem;
+      background: rgba(255,255,255,0.06); border: 1px solid var(--border);
+      border-radius: 8px; padding: .4rem .9rem;
+      cursor: pointer; color: var(--muted);
+      font-family: inherit; font-size: .82rem; font-weight: 600;
+      transition: border-color .2s, color .2s, background .2s;
+    }
+    .mobile-lang-btn:hover { border-color: var(--teal); color: var(--white); }
+    .mobile-lang-btn.active { border-color: var(--teal); color: var(--white); background: rgba(14,165,197,0.15); }
+    .mobile-lang-btn svg { width: 22px; height: 15px; flex-shrink: 0; }
+
+    /* ── HERO ── */
+    .hero {
+      min-height: 100vh; display: flex; flex-direction: column;
+      align-items: center; justify-content: center; text-align: center;
+      padding: 9rem 2rem 5rem; position: relative; z-index: 1;
+      background: radial-gradient(ellipse 80% 50% at 50% 0%, rgba(14,165,197,0.12) 0%, transparent 70%);
+    }
+    .hero-badge {
+      display: inline-flex; align-items: center; gap: .5rem;
+      background: rgba(14,165,197,0.12); border: 1px solid var(--border);
+      color: var(--teal2); font-size: .78rem; font-weight: 500;
+      letter-spacing: .06em; text-transform: uppercase;
+      padding: .4rem 1rem; border-radius: 99px; margin-bottom: 2rem;
+    }
+    .hero-badge::before {
+      content: ''; width: 6px; height: 6px;
+      background: var(--teal2); border-radius: 50%;
+      animation: pulse-dot 2s infinite;
+    }
+    @keyframes pulse-dot { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.5;transform:scale(1.4)} }
+    .hero h1 {
+      font-family: 'DM Serif Display', serif;
+      font-size: clamp(2.4rem, 6vw, 4.2rem);
+      line-height: 1.12; letter-spacing: -0.02em;
+      max-width: 760px; margin-bottom: 1.5rem;
+    }
+    .hero h1 em { color: var(--teal2); font-style: italic; }
+    .hero > p { font-size: clamp(1rem, 2vw, 1.15rem); color: var(--muted); max-width: 580px; margin-bottom: 2.5rem; }
+    .hero-actions { display: flex; gap: 1rem; flex-wrap: wrap; justify-content: center; margin-bottom: 4rem; }
+    .btn-primary {
+      display: inline-flex; align-items: center; gap: .5rem;
+      background: var(--teal); color: #fff;
+      padding: .85rem 1.8rem; border-radius: 8px;
+      text-decoration: none; font-weight: 600; font-size: .95rem;
+      transition: background .2s, transform .15s, box-shadow .2s;
+      box-shadow: 0 0 24px rgba(14,165,197,0.3);
+    }
+    .btn-primary:hover { background: var(--teal2); transform: translateY(-1px); box-shadow: 0 4px 32px rgba(14,165,197,0.45); }
+    .btn-secondary {
+      display: inline-flex; align-items: center; gap: .5rem;
+      background: transparent; color: var(--white);
+      padding: .85rem 1.8rem; border-radius: 8px;
+      border: 1px solid var(--border); text-decoration: none; font-size: .95rem;
+      transition: border-color .2s, background .2s;
+    }
+    .btn-secondary:hover { border-color: var(--teal); background: rgba(14,165,197,0.07); }
+
+    /* phone mockup */
+    .mockup-wrapper { position: relative; display: inline-block; margin-top: 1rem; }
+    .phone {
+      width: 260px; border-radius: 32px; background: var(--card-bg);
+      border: 1.5px solid var(--border); padding: 1.5rem 1.25rem;
+      box-shadow: 0 20px 80px rgba(0,0,0,0.6), 0 0 0 1px rgba(255,255,255,0.04);
+      text-align: left;
+    }
+    .phone-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem; padding-bottom: .75rem; border-bottom: 1px solid var(--border); }
+    .phone-header-logo { display: inline-flex; align-items: center; gap: 7px; }
+    .phone-logo-icon { width: 22px; height: 22px; background: var(--teal); border-radius: 5px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .phone-logo-text { font-family: 'DM Serif Display', serif; font-size: .9rem; color: var(--white); letter-spacing: -0.02em; }
+    .phone-logo-text span { color: var(--teal); }
+    .phone-tag { background: rgba(14,165,197,0.15); color: var(--teal2); font-family: 'DM Sans', sans-serif; font-size: .68rem; font-weight: 600; letter-spacing: .05em; padding: .2rem .6rem; border-radius: 99px; }
+    .phone-note { background: rgba(255,255,255,0.03); border: 1px solid var(--border); border-radius: 10px; padding: .75rem; font-size: .75rem; color: var(--muted); margin-bottom: .6rem; line-height: 1.55; }
+    .phone-note strong { color: var(--white); font-size: .7rem; text-transform: uppercase; letter-spacing: .05em; display: block; margin-bottom: .3rem; }
+    .phone-score { display: flex; align-items: center; justify-content: space-between; background: rgba(240,192,96,0.07); border: 1px solid rgba(240,192,96,0.2); border-radius: 10px; padding: .65rem .75rem; font-size: .72rem; }
+    .phone-score span:first-child { color: var(--gold); font-weight: 600; }
+    .phone-score span:last-child { color: var(--muted); }
+
+    /* ── SECTIONS ── */
+    section { position: relative; }
+    .section-inner { max-width: 1100px; margin: 0 auto; padding: 6rem 2rem; }
+    .section-label { font-size: .72rem; font-weight: 600; letter-spacing: .12em; text-transform: uppercase; color: var(--teal); margin-bottom: 1rem; display: block; }
+    .section-title { font-family: 'DM Serif Display', serif; font-size: clamp(1.8rem, 4vw, 2.8rem); letter-spacing: -0.02em; line-height: 1.15; margin-bottom: 1rem; }
+    .section-sub { color: var(--muted); max-width: 560px; font-size: 1.05rem; margin-bottom: 3.5rem; }
+
+    /* ── FEATURES ── */
+    #features { background: var(--navy2); }
+    .features-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px,1fr)); gap: 1.5rem; }
+    .feature-card { background: var(--card-bg); border: 1px solid var(--border); border-radius: 16px; padding: 1.75rem; transition: border-color .25s, transform .25s, box-shadow .25s; }
+    .feature-card:hover { border-color: var(--teal); transform: translateY(-3px); box-shadow: 0 8px 32px rgba(0,0,0,0.3); }
+    .feature-icon { width: 44px; height: 44px; background: rgba(14,165,197,0.1); border-radius: 10px; display: flex; align-items: center; justify-content: center; margin-bottom: 1.1rem; font-size: 1.3rem; }
+    .feature-card h3 { font-size: 1.05rem; font-weight: 600; margin-bottom: .5rem; }
+    .feature-card p { font-size: .875rem; color: var(--muted); line-height: 1.6; }
+
+    /* ── HOW ── */
+    .steps { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px,1fr)); gap: 2rem; }
+    .step { text-align: center; }
+    .step-num { width: 52px; height: 52px; border-radius: 50%; background: rgba(14,165,197,0.1); border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; font-family: 'DM Serif Display', serif; font-size: 1.4rem; color: var(--teal2); margin: 0 auto 1.25rem; }
+    .step h3 { font-size: 1rem; font-weight: 600; margin-bottom: .5rem; }
+    .step p { font-size: .875rem; color: var(--muted); }
+
+    /* ── AUDIENCE ── */
+    #audience { background: var(--navy2); }
+    .audience-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px,1fr)); gap: 1rem; }
+    .audience-card { background: var(--card-bg); border: 1px solid var(--border); border-radius: 12px; padding: 1.25rem; text-align: center; transition: border-color .2s; }
+    .audience-card:hover { border-color: rgba(14,165,197,0.4); }
+    .audience-card .icon { font-size: 1.8rem; margin-bottom: .6rem; }
+    .audience-card h4 { font-size: .9rem; font-weight: 600; margin-bottom: .25rem; }
+    .audience-card p { font-size: .78rem; color: var(--muted); }
+
+    /* ── ABOUT ── */
+    #about { background: linear-gradient(135deg, var(--navy3) 0%, var(--navy) 100%); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); }
+    .about-inner { max-width: 900px; margin: 0 auto; padding: 6rem 2rem; display: grid; grid-template-columns: auto 1fr; gap: 4rem; align-items: center; }
+    .about-avatar { width: 120px; height: 120px; border-radius: 50%; background: linear-gradient(135deg, var(--teal) 0%, var(--navy3) 100%); border: 2px solid var(--border); display: flex; align-items: center; justify-content: center; font-family: 'DM Serif Display', serif; font-size: 2.8rem; color: #fff; flex-shrink: 0; box-shadow: 0 0 40px rgba(14,165,197,0.2); }
+    .about-content .section-label { margin-bottom: .75rem; }
+    .about-content h2 { font-family: 'DM Serif Display', serif; font-size: clamp(1.5rem, 3vw, 2.2rem); letter-spacing: -0.02em; margin-bottom: 1rem; }
+    .about-content p { color: var(--muted); font-size: .975rem; line-height: 1.75; margin-bottom: .75rem; }
+    .about-content p strong { color: var(--white); }
+    .credentials { display: flex; flex-wrap: wrap; gap: .5rem; margin-top: 1.25rem; }
+    .credential { background: rgba(14,165,197,0.1); border: 1px solid var(--border); color: var(--teal2); font-size: .75rem; font-weight: 500; padding: .3rem .85rem; border-radius: 99px; }
+
+    /* ── COMMUNITY ── */
+    #community { background: var(--navy); position: relative; overflow: hidden; }
+    #community::before { content: ''; position: absolute; inset: 0; background: radial-gradient(ellipse 70% 60% at 50% 50%, rgba(240,192,96,0.06) 0%, transparent 70%); pointer-events: none; }
+    .community-inner { max-width: 1100px; margin: 0 auto; padding: 7rem 2rem; }
+    .community-header { max-width: 680px; margin-bottom: 4rem; }
+    .community-label { color: var(--gold) !important; }
+    .community-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; align-items: start; }
+    .community-left { display: flex; flex-direction: column; gap: 1.25rem; }
+    .community-card { background: var(--card-bg); border: 1px solid var(--border); border-radius: 16px; padding: 1.75rem; transition: border-color .25s, transform .2s; }
+    .community-card:hover { border-color: rgba(240,192,96,0.3); transform: translateY(-2px); }
+    .community-card .c-icon { width: 40px; height: 40px; background: rgba(240,192,96,0.1); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; margin-bottom: 1rem; }
+    .community-card h3 { font-size: 1rem; font-weight: 600; margin-bottom: .4rem; }
+    .community-card p { font-size: .875rem; color: var(--muted); line-height: 1.65; }
+    .community-visual { background: var(--card-bg); border: 1px solid rgba(240,192,96,0.2); border-radius: 20px; padding: 2rem; position: sticky; top: 6rem; }
+    .cv-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.5rem; padding-bottom: 1rem; border-bottom: 1px solid var(--border); }
+    .cv-title { font-family: 'DM Serif Display', serif; font-size: 1rem; }
+    .cv-badge { background: rgba(240,192,96,0.12); color: var(--gold); font-size: .68rem; font-weight: 600; letter-spacing: .05em; padding: .25rem .7rem; border-radius: 99px; }
+    .cv-result { background: rgba(255,255,255,0.03); border: 1px solid var(--border); border-radius: 12px; padding: 1rem 1.1rem; margin-bottom: .75rem; transition: border-color .2s; }
+    .cv-result:hover { border-color: rgba(240,192,96,0.25); }
+    .cv-result-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: .35rem; }
+    .cv-result-spec { font-size: .72rem; font-weight: 600; color: var(--teal2); text-transform: uppercase; letter-spacing: .05em; }
+    .cv-result-tag { font-size: .68rem; color: var(--muted); background: rgba(255,255,255,0.05); border-radius: 4px; padding: .15rem .5rem; }
+    .cv-result p { font-size: .8rem; color: var(--muted); line-height: 1.55; }
+    .cv-result-contact { display: inline-flex; align-items: center; gap: .35rem; margin-top: .6rem; font-size: .72rem; color: var(--teal); cursor: pointer; opacity: .7; transition: opacity .2s; }
+    .cv-result-contact:hover { opacity: 1; }
+    .cv-searchbar { display: flex; gap: .6rem; margin-bottom: 1.25rem; }
+    .cv-searchbar input { flex: 1; background: rgba(255,255,255,0.05); border: 1px solid var(--border); color: var(--muted); border-radius: 8px; padding: .55rem .9rem; font-family: inherit; font-size: .8rem; outline: none; }
+    .cv-searchbar button { background: rgba(14,165,197,0.15); color: var(--teal2); border: 1px solid rgba(14,165,197,0.3); border-radius: 8px; padding: .55rem .9rem; cursor: pointer; font-size: .8rem; font-family: inherit; transition: background .2s; }
+    .cv-searchbar button:hover { background: rgba(14,165,197,0.25); }
+    .cv-stat { text-align: center; padding-top: 1rem; border-top: 1px solid var(--border); font-size: .75rem; color: var(--muted); }
+    .cv-stat strong { color: var(--gold); font-size: 1.1rem; display: block; margin-bottom: .2rem; }
+    .evidence-note { margin-top: 3rem; padding: 1.25rem 1.5rem; background: rgba(240,192,96,0.05); border: 1px solid rgba(240,192,96,0.15); border-radius: 12px; display: flex; gap: 1rem; align-items: flex-start; }
+    .evidence-note .en-icon { font-size: 1.3rem; flex-shrink: 0; margin-top: .1rem; }
+    .evidence-note p { font-size: .85rem; color: var(--muted); line-height: 1.65; }
+    .evidence-note strong { color: var(--gold); }
+
+    /* ── WAITLIST ── */
+    #waitlist { background: radial-gradient(ellipse 60% 80% at 50% 100%, rgba(14,165,197,0.1) 0%, transparent 70%); }
+    .waitlist-inner { max-width: 600px; margin: 0 auto; padding: 6rem 2rem; text-align: center; }
+    .waitlist-inner .section-title { margin-bottom: .75rem; }
+    .waitlist-inner .section-sub { margin: 0 auto 2.5rem; }
+    .waitlist-form { display: flex; gap: .75rem; flex-wrap: wrap; justify-content: center; }
+    .waitlist-form input { flex: 1; min-width: 220px; background: var(--card-bg); border: 1px solid var(--border); color: var(--white); border-radius: 8px; padding: .85rem 1.1rem; font-family: inherit; font-size: .95rem; outline: none; transition: border-color .2s; }
+    .waitlist-form input:focus { border-color: var(--teal); }
+    .waitlist-form input::placeholder { color: var(--muted); }
+    .waitlist-form button { background: var(--teal); color: #fff; border: none; border-radius: 8px; padding: .85rem 1.6rem; cursor: pointer; font-family: inherit; font-size: .95rem; font-weight: 600; transition: background .2s, transform .15s; white-space: nowrap; }
+    .waitlist-form button:hover { background: var(--teal2); transform: translateY(-1px); }
+    .waitlist-form button:disabled { opacity: .6; cursor: not-allowed; transform: none; }
+    .waitlist-message { margin-top: 1rem; font-size: .875rem; min-height: 1.5rem; transition: opacity .3s; }
+    .waitlist-message.success { color: var(--success); }
+    .waitlist-message.error { color: var(--error); }
+    .waitlist-note { margin-top: .75rem; font-size: .78rem; color: var(--muted); }
+    .store-badges { display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; margin-top: 2.5rem; }
+    .store-badge { display: flex; align-items: center; gap: .65rem; background: var(--card-bg); border: 1px solid var(--border); border-radius: 10px; padding: .65rem 1.2rem; text-decoration: none; color: var(--white); transition: border-color .2s, transform .15s; opacity: .6; }
+    .store-badge:hover { border-color: var(--teal); transform: translateY(-1px); opacity: .85; }
+    .store-badge svg { flex-shrink: 0; }
+    .store-badge-text { text-align: left; }
+    .store-badge-text small { display: block; font-size: .65rem; color: var(--muted); text-transform: uppercase; letter-spacing: .05em; }
+    .store-badge-text span { font-size: .9rem; font-weight: 600; }
+    .store-coming { font-size: .72rem; color: var(--muted); margin-top: .5rem; }
+
+    /* ── CONTACT ── */
+    #contact { background: var(--navy2); }
+    .contact-inner { max-width: 700px; margin: 0 auto; padding: 5rem 2rem; text-align: center; }
+    .contact-inner .section-title { margin-bottom: .75rem; }
+    .contact-inner p { color: var(--muted); margin-bottom: 2rem; }
+    .contact-link { display: inline-flex; align-items: center; gap: .6rem; color: var(--teal2); font-size: 1.05rem; font-weight: 500; text-decoration: none; border-bottom: 1px solid rgba(56,189,248,0.3); padding-bottom: 2px; transition: border-color .2s, color .2s; }
+    .contact-link:hover { border-color: var(--teal2); color: var(--white); }
+
+    /* ── FOOTER ── */
+    footer { background: var(--navy2); border-top: 1px solid var(--border); padding: 2.5rem 2rem; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem; }
+    .footer-logo { display: inline-flex; align-items: center; gap: 10px; text-decoration: none; }
+    .footer-logo-wordmark { font-family: 'DM Serif Display', serif; font-size: 1.25rem; color: var(--white); letter-spacing: -0.02em; }
+    .footer-logo-wordmark span { color: var(--teal); }
+    .footer-links { display: flex; gap: 1.5rem; }
+    .footer-links a { color: var(--muted); font-size: .82rem; text-decoration: none; transition: color .2s; }
+    .footer-links a:hover { color: var(--white); }
+    footer p { font-size: .78rem; color: var(--muted); }
+
+    .divider { width: 100%; height: 1px; background: linear-gradient(90deg, transparent, var(--border), transparent); }
+    .reveal { opacity: 0; transform: translateY(28px); transition: opacity .7s ease, transform .7s ease; }
+    .reveal.visible { opacity: 1; transform: none; }
+
+    /* ── LOGIN KNAP I NAV ── */
+    .nav-login {
+      background: transparent; color: var(--muted);
+      border: 1px solid var(--border); border-radius: 6px;
+      padding: .45rem 1rem; cursor: pointer;
+      font-family: inherit; font-size: .9rem; font-weight: 500;
+      transition: color .2s, border-color .2s, background .2s;
+    }
+    .nav-login:hover { color: var(--white); border-color: var(--teal); background: rgba(14,165,197,0.07); }
+
+    /* ── LOGIN MODAL ── */
+    #login-overlay {
+      display: none; position: fixed; inset: 0; z-index: 2000;
+      background: rgba(7,12,24,0.85); backdrop-filter: blur(8px);
+      align-items: center; justify-content: center;
+    }
+    #login-overlay.open { display: flex; }
+    .login-modal {
+      background: var(--navy2); border: 1px solid var(--border);
+      border-radius: 20px; padding: 2.5rem; width: 100%; max-width: 420px;
+      box-shadow: 0 24px 80px rgba(0,0,0,0.6);
+      position: relative;
+    }
+    .login-modal h2 {
+      font-family: 'DM Serif Display', serif; font-size: 1.7rem;
+      letter-spacing: -0.02em; margin-bottom: .4rem;
+    }
+    .login-modal .login-sub { font-size: .875rem; color: var(--muted); margin-bottom: 1.75rem; }
+    .login-close {
+      position: absolute; top: 1.1rem; right: 1.1rem;
+      background: rgba(255,255,255,0.06); border: 1px solid var(--border);
+      color: var(--muted); width: 32px; height: 32px; border-radius: 8px;
+      cursor: pointer; font-size: 1.1rem; display: flex; align-items: center; justify-content: center;
+      transition: color .2s, border-color .2s;
+    }
+    .login-close:hover { color: var(--white); border-color: var(--muted); }
+    .login-field { display: flex; flex-direction: column; gap: .45rem; margin-bottom: 1rem; }
+    .login-field label { font-size: .8rem; font-weight: 500; color: var(--muted); letter-spacing: .04em; }
+    .login-field input {
+      background: var(--card-bg); border: 1px solid var(--border);
+      color: var(--white); border-radius: 8px; padding: .8rem 1rem;
+      font-family: inherit; font-size: .95rem; outline: none; transition: border-color .2s;
+    }
+    .login-field input:focus { border-color: var(--teal); }
+    .login-btn {
+      width: 100%; background: var(--teal); color: #fff; border: none;
+      border-radius: 8px; padding: .9rem; cursor: pointer;
+      font-family: inherit; font-size: .95rem; font-weight: 600;
+      transition: background .2s, transform .15s; margin-top: .5rem;
+    }
+    .login-btn:hover { background: var(--teal2); transform: translateY(-1px); }
+    .login-btn:disabled { opacity: .6; cursor: not-allowed; transform: none; }
+    .login-msg { margin-top: .85rem; font-size: .845rem; min-height: 1.2rem; text-align: center; }
+    .login-msg.error { color: var(--error); }
+    .login-msg.success { color: var(--success); }
+    .login-toggle { text-align: center; margin-top: 1.2rem; font-size: .845rem; color: var(--muted); }
+    .login-toggle button {
+      background: none; border: none; color: var(--teal2); cursor: pointer;
+      font-family: inherit; font-size: inherit; text-decoration: underline;
+    }
+    .login-divider { height: 1px; background: var(--border); margin: 1.5rem 0; }
+
+    /* ── PORTAL ── */
+    #portal {
+      display: none; min-height: 100vh;
+      background: var(--navy);
+      padding-top: 72px; /* nav height */
+    }
+    #portal.open { display: block; }
+    .portal-nav-user {
+      display: flex; align-items: center; gap: .75rem;
+    }
+    .portal-nav-email { font-size: .82rem; color: var(--muted); }
+    .portal-logout {
+      background: transparent; color: var(--muted);
+      border: 1px solid var(--border); border-radius: 6px;
+      padding: .4rem .9rem; cursor: pointer;
+      font-family: inherit; font-size: .82rem;
+      transition: color .2s, border-color .2s;
+    }
+    .portal-logout:hover { color: var(--white); border-color: var(--muted); }
+    .portal-inner { max-width: 900px; margin: 0 auto; padding: 3rem 2rem; }
+    .portal-header { margin-bottom: 2.5rem; }
+    .portal-header h1 {
+      font-family: 'DM Serif Display', serif;
+      font-size: clamp(1.8rem, 4vw, 2.6rem); letter-spacing: -0.02em; margin-bottom: .4rem;
+    }
+    .portal-header p { color: var(--muted); font-size: .975rem; }
+    .portal-empty {
+      background: var(--card-bg); border: 1px dashed var(--border);
+      border-radius: 16px; padding: 4rem 2rem; text-align: center;
+    }
+    .portal-empty .empty-icon { font-size: 2.5rem; margin-bottom: 1rem; }
+    .portal-empty p { color: var(--muted); font-size: .95rem; }
+    .note-card {
+      background: var(--card-bg); border: 1px solid var(--border);
+      border-radius: 14px; padding: 1.5rem; margin-bottom: 1rem;
+      transition: border-color .2s;
+    }
+    .note-card:hover { border-color: var(--teal); }
+    .note-card-header { display: flex; align-items: flex-start; justify-content: space-between; gap: 1rem; margin-bottom: .75rem; }
+    .note-card-title { font-weight: 600; font-size: 1rem; }
+    .note-card-meta { font-size: .78rem; color: var(--muted); white-space: nowrap; }
+    .note-card-category {
+      display: inline-block; background: rgba(14,165,197,0.1);
+      border: 1px solid var(--border); color: var(--teal2);
+      font-size: .72rem; font-weight: 500; padding: .2rem .7rem;
+      border-radius: 99px; margin-bottom: .75rem;
+    }
+    .note-card-content { font-size: .875rem; color: var(--muted); line-height: 1.65; }
+    .note-card { cursor: pointer; }
+
+    /* ── PORTAL SØGNING + FILTER ── */
+    .portal-toolbar {
+      display: flex; flex-direction: column; gap: .75rem; margin-bottom: 1.5rem;
+    }
+    .portal-search-wrap { position: relative; }
+    .portal-search {
+      width: 100%; background: var(--card-bg); border: 1px solid var(--border);
+      color: var(--white); border-radius: 10px; padding: .75rem 1rem .75rem 2.6rem;
+      font-family: inherit; font-size: .95rem; outline: none; transition: border-color .2s;
+    }
+    .portal-search:focus { border-color: var(--teal); }
+    .portal-search::placeholder { color: var(--muted); }
+    .portal-search-icon {
+      position: absolute; left: .85rem; top: 50%; transform: translateY(-50%);
+      color: var(--muted); pointer-events: none; font-size: 1rem;
+    }
+    .portal-cats { display: flex; gap: .5rem; flex-wrap: wrap; }
+    .portal-cat {
+      background: transparent; border: 1px solid var(--border); color: var(--muted);
+      border-radius: 99px; padding: .35rem .9rem; cursor: pointer;
+      font-family: inherit; font-size: .8rem; font-weight: 500;
+      transition: color .2s, border-color .2s, background .2s;
+    }
+    .portal-cat:hover { color: var(--white); border-color: var(--teal); }
+    .portal-cat.active {
+      background: rgba(14,165,197,0.15); border-color: var(--teal); color: var(--teal2);
+    }
+
+    /* ── NOTE DETAIL VIEW ── */
+    #portal-detail { display: none; height: calc(100vh - 72px); flex-direction: column; }
+    #portal-detail.open { display: flex; }
+    .detail-topbar {
+      display: flex; align-items: center; gap: 1rem;
+      padding: 1rem 2rem; border-bottom: 1px solid var(--border);
+      background: var(--navy2); flex-shrink: 0;
+    }
+    .detail-back {
+      background: transparent; border: 1px solid var(--border); color: var(--muted);
+      border-radius: 8px; padding: .45rem .9rem; cursor: pointer;
+      font-family: inherit; font-size: .85rem; transition: color .2s, border-color .2s;
+      white-space: nowrap;
+    }
+    .detail-back:hover { color: var(--white); border-color: var(--muted); }
+    .detail-title-input {
+      flex: 1; background: transparent; border: none; color: var(--white);
+      font-family: 'DM Serif Display', serif; font-size: 1.2rem;
+      outline: none; min-width: 0;
+    }
+    .detail-save-badge {
+      font-size: .75rem; color: var(--success); opacity: 0;
+      transition: opacity .4s; white-space: nowrap;
+    }
+    .detail-save-badge.show { opacity: 1; }
+    .detail-save-badge.persistent { opacity: 1; }
+    .struct-section { margin-bottom: 1rem; }
+    .struct-label {
+      font-size: .72rem; font-weight: 600; letter-spacing: .08em;
+      text-transform: uppercase; color: var(--teal); margin-bottom: .35rem;
+    }
+    .struct-textarea {
+      width: 100%; background: transparent;
+      border: none; border-bottom: 1px solid transparent;
+      color: var(--white); font-family: inherit;
+      font-size: .9rem; line-height: 1.75; padding: .2rem 0 .4rem;
+      resize: none; outline: none; overflow: hidden;
+      transition: border-color .2s;
+    }
+    .struct-textarea:focus { border-bottom-color: var(--teal); background: rgba(14,165,197,0.04); padding: .2rem .4rem .4rem; border-radius: 4px; }
+    .struct-section { margin-bottom: 1.25rem; }
+    .detail-editor-wrap {
+      flex: 2; overflow-y: auto; padding: 1.5rem 2rem;
+      border-bottom: 1px solid var(--border);
+    }
+    .detail-textarea {
+      width: 100%; min-height: 100%;
+      background: transparent; border: none; color: var(--white);
+      font-family: inherit; font-size: .95rem; line-height: 1.75;
+      resize: none; outline: none; box-sizing: border-box;
+    }
+    .detail-refs-wrap {
+      flex: 1; overflow-y: auto; padding: 1.25rem 2rem;
+      background: var(--navy2);
+    }
+    .detail-refs-title {
+      font-size: .72rem; font-weight: 600; letter-spacing: .1em;
+      text-transform: uppercase; color: var(--teal); margin-bottom: 1rem;
+    }
+    .ref-item {
+      display: flex; align-items: flex-start; gap: .75rem;
+      padding: .75rem 0; border-bottom: 1px solid var(--border);
+    }
+    .ref-item:last-child { border-bottom: none; }
+    .ref-num {
+      width: 24px; height: 24px; background: rgba(14,165,197,0.1);
+      border: 1px solid var(--border); border-radius: 6px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: .72rem; color: var(--teal2); flex-shrink: 0; margin-top: 2px;
+    }
+    .ref-body { flex: 1; min-width: 0; }
+    .ref-title {
+      font-size: .875rem; font-weight: 500; color: var(--white);
+      text-decoration: none; line-height: 1.4; display: block; margin-bottom: .2rem;
+    }
+    .ref-title:hover { color: var(--teal2); }
+    .ref-meta { font-size: .75rem; color: var(--muted); }
+    .refs-loading { color: var(--muted); font-size: .875rem; }
+    @media (max-width: 768px) {
+      .detail-topbar { padding: .75rem 1rem; }
+      .detail-editor-wrap { padding: 1rem; }
+      .detail-refs-wrap { padding: 1rem; }
+    }
+
+    /* ── MOBIL NAV HØJRE ── */
+    .nav-mobile-right {
+      display: none;
+      align-items: center; gap: .4rem;
+    }
+    .nav-mobile-right .lang-switch {
+      width: 30px; height: 22px;
+    }
+    .nav-mobile-right .nav-login {
+      font-size: .78rem; padding: .35rem .75rem;
+      white-space: nowrap;
+    }
+
+    @media (max-width: 768px) {
+      nav { padding: 1rem 1.25rem; }
+      .nav-links { display: none; }
+      .nav-mobile-right { display: flex; }
+      .mobile-lang-bar { display: none; }
+      #cookie-banner { padding-bottom: 0; }
+      .hero { padding-top: 7rem; }
+      .section-inner, .waitlist-inner, .contact-inner { padding: 4rem 1.25rem; }
+      .about-inner { grid-template-columns: 1fr; text-align: center; gap: 2rem; }
+      .about-avatar { margin: 0 auto; }
+      .credentials { justify-content: center; }
+      .community-grid { grid-template-columns: 1fr; }
+      .community-visual { position: static; }
+      footer { flex-direction: column; text-align: center; }
+      .footer-links { justify-content: center; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ══ LOGIN MODAL ══ -->
+  <div id="login-overlay" role="dialog" aria-modal="true" aria-label="Log ind">
+    <div class="login-modal">
+      <button class="login-close" id="login-close-btn" aria-label="Luk">✕</button>
+      <h2 id="login-modal-title">Log ind</h2>
+      <p class="login-sub" id="login-modal-sub">Velkommen tilbage til ClinLog</p>
+      <div class="login-field">
+        <label for="login-email">E-mail</label>
+        <input type="email" id="login-email" placeholder="din@email.dk" autocomplete="email" />
+      </div>
+      <div class="login-field">
+        <label for="login-password">Adgangskode</label>
+        <input type="password" id="login-password" placeholder="••••••••" autocomplete="current-password" />
+      </div>
+      <button class="login-btn" id="login-submit-btn">Log ind</button>
+      <p class="login-msg" id="login-msg"></p>
+      <div class="login-divider"></div>
+      <p class="login-toggle">
+        Ingen konto? <button id="login-toggle-btn">Opret konto</button>
+      </p>
+    </div>
+  </div>
+
+  <!-- ══ PORTAL ══ -->
+  <div id="portal">
+
+    <!-- Note-liste visning -->
+    <div id="portal-list-view" class="portal-inner">
+      <div class="portal-header">
+        <h1 data-t="portal-notes-title">Mine noter</h1>
+      </div>
+      <div class="portal-toolbar">
+        <div class="portal-search-wrap">
+          <span class="portal-search-icon">🔍</span>
+          <input class="portal-search" id="portal-search" type="search" placeholder="Søg i noter…" data-t-placeholder="portal-search-ph" />
+        </div>
+        <div class="portal-cats" id="portal-cats">
+          <button class="portal-cat active" data-cat="">Alle</button>
+        </div>
+      </div>
+      <div class="portal-empty" id="portal-notes-loading">
+        <div class="empty-icon">⏳</div>
+        <p>Henter noter…</p>
+      </div>
+      <div class="portal-empty" id="portal-notes-empty" style="display:none">
+        <div class="empty-icon">📋</div>
+        <p>Du har endnu ingen noter synkroniseret fra appen.<br>Optag din første note i ClinLog-appen for at se den her.</p>
+      </div>
+      <div id="portal-notes-list" style="display:none"></div>
+    </div>
+
+    <!-- Note-detalje visning -->
+    <div id="portal-detail">
+      <div class="detail-topbar">
+        <button class="detail-back" id="detail-back-btn" data-t="portal-back">← Tilbage</button>
+        <input class="detail-title-input" id="detail-title" type="text" placeholder="Titel…" />
+        <span class="detail-save-badge" id="detail-save-badge">Gemt ✓</span>
+      </div>
+      <div class="detail-editor-wrap">
+        <textarea class="detail-textarea" id="detail-textarea" placeholder="Noteindhold…"></textarea>
+      </div>
+      <div class="detail-refs-wrap">
+        <div class="detail-refs-title" data-t="portal-refs-title">Referencer</div>
+        <div id="detail-refs-content"><p class="refs-loading">Henter referencer…</p></div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ══ COOKIE BANNER ══ -->
+  <div id="cookie-banner">
+    <p class="cookie-text" data-t="cookie-text">
+      Vi bruger tekniske cookies for at siden virker korrekt. Vi indsamler ingen sporingsdata og sælger ikke dine oplysninger.
+      <a href="#contact">Læs mere</a>.
+    </p>
+    <div class="cookie-buttons">
+      <button class="cookie-decline" id="cookie-decline" data-t="cookie-decline">Afvis ikke-nødvendige</button>
+      <button class="cookie-accept" id="cookie-accept" data-t="cookie-accept">Acceptér</button>
+    </div>
+  </div>
+
+  <!-- ══ NAV ══ -->
+  <nav>
+    <a href="#" class="nav-logo">
+      <div class="logo-icon">
+        <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
+          <polyline points="1,11 5,11 7,11 8.5,5 10.5,17 12.5,9 14,11 17,11 21,11"
+            stroke="#ffffff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+      <span class="logo-wordmark">Clin<span>Log</span></span>
+    </a>
+    <ul class="nav-links">
+      <li><a href="#features" data-t="nav-features">Funktioner</a></li>
+      <li><a href="#how" data-t="nav-how">Sådan virker det</a></li>
+      <li><a href="#about" data-t="nav-about">Om Clinlog</a></li>
+      <li><a href="#contact" data-t="nav-contact">Kontakt</a></li>
+      <li><a href="#waitlist" class="nav-cta" data-t="nav-waitlist">Tilmeld venteliste</a></li>
+      <li id="nav-login-item"><button class="nav-login" id="nav-login-btn">Log ind</button></li>
+      <li id="nav-user-item" style="display:none">
+        <div class="portal-nav-user">
+          <span class="portal-nav-email" id="nav-user-email"></span>
+          <button class="portal-logout" id="nav-logout-btn">Log ud</button>
+        </div>
+      </li>
+      <li>
+        <div class="lang-switcher">
+          <button class="lang-switch active" id="lang-da" onclick="setLang('da')" title="Dansk">
+            <!-- Dannebrog -->
+            <svg viewBox="0 0 22 15" xmlns="http://www.w3.org/2000/svg">
+              <rect width="22" height="15" fill="#C60C30"/>
+              <rect x="6" width="3" height="15" fill="#fff"/>
+              <rect y="6" width="22" height="3" fill="#fff"/>
+            </svg>
+          </button>
+          <button class="lang-switch" id="lang-en" onclick="setLang('en')" title="English">
+            <!-- Union Jack -->
+            <svg viewBox="0 0 22 15" xmlns="http://www.w3.org/2000/svg">
+              <rect width="22" height="15" fill="#012169"/>
+              <path d="M0,0 L22,15 M22,0 L0,15" stroke="#fff" stroke-width="3"/>
+              <path d="M0,0 L22,15 M22,0 L0,15" stroke="#C8102E" stroke-width="1.5"/>
+              <path d="M11,0 V15 M0,7.5 H22" stroke="#fff" stroke-width="4"/>
+              <path d="M11,0 V15 M0,7.5 H22" stroke="#C8102E" stroke-width="2.5"/>
+            </svg>
+          </button>
+          <button class="lang-switch" id="lang-de" onclick="setLang('de')" title="Deutsch">
+            <!-- Tysklands flag -->
+            <svg viewBox="0 0 22 15" xmlns="http://www.w3.org/2000/svg">
+              <rect width="22" height="5" fill="#000"/>
+              <rect y="5" width="22" height="5" fill="#D00"/>
+              <rect y="10" width="22" height="5" fill="#FFCE00"/>
+            </svg>
+          </button>
+        </div>
+      </li>
+    </ul>
+
+    <!-- Mobil: flag + login (kun synlig på mobil) -->
+    <div class="nav-mobile-right">
+      <button class="lang-switch active" id="mlang2-da" onclick="setLang('da')" title="Dansk">
+        <svg viewBox="0 0 22 15" xmlns="http://www.w3.org/2000/svg">
+          <rect width="22" height="15" fill="#C60C30"/>
+          <rect x="6" width="3" height="15" fill="#fff"/>
+          <rect y="6" width="22" height="3" fill="#fff"/>
+        </svg>
+      </button>
+      <button class="lang-switch" id="mlang2-en" onclick="setLang('en')" title="English">
+        <svg viewBox="0 0 22 15" xmlns="http://www.w3.org/2000/svg">
+          <rect width="22" height="15" fill="#012169"/>
+          <path d="M0,0 L22,15 M22,0 L0,15" stroke="#fff" stroke-width="3"/>
+          <path d="M0,0 L22,15 M22,0 L0,15" stroke="#C8102E" stroke-width="1.5"/>
+          <path d="M11,0 V15 M0,7.5 H22" stroke="#fff" stroke-width="4"/>
+          <path d="M11,0 V15 M0,7.5 H22" stroke="#C8102E" stroke-width="2.5"/>
+        </svg>
+      </button>
+      <button class="lang-switch" id="mlang2-de" onclick="setLang('de')" title="Deutsch">
+        <svg viewBox="0 0 22 15" xmlns="http://www.w3.org/2000/svg">
+          <rect width="22" height="5" fill="#000"/>
+          <rect y="5" width="22" height="5" fill="#D00"/>
+          <rect y="10" width="22" height="5" fill="#FFCE00"/>
+        </svg>
+      </button>
+      <button class="nav-login" id="nav-login-btn-mobile" style="font-size:.8rem; padding:.4rem .85rem;">Log ind</button>
+      <div id="nav-user-item-mobile" style="display:none; align-items:center; gap:.4rem;">
+        <button class="portal-logout" id="nav-logout-btn-mobile" style="font-size:.78rem; padding:.35rem .7rem;">Log ud</button>
+      </div>
+    </div>
+  </nav>
+
+  <!-- ══ LANDING CONTENT (skjules når bruger er logget ind) ══ -->
+  <div id="landing-content">
+
+  <!-- ══ HERO ══ -->
+  <section class="hero">
+    <div class="hero-badge" data-t="hero-badge">Kommer snart · Beta 2026</div>
+    <h1 data-t="hero-h1">Din kliniske <em>læringsdagbog</em></h1>
+    <p data-t="hero-p">Clinlog hjælper læger, sygeplejersker, studerende og andre sundhedspersoner med at dokumentere, reflektere og lære fra kliniske oplevelser — diktér med medicinsk talegenkendelse, struktureret af AI, specialitetsspecifik og GDPR-sikker.</p>
+    <div class="hero-actions">
+      <a href="#waitlist" class="btn-primary">
+        <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path d="M12 5v14M5 12l7 7 7-7"/></svg>
+        <span data-t="hero-cta">Tilmeld venteliste</span>
+      </a>
+      <a href="#features" class="btn-secondary" data-t="hero-cta2">Se funktioner →</a>
+    </div>
+
+    <div class="mockup-wrapper">
+      <div class="phone">
+        <div class="phone-header">
+          <div class="phone-header-logo">
+            <div class="phone-logo-icon">
+              <svg width="13" height="13" viewBox="0 0 22 22" fill="none">
+                <polyline points="1,11 5,11 7,11 8.5,5 10.5,17 12.5,9 14,11 17,11 21,11"
+                  stroke="#ffffff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </div>
+            <span class="phone-logo-text">Clin<span>Log</span></span>
+          </div>
+          <div class="phone-tag" data-t="phone-tag">Anæstesi</div>
+        </div>
+        <div class="phone-note"><strong data-t="phone-note1-label">Patientcase</strong><span data-t="phone-note1-text">67-årig mand, ASA III. Laparoskopisk colektomi. Epidural + GA, RSI pga. tidl. aspiration…</span></div>
+        <div class="phone-note"><strong data-t="phone-note2-label">Faglig læring</strong><span data-t="phone-note2-text">Sugammadex vs. neostigmin — valgte sugammadex pga. TOF-ratio &lt; 0.9. Korrekt beslutning.</span></div>
+        <div class="phone-score">
+          <span>CUSUM +1.0</span>
+          <span data-t="phone-epa">EPA Niveau 3</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══ FEATURES ══ -->
+  <section id="features">
+    <div class="section-inner">
+      <span class="section-label reveal" data-t="feat-label">Funktioner</span>
+      <h2 class="section-title reveal" data-t="feat-h2">Alt hvad du har brug for<br>til klinisk refleksion</h2>
+      <p class="section-sub reveal" data-t="feat-sub">Designet af en praktiserende anæstesiolog — til alle specialer.</p>
+      <div class="features-grid">
+        <div class="feature-card reveal" style="border-color:rgba(14,165,197,0.4);background:linear-gradient(135deg,#131e30 0%,#0f1e2e 100%)">
+          <div class="feature-icon" style="background:rgba(14,165,197,0.18)">🎙️</div>
+          <h3 data-t="feat1-h">Medicinsk taleindtastning</h3>
+          <p data-t="feat1-p">Diktér dine noter direkte under eller efter klinisk arbejde — avanceret talegenkendelse med fuldt kendskab til medicinsk fagterminologi. Clinlog forstår "sugammadex", "laryngoskopi" og "CUSUM" uden stavefejl.</p>
+        </div>
+        <div class="feature-card reveal">
+          <div class="feature-icon">🧠</div>
+          <h3 data-t="feat2-h">AI-strukturerede noter</h3>
+          <p data-t="feat2-p">Skriv eller diktér frit — AI'en organiserer automatisk din tekst i klinisk relevante sektioner: patientcase, forløb, læring og refleksion.</p>
+        </div>
+        <div class="feature-card reveal">
+          <div class="feature-icon">📊</div>
+          <h3 data-t="feat3-h">CUSUM & EPA-scoring</h3>
+          <p data-t="feat3-p">Automatisk kompetencevurdering baseret på officielle danske standarder fra Sundhedsstyrelsen og specialeselskaberne.</p>
+        </div>
+        <div class="feature-card reveal">
+          <div class="feature-icon">🔒</div>
+          <h3 data-t="feat4-h">GDPR-sikker anonymisering</h3>
+          <p data-t="feat4-p">Brugeren gøres opmærksom på at der ikke må videregives personhenførbare data — hverken via tekst, stemme eller billedmateriale. Avancerede algoritmer sikrer desuden at eventuelle personhenførbare data automatisk erstattes direkte på din enhed, <em>inden</em> noget gemmes eller sendes til AI. Intet forlader din enhed uden at være fuldt anonymiseret.</p>
+        </div>
+        <div class="feature-card reveal">
+          <div class="feature-icon">📈</div>
+          <h3 data-t="feat5-h">Læringsanalyse</h3>
+          <p data-t="feat5-p">Følg din faglige udvikling over tid. Se mønstre i dine kompetencer, identificér styrker og udviklingsområder på tværs af vagter.</p>
+        </div>
+        <div class="feature-card reveal">
+          <div class="feature-icon">📄</div>
+          <h3 data-t="feat6-h">PDF & DOCX-eksport</h3>
+          <p data-t="feat6-p">Eksportér dine noter og læringsrapporter til din uddannelsesportfolio, vejleder eller logbog med ét tryk.</p>
+        </div>
+        <div class="feature-card reveal">
+          <div class="feature-icon">⚕️</div>
+          <h3 data-t="feat7-h">Alle specialer i DK og Norden</h3>
+          <p data-t="feat7-p">Fuld dansk og nordisk sprogunderstøttelse. Dækker alle godkendte specialer i Danmark og Norden — tilpasset hvert speciales uddannelsesstruktur, kompetencekrav og terminologi.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- ══ COMMUNITY ══ -->
+  <section id="community">
+    <div class="community-inner">
+      <div class="community-header">
+        <span class="section-label community-label reveal" data-t="comm-label">✦ Unikt feature</span>
+        <h2 class="section-title reveal" data-t="comm-h2">En levende vidensbase<br>bygget af klinikere — for klinikere</h2>
+        <p class="section-sub reveal" data-t="comm-sub">Med tiden opbygger Clinlog en unik, anonymiseret database af reelle kliniske erfaringer på tværs af specialer og hospitaler. Jo flere brugere, jo mere værdifuld bliver den.</p>
+      </div>
+      <div class="community-grid">
+        <div class="community-left">
+          <div class="community-card reveal">
+            <div class="c-icon">🔍</div>
+            <h3 data-t="comm1-h">Søg i andres anonymiserede erfaringer</h3>
+            <p data-t="comm1-p">Find ud af hvordan kolleger håndterede lignende cases — på tværs af specialer, afdelinger og hospitaler. Søg på diagnose, procedure, komplikation eller læringspointe.</p>
+          </div>
+          <div class="community-card reveal">
+            <div class="c-icon">🤝</div>
+            <h3 data-t="comm2-h">Vælg selv om du kan kontaktes</h3>
+            <p data-t="comm2-p">Brugere kan aktivt tilvælge at være kontaktbare. Finder du en erfaring der er særlig relevant, kan du anmode om at komme i kontakt med den anonyme bidragsyder — på dine egne præmisser.</p>
+          </div>
+          <div class="community-card reveal">
+            <div class="c-icon">📡</div>
+            <h3 data-t="comm3-h">Erfaringer der vokser i værdi</h3>
+            <p data-t="comm3-p">Databasen bliver mere informativ for hver bruger der bidrager. Det er kollektiv intelligens fra frontlinjen — ikke lærebøger, men hvad der virker i den virkelige klinik.</p>
+          </div>
+          <div class="community-card reveal">
+            <div class="c-icon">🏥</div>
+            <h3 data-t="comm4-h">På tværs af hele sundhedsvæsenet</h3>
+            <p data-t="comm4-p">Erfaringer fra universitetshospitaler, regionshospitaler og præhospitalt miljø samles ét sted. Sjældne cases og uventede fund bliver synlige for hele fællesskabet.</p>
+          </div>
+          <div class="evidence-note reveal">
+            <div class="en-icon">📋</div>
+            <p data-t="evidence-p"><strong data-t="evidence-strong">En note om evidens:</strong> Kliniske erfaringsregistreringer udgør C-evidens i evidenshierarkiet — og kan ikke erstatte randomiserede studier. Men denne samling er unik: den repræsenterer real-world klinisk praksis i en skala og detaljegrad som ikke findes andre steder, og med tilstrækkelig volumen åbner den for værdifulde mønstre og indsigter.</p>
+          </div>
+        </div>
+        <div class="community-visual reveal">
+          <div class="cv-header">
+            <span class="cv-title" data-t="cv-title">Søg i erfaringsbase</span>
+            <span class="cv-badge" data-t="cv-badge">Beta · Anonymiseret</span>
+          </div>
+          <div class="cv-searchbar">
+            <input type="text" data-t-val="cv-search" value="svær luftvej + overvægtig patient" readonly />
+            <button data-t="cv-btn">Søg</button>
+          </div>
+          <div class="cv-result">
+            <div class="cv-result-top"><span class="cv-result-spec">Anæstesiologi</span><span class="cv-result-tag">Universitetshospital · 2024</span></div>
+            <p data-t="cv-r1">Planlagt GA til bariatrisk kirurgi. Cormack-Lehane grad III ved direkte laryngoskopi. Videolaryngoskop (C-MAC) afgjorde sagen — intubation lykkes i 2. forsøg. CUSUM +1.0.</p>
+            <span class="cv-result-contact" data-t="cv-contact1">✉ Bidragsyder er kontaktbar</span>
+          </div>
+          <div class="cv-result">
+            <div class="cv-result-top"><span class="cv-result-spec">Anæstesiologi</span><span class="cv-result-tag">Regionshospital · 2025</span></div>
+            <p data-t="cv-r2">Akut sectio, BMI 47. Spinalanæstesi foretrukket frem for GA pga. luftvejsrisiko. Teknisk udfordrende pga. anatomiske forhold — ultralyd vejledte nåleplacering.</p>
+            <span class="cv-result-contact" data-t="cv-contact2">✉ Bidragsyder er kontaktbar</span>
+          </div>
+          <div class="cv-result">
+            <div class="cv-result-top"><span class="cv-result-spec">Intensiv medicin</span><span class="cv-result-tag">Præhospital · 2025</span></div>
+            <p data-t="cv-r3">Præhospital RSI, GCS 6, mistænkt cervikalskade. Manuelt hold af akse, bougie first-pass strategi. Vigtig erfaring: kommunikation med makker er afgørende.</p>
+            <span class="cv-result-contact" style="opacity:.4;cursor:default;" data-t="cv-contact3">🔒 Ikke kontaktbar</span>
+          </div>
+          <div class="cv-stat">
+            <strong id="db-counter">0</strong>
+            <span data-t="cv-stat">anonymiserede erfaringer i databasen · vokser dagligt</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- ══ HOW IT WORKS ══ -->
+  <section id="how">
+    <div class="section-inner">
+      <span class="section-label reveal" data-t="how-label">Sådan virker det</span>
+      <h2 class="section-title reveal" data-t="how-h2">Fra vagt til læring<br>på få minutter</h2>
+      <p class="section-sub reveal" data-t="how-sub">Ingen skemaer at udfylde. Ingen templates. Bare fri tekst — AI'en klarer resten.</p>
+      <div class="steps">
+        <div class="step reveal"><div class="step-num">1</div><h3 data-t="step1-h">Diktér eller skriv</h3><p data-t="step1-p">Tal frit under eller efter klinisk arbejde — medicinsk talegenkendelse fanger fagtermer korrekt. Eller skriv, hvis du foretrækker det.</p></div>
+        <div class="step reveal"><div class="step-num">2</div><h3 data-t="step2-h">GDPR-advarsel & anonymisering</h3><p data-t="step2-p">Appen minder dig om ikke at videregive personhenførbare data. Avancerede algoritmer scanner og anonymiserer automatisk tekst, tale og billeder — inden noget bearbejdes eller gemmes.</p></div>
+        <div class="step reveal"><div class="step-num">3</div><h3 data-t="step3-h">Få indsigt</h3><p data-t="step3-p">Se kompetencevurderinger, læringsanalyse og forslag til videre fordybelse — tilpasset dit speciale.</p></div>
+        <div class="step reveal"><div class="step-num">4</div><h3 data-t="step4-h">Eksportér</h3><p data-t="step4-p">Del med din vejleder eller tilføj til din uddannelsesportfolio med PDF/DOCX-eksport.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══ AUDIENCE ══ -->
+  <section id="audience">
+    <div class="section-inner">
+      <span class="section-label reveal" data-t="aud-label">Til hvem</span>
+      <h2 class="section-title reveal" data-t="aud-h2">Bygget til alle<br>sundhedsprofessionelle</h2>
+      <p class="section-sub reveal" data-t="aud-sub">Uanset speciale eller erfaringsniveau — Clinlog dækker alle specialer i Danmark og Norden.</p>
+      <div class="audience-grid">
+        <div class="audience-card reveal"><div class="icon">🏥</div><h4 data-t="aud1-h">KBU-læger</h4><p data-t="aud1-p">Strukturér dine tidlige kliniske erfaringer og nå dine KBU-kompetencer</p></div>
+        <div class="audience-card reveal"><div class="icon">🩺</div><h4 data-t="aud2-h">Introduktionslæger</h4><p data-t="aud2-p">Dokumentér din faglige progression mod speciallæge</p></div>
+        <div class="audience-card reveal"><div class="icon">⚕️</div><h4 data-t="aud3-h">Hoveduddannelseslæger</h4><p data-t="aud3-p">EPA-niveau og CUSUM automatisk tilpasset dit speciale</p></div>
+        <div class="audience-card reveal"><div class="icon">👩‍⚕️</div><h4 data-t="aud4-h">Sygeplejersker</h4><p data-t="aud4-p">Klinisk refleksion tilpasset sygeplejefaglige kompetencer</p></div>
+        <div class="audience-card reveal"><div class="icon">🎓</div><h4 data-t="aud5-h">Medicinstuderende</h4><p data-t="aud5-p">Byg gode refleksionsvaner fra dag ét i klinikken</p></div>
+        <div class="audience-card reveal"><div class="icon">🧑‍⚕️</div><h4 data-t="aud6-h">Andre sundhedspersoner</h4><p data-t="aud6-p">Bioanalytikere, fysioterapeuter, paramedicinere og øvrige kliniske faggrupper</p></div>
+      </div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- ══ ABOUT ══ -->
+  <section id="about">
+    <div class="about-inner">
+      <div class="about-avatar">F</div>
+      <div class="about-content">
+        <span class="section-label" data-t="about-label">Om Clinlog</span>
+        <h2 data-t="about-h2">Bygget af en praktiserende anæstesiolog</h2>
+        <p data-t="about-p1">Clinlog er skabt af <strong>Frank Pott</strong>, speciallæge i anæstesiologi med klinisk arbejde inden for anæstesi, intensiv og præhospital medicin i Danmark — og <strong>Daniel Pott</strong>, app-udvikler.</p>
+        <p data-t="about-p2">Idéen opstod fra en simpel frustration: der fandtes ingen god måde at dokumentere og lære fra de kliniske oplevelser, der fylder hverdagen — de svære intubationer, de komplekse beslutninger, de øjeblikke hvor man tænker <em>"det her skal jeg huske."</em></p>
+        <p data-t="about-p3">Clinlog er ikke endnu et ambulant journalsystem. Det er et <strong>personligt læringsværktøj</strong> — designet til den travle kliniker der vil bruge 5 minutter på at blive en bedre læge.</p>
+        <div class="credentials">
+          <span class="credential" data-t="cred1">Anæstesiologi</span>
+          <span class="credential" data-t="cred2">Intensiv medicin</span>
+          <span class="credential" data-t="cred3">Præhospital medicin</span>
+          <span class="credential">Danmark</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══ WAITLIST ══ -->
+  <section id="waitlist">
+    <div class="waitlist-inner">
+      <span class="section-label reveal" data-t="wl-label">Bliv beta-tester</span>
+      <h2 class="section-title reveal" data-t="wl-h2">Vær med fra starten</h2>
+      <p class="section-sub reveal" data-t="wl-sub">Tilmeld dig ventelisten og få besked når beta-adgang åbner — og mulighed for at påvirke hvilke funktioner der bygges først.</p>
+      <div class="waitlist-form reveal">
+        <input type="email" id="waitlist-email" data-t-placeholder="wl-placeholder" placeholder="din@email.dk" autocomplete="email" />
+        <button type="button" id="waitlist-btn" data-t="wl-btn">Tilmeld mig →</button>
+      </div>
+      <div class="waitlist-message" id="waitlist-msg"></div>
+      <p class="waitlist-note reveal" data-t="wl-note">Ingen spam. Afmeld når som helst. Dine data deles ikke med tredjeparter.</p>
+      <div class="store-badges reveal">
+        <a href="#waitlist" class="store-badge">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/></svg>
+          <div class="store-badge-text"><small data-t="badge-coming">Kommer til</small><span>App Store</span></div>
+        </a>
+        <a href="#waitlist" class="store-badge">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M3 20.5v-17c0-.83 1-.83 1.5-.5l15 8.5-15 8.5c-.5.33-1.5.33-1.5-.5z" opacity=".3"/><path d="M5.5 3.21V20.8l6.56-6.57L5.5 3.21zm13.15 9.97L17.18 12l-1.46-.82-5.15-2.89-5.26 5.26 5.26 5.26 6.61-3.7 1.47-.83zm-13.15 7.62l6.56-6.57L5.5 20.8z" opacity=".3"/><path d="M5.5 3.21l6.56 8.33-6.56 6.57V3.21zm0 0l8.07 4.53-1.51 1.51L5.5 3.21zm8.07 13.26l-1.51-1.51 1.51-1.51 3.08 1.73-3.08 1.29zm0-8.94l3.08 1.73-1.47.83-1.61-2.56z"/></svg>
+          <div class="store-badge-text"><small data-t="badge-coming">Kommer til</small><span>Google Play</span></div>
+        </a>
+      </div>
+      <p class="store-coming reveal" data-t="store-coming">App'en er under udvikling og lanceres i 2026</p>
+    </div>
+  </section>
+
+  <!-- ══ CONTACT ══ -->
+  <section id="contact">
+    <div class="contact-inner">
+      <span class="section-label reveal" data-t="contact-label">Kontakt</span>
+      <h2 class="section-title reveal" data-t="contact-h2">Spørgsmål eller feedback?</h2>
+      <p class="reveal" data-t="contact-p">Er du interesseret i at afprøve Clinlog, samarbejde om klinisk validering, eller blot nysgerrig på projektet? Skriv gerne direkte.</p>
+      <a href="mailto:frank@clinlog.dk" class="contact-link reveal">
+        <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+        frank@clinlog.dk
+      </a>
+    </div>
+  </section>
+
+  <!-- ══ MOBIL SPROGBAR ══ -->
+  <div class="mobile-lang-bar" id="mobile-lang-bar">
+    <button class="mobile-lang-btn active" id="mlang-da" onclick="setLang('da')">
+      <svg viewBox="0 0 22 15" xmlns="http://www.w3.org/2000/svg">
+        <rect width="22" height="15" fill="#C60C30"/>
+        <rect x="6" width="3" height="15" fill="#fff"/>
+        <rect y="6" width="22" height="3" fill="#fff"/>
+      </svg>
+      Dansk
+    </button>
+    <button class="mobile-lang-btn" id="mlang-en" onclick="setLang('en')">
+      <svg viewBox="0 0 22 15" xmlns="http://www.w3.org/2000/svg">
+        <rect width="22" height="15" fill="#012169"/>
+        <path d="M0,0 L22,15 M22,0 L0,15" stroke="#fff" stroke-width="3"/>
+        <path d="M0,0 L22,15 M22,0 L0,15" stroke="#C8102E" stroke-width="1.5"/>
+        <path d="M11,0 V15 M0,7.5 H22" stroke="#fff" stroke-width="4"/>
+        <path d="M11,0 V15 M0,7.5 H22" stroke="#C8102E" stroke-width="2.5"/>
+      </svg>
+      English
+    </button>
+    <button class="mobile-lang-btn" id="mlang-de" onclick="setLang('de')">
+      <svg viewBox="0 0 22 15" xmlns="http://www.w3.org/2000/svg">
+        <rect width="22" height="5" fill="#000"/>
+        <rect y="5" width="22" height="5" fill="#D00"/>
+        <rect y="10" width="22" height="5" fill="#FFCE00"/>
+      </svg>
+      Deutsch
+    </button>
+  </div>
+
+  <!-- ══ FOOTER ══ -->
+  <footer>
+    <a href="#" class="footer-logo">
+      <div class="logo-icon" style="width:28px;height:28px;border-radius:7px;">
+        <svg width="17" height="17" viewBox="0 0 22 22" fill="none">
+          <polyline points="1,11 5,11 7,11 8.5,5 10.5,17 12.5,9 14,11 17,11 21,11"
+            stroke="#ffffff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+      <span class="footer-logo-wordmark">Clin<span>Log</span></span>
+    </a>
+    <div class="footer-links">
+      <a href="#features" data-t="nav-features">Funktioner</a>
+      <a href="#about" data-t="nav-about">Om Clinlog</a>
+      <a href="#waitlist" data-t="nav-waitlist">Tilmeld venteliste</a>
+      <a href="#contact" data-t="nav-contact">Kontakt</a>
+      <a href="privatlivspolitik.html" data-t="footer-privacy">Privatlivspolitik</a>
+    </div>
+    <p>© <span id="footer-year"></span> Clinlog · clinlog.dk · <span data-t="footer-built">Bygget i Danmark</span></p>
+  </footer>
+
+  </div><!-- /#landing-content -->
+
+  <script>
+  // ══════════════════════════════════════════════════════════
+  // TRANSLATIONS
+  // ══════════════════════════════════════════════════════════
+  const T = {
+    da: {
+      'nav-features': 'Funktioner',
+      'nav-how': 'Sådan virker det',
+      'nav-about': 'Om Clinlog',
+      'nav-contact': 'Kontakt',
+      'nav-waitlist': 'Tilmeld venteliste',
+      'hero-badge': 'Kommer snart · Beta 2026',
+      'hero-h1': 'Din kliniske <em>læringsdagbog</em>',
+      'hero-p': 'Clinlog hjælper læger, sygeplejersker, studerende og andre sundhedspersoner med at dokumentere, reflektere og lære fra kliniske oplevelser — diktér med medicinsk talegenkendelse, struktureret af AI, specialitetsspecifik og GDPR-sikker.',
+      'hero-cta': 'Tilmeld venteliste',
+      'hero-cta2': 'Se funktioner →',
+      'phone-tag': 'Anæstesi',
+      'phone-note1-label': 'Patientcase',
+      'phone-note1-text': '67-årig mand, ASA III. Laparoskopisk colektomi. Epidural + GA, RSI pga. tidl. aspiration…',
+      'phone-note2-label': 'Faglig læring',
+      'phone-note2-text': 'Sugammadex vs. neostigmin — valgte sugammadex pga. TOF-ratio < 0.9. Korrekt beslutning.',
+      'phone-epa': 'EPA Niveau 3',
+      'feat-label': 'Funktioner',
+      'feat-h2': 'Alt hvad du har brug for<br>til klinisk refleksion',
+      'feat-sub': 'Designet af en praktiserende anæstesiolog — til alle specialer.',
+      'feat1-h': 'Medicinsk taleindtastning',
+      'feat1-p': 'Diktér dine noter direkte under eller efter klinisk arbejde — avanceret talegenkendelse med fuldt kendskab til medicinsk fagterminologi. Clinlog forstår "sugammadex", "laryngoskopi" og "CUSUM" uden stavefejl.',
+      'feat2-h': 'AI-strukturerede noter',
+      'feat2-p': 'Skriv eller diktér frit — AI\'en organiserer automatisk din tekst i klinisk relevante sektioner: patientcase, forløb, læring og refleksion.',
+      'feat3-h': 'CUSUM & EPA-scoring',
+      'feat3-p': 'Automatisk kompetencevurdering baseret på officielle danske standarder fra Sundhedsstyrelsen og specialeselskaberne.',
+      'feat4-h': 'GDPR-sikker anonymisering',
+      'feat4-p': 'Brugeren gøres opmærksom på at der ikke må videregives personhenførbare data — hverken via tekst, stemme eller billedmateriale. Avancerede algoritmer sikrer desuden at eventuelle personhenførbare data automatisk erstattes direkte på din enhed, <em>inden</em> noget gemmes eller sendes til AI. Intet forlader din enhed uden at være fuldt anonymiseret.',
+      'feat5-h': 'Læringsanalyse',
+      'feat5-p': 'Følg din faglige udvikling over tid. Se mønstre i dine kompetencer, identificér styrker og udviklingsområder på tværs af vagter.',
+      'feat6-h': 'PDF & DOCX-eksport',
+      'feat6-p': 'Eksportér dine noter og læringsrapporter til din uddannelsesportfolio, vejleder eller logbog med ét tryk.',
+      'feat7-h': 'Alle specialer i DK og Norden',
+      'feat7-p': 'Fuld dansk og nordisk sprogunderstøttelse. Dækker alle godkendte specialer i Danmark og Norden — tilpasset hvert speciales uddannelsesstruktur, kompetencekrav og terminologi.',
+      'comm-label': '✦ Unikt feature',
+      'comm-h2': 'En levende vidensbase<br>bygget af klinikere — for klinikere',
+      'comm-sub': 'Med tiden opbygger Clinlog en unik, anonymiseret database af reelle kliniske erfaringer på tværs af specialer og hospitaler.',
+      'comm1-h': 'Søg i andres anonymiserede erfaringer',
+      'comm1-p': 'Find ud af hvordan kolleger håndterede lignende cases — på tværs af specialer, afdelinger og hospitaler. Søg på diagnose, procedure, komplikation eller læringspointe.',
+      'comm2-h': 'Vælg selv om du kan kontaktes',
+      'comm2-p': 'Brugere kan aktivt tilvælge at være kontaktbare. Finder du en erfaring der er særlig relevant, kan du anmode om at komme i kontakt med den anonyme bidragsyder — på dine egne præmisser.',
+      'comm3-h': 'Erfaringer der vokser i værdi',
+      'comm3-p': 'Databasen bliver mere informativ for hver bruger der bidrager. Det er kollektiv intelligens fra frontlinjen — ikke lærebøger, men hvad der virker i den virkelige klinik.',
+      'comm4-h': 'På tværs af hele sundhedsvæsenet',
+      'comm4-p': 'Erfaringer fra universitetshospitaler, regionshospitaler og præhospitalt miljø samles ét sted. Sjældne cases og uventede fund bliver synlige for hele fællesskabet.',
+      'evidence-strong': 'En note om evidens:',
+      'evidence-p': 'Kliniske erfaringsregistreringer udgør C-evidens i evidenshierarkiet — og kan ikke erstatte randomiserede studier. Men denne samling er unik: den repræsenterer real-world klinisk praksis i en skala og detaljegrad som ikke findes andre steder, og med tilstrækkelig volumen åbner den for værdifulde mønstre og indsigter.',
+      'cv-title': 'Søg i erfaringsbase',
+      'cv-badge': 'Beta · Anonymiseret',
+      'cv-search': 'svær luftvej + overvægtig patient',
+      'cv-btn': 'Søg',
+      'cv-r1': 'Planlagt GA til bariatrisk kirurgi. Cormack-Lehane grad III ved direkte laryngoskopi. Videolaryngoskop (C-MAC) afgjorde sagen — intubation lykkes i 2. forsøg. CUSUM +1.0.',
+      'cv-r2': 'Akut sectio, BMI 47. Spinalanæstesi foretrukket frem for GA pga. luftvejsrisiko. Teknisk udfordrende pga. anatomiske forhold — ultralyd vejledte nåleplacering.',
+      'cv-r3': 'Præhospital RSI, GCS 6, mistænkt cervikalskade. Manuelt hold af akse, bougie first-pass strategi. Vigtig erfaring: kommunikation med makker er afgørende.',
+      'cv-contact1': '✉ Bidragsyder er kontaktbar',
+      'cv-contact2': '✉ Bidragsyder er kontaktbar',
+      'cv-contact3': '🔒 Ikke kontaktbar',
+      'cv-stat': 'anonymiserede erfaringer i databasen · vokser dagligt',
+      'how-label': 'Sådan virker det',
+      'how-h2': 'Fra vagt til læring<br>på få minutter',
+      'how-sub': 'Ingen skemaer at udfylde. Ingen templates. Bare fri tekst — AI\'en klarer resten.',
+      'step1-h': 'Diktér eller skriv',
+      'step1-p': 'Tal frit under eller efter klinisk arbejde — medicinsk talegenkendelse fanger fagtermer korrekt. Eller skriv, hvis du foretrækker det.',
+      'step2-h': 'GDPR-advarsel & anonymisering',
+      'step2-p': 'Appen minder dig om ikke at videregive personhenførbare data. Avancerede algoritmer scanner og anonymiserer automatisk tekst, tale og billeder — inden noget bearbejdes eller gemmes.',
+      'step3-h': 'Få indsigt',
+      'step3-p': 'Se kompetencevurderinger, læringsanalyse og forslag til videre fordybelse — tilpasset dit speciale.',
+      'step4-h': 'Eksportér',
+      'step4-p': 'Del med din vejleder eller tilføj til din uddannelsesportfolio med PDF/DOCX-eksport.',
+      'aud-label': 'Til hvem',
+      'aud-h2': 'Bygget til alle<br>sundhedsprofessionelle',
+      'aud-sub': 'Uanset speciale eller erfaringsniveau — Clinlog dækker alle specialer i Danmark og Norden.',
+      'aud1-h': 'KBU-læger', 'aud1-p': 'Strukturér dine tidlige kliniske erfaringer og nå dine KBU-kompetencer',
+      'aud2-h': 'Introduktionslæger', 'aud2-p': 'Dokumentér din faglige progression mod speciallæge',
+      'aud3-h': 'Hoveduddannelseslæger', 'aud3-p': 'EPA-niveau og CUSUM automatisk tilpasset dit speciale',
+      'aud4-h': 'Sygeplejersker', 'aud4-p': 'Klinisk refleksion tilpasset sygeplejefaglige kompetencer',
+      'aud5-h': 'Medicinstuderende', 'aud5-p': 'Byg gode refleksionsvaner fra dag ét i klinikken',
+      'aud6-h': 'Andre sundhedspersoner', 'aud6-p': 'Bioanalytikere, fysioterapeuter, paramedicinere og øvrige kliniske faggrupper',
+      'about-label': 'Om Clinlog',
+      'about-h2': 'Bygget af en praktiserende anæstesiolog',
+      'about-p1': 'Clinlog er skabt af <strong>Frank Pott</strong>, speciallæge i anæstesiologi med klinisk arbejde inden for anæstesi, intensiv og præhospital medicin i Danmark — og <strong>Daniel Pott</strong>, app-udvikler.',
+      'about-p2': 'Idéen opstod fra en simpel frustration: der fandtes ingen god måde at dokumentere og lære fra de kliniske oplevelser, der fylder hverdagen — de svære intubationer, de komplekse beslutninger, de øjeblikke hvor man tænker <em>"det her skal jeg huske."</em>',
+      'about-p3': 'Clinlog er ikke endnu et ambulant journalsystem. Det er et <strong>personligt læringsværktøj</strong> — designet til den travle kliniker der vil bruge 5 minutter på at blive en bedre læge.',
+      'cred1': 'Anæstesiologi', 'cred2': 'Intensiv medicin', 'cred3': 'Præhospital medicin',
+      'wl-label': 'Bliv beta-tester',
+      'wl-h2': 'Vær med fra starten',
+      'wl-sub': 'Tilmeld dig ventelisten og få besked når beta-adgang åbner — og mulighed for at påvirke hvilke funktioner der bygges først.',
+      'wl-placeholder': 'din@email.dk',
+      'wl-btn': 'Tilmeld mig →',
+      'wl-note': 'Ingen spam. Afmeld når som helst. Dine data deles ikke med tredjeparter.',
+      'wl-success': 'Du er på ventelisten! Vi vender tilbage når beta åbner.',
+      'wl-duplicate': 'Denne e-mail er allerede tilmeldt. Vi ses til beta!',
+      'wl-error': 'Noget gik galt. Prøv igen eller skriv til frank@clinlog.dk',
+      'wl-invalid': 'Indtast venligst en gyldig e-mailadresse.',
+      'wl-loading': 'Tilmelder…',
+      'wl-done': 'Tak! 🎉',
+      'badge-coming': 'Kommer til',
+      'store-coming': 'App\'en er under udvikling og lanceres i 2026',
+      'contact-label': 'Kontakt',
+      'contact-h2': 'Spørgsmål eller feedback?',
+      'contact-p': 'Er du interesseret i at afprøve Clinlog, samarbejde om klinisk validering, eller blot nysgerrig på projektet? Skriv gerne direkte.',
+      'footer-privacy': 'Privatlivspolitik',
+      'footer-built': 'Bygget i Danmark',
+      'cookie-text': 'Vi bruger tekniske cookies for at siden virker korrekt. Vi indsamler ingen sporingsdata og sælger ikke dine oplysninger.',
+      'cookie-decline': 'Afvis ikke-nødvendige',
+      'cookie-accept': 'Acceptér',
+      'portal-refs-title': 'Referencer',
+      'portal-search-ph': 'Søg i noter…',
+      'portal-back': '← Tilbage',
+      'portal-notes-title': 'Mine noter',
+      'portal-loading': 'Henter noter…',
+      'portal-empty': 'Du har endnu ingen noter synkroniseret fra appen.',
+      'portal-saved': 'Ændringer gemt ✓',
+      'portal-save-err': 'Fejl ved gemning',
+      'portal-refs-loading': 'Søger i PubMed…',
+      'portal-refs-none': 'Ingen relevante referencer fundet for denne note.',
+    },
+    en: {
+      'nav-features': 'Features',
+      'nav-how': 'How it works',
+      'nav-about': 'About',
+      'nav-contact': 'Contact',
+      'nav-waitlist': 'Join waitlist',
+      'hero-badge': 'Coming soon · Beta 2026',
+      'hero-h1': 'Your clinical <em>learning diary</em>',
+      'hero-p': 'Clinlog helps doctors, nurses, students and other healthcare professionals document, reflect and learn from clinical experiences — dictate with medical speech recognition, structured by AI, specialty-specific and GDPR-secure.',
+      'hero-cta': 'Join waitlist',
+      'hero-cta2': 'See features →',
+      'phone-tag': 'Anaesthesia',
+      'phone-note1-label': 'Patient case',
+      'phone-note1-text': '67-year-old male, ASA III. Laparoscopic colectomy. Epidural + GA, RSI due to prior aspiration…',
+      'phone-note2-label': 'Clinical learning',
+      'phone-note2-text': 'Sugammadex vs. neostigmine — chose sugammadex due to TOF-ratio < 0.9. Correct decision.',
+      'phone-epa': 'EPA Level 3',
+      'feat-label': 'Features',
+      'feat-h2': 'Everything you need<br>for clinical reflection',
+      'feat-sub': 'Designed by a practising anaesthesiologist — for all specialties.',
+      'feat1-h': 'Medical speech input',
+      'feat1-p': 'Dictate your notes directly during or after clinical work — advanced speech recognition with full knowledge of medical terminology. Clinlog understands "sugammadex", "laryngoscopy" and "CUSUM" without errors.',
+      'feat2-h': 'AI-structured notes',
+      'feat2-p': 'Write or dictate freely — AI automatically organises your text into clinically relevant sections: patient case, clinical course, learning and reflection.',
+      'feat3-h': 'CUSUM & EPA scoring',
+      'feat3-p': 'Automatic competency assessment aligned with recognised international training standards and specialty society frameworks — adapted to your local context.',
+      'feat4-h': 'GDPR-secure anonymisation',
+      'feat4-p': 'Users are reminded not to share personally identifiable data — via text, voice or images. Algorithms ensure that any personal data is automatically replaced on your device, before anything is stored or sent to AI.',
+      'feat5-h': 'Learning analytics',
+      'feat5-p': 'Track your professional development over time. See patterns in your competencies, identify strengths and development areas across shifts.',
+      'feat6-h': 'PDF & DOCX export',
+      'feat6-p': 'Export your notes and learning reports to your training portfolio, supervisor or logbook with one tap.',
+      'feat7-h': 'All medical specialties supported',
+      'feat7-p': 'Covers all major medical and surgical specialties — adapted to each specialty\'s training structure, competency requirements and clinical terminology.',
+      'comm-label': '✦ Unique feature',
+      'comm-h2': 'A living knowledge base<br>built by clinicians — for clinicians',
+      'comm-sub': 'Over time, Clinlog builds a unique, anonymised database of real clinical experiences across specialties and hospitals.',
+      'comm1-h': 'Search anonymised experiences',
+      'comm1-p': 'Find out how colleagues handled similar cases — across specialties, departments and hospitals.',
+      'comm2-h': 'Choose if you can be contacted',
+      'comm2-p': 'Users can opt in to being contactable. If you find a particularly relevant experience, you can request contact — on your own terms.',
+      'comm3-h': 'Experiences that grow in value',
+      'comm3-p': 'The database becomes more informative with each contributing user. It is collective intelligence from the frontline.',
+      'comm4-h': 'Across the entire healthcare system',
+      'comm4-p': 'Experiences from university hospitals, regional hospitals and pre-hospital settings gathered in one place.',
+      'evidence-strong': 'A note on evidence:',
+      'evidence-p': 'Clinical experience records constitute C-evidence in the evidence hierarchy — and cannot replace randomised studies. But this collection represents real-world clinical practice at a scale and level of detail not found elsewhere.',
+      'cv-title': 'Search experience base',
+      'cv-badge': 'Beta · Anonymised',
+      'cv-search': 'difficult airway + obese patient',
+      'cv-btn': 'Search',
+      'cv-r1': 'Planned GA for bariatric surgery. Cormack-Lehane grade III. Videolaryngoscope (C-MAC) resolved the situation — intubation succeeded on 2nd attempt. CUSUM +1.0.',
+      'cv-r2': 'Emergency caesarean, BMI 47. Spinal anaesthesia preferred over GA due to airway risk. Technically challenging — ultrasound guided needle placement.',
+      'cv-r3': 'Pre-hospital RSI, GCS 6, suspected cervical injury. Bougie first-pass strategy. Communication with partner is critical.',
+      'cv-contact1': '✉ Contributor is contactable',
+      'cv-contact2': '✉ Contributor is contactable',
+      'cv-contact3': '🔒 Not contactable',
+      'cv-stat': 'anonymised experiences in the database · growing daily',
+      'how-label': 'How it works',
+      'how-h2': 'From shift to learning<br>in minutes',
+      'how-sub': 'No forms to fill in. No templates. Just free text — AI handles the rest.',
+      'step1-h': 'Dictate or write',
+      'step1-p': 'Speak freely during or after clinical work — medical speech recognition captures terminology correctly.',
+      'step2-h': 'GDPR warning & anonymisation',
+      'step2-p': 'The app reminds you not to share personally identifiable data. Algorithms automatically scan and anonymise.',
+      'step3-h': 'Get insights',
+      'step3-p': 'View competency assessments, learning analytics and suggestions for further study — tailored to your specialty.',
+      'step4-h': 'Export',
+      'step4-p': 'Share with your supervisor or add to your training portfolio with PDF/DOCX export.',
+      'aud-label': 'Who is it for',
+      'aud-h2': 'Built for all<br>healthcare professionals',
+      'aud-sub': 'Regardless of specialty or experience level — Clinlog adapts to your professional background and training context.',
+      'aud1-h': 'Foundation doctors', 'aud1-p': 'Structure your early clinical experiences and achieve your foundation competencies',
+      'aud2-h': 'Junior doctors', 'aud2-p': 'Document your professional progression towards specialist',
+      'aud3-h': 'Specialist trainees', 'aud3-p': 'EPA level and CUSUM automatically adapted to your specialty',
+      'aud4-h': 'Nurses', 'aud4-p': 'Clinical reflection adapted to nursing competencies',
+      'aud5-h': 'Medical students', 'aud5-p': 'Build good reflection habits from day one in the clinic',
+      'aud6-h': 'Other healthcare workers', 'aud6-p': 'Biomedical scientists, physiotherapists, paramedics and other clinical groups',
+      'about-label': 'About Clinlog',
+      'about-h2': 'Built by a practising anaesthesiologist',
+      'about-p1': 'Clinlog is created by <strong>Frank Pott</strong>, specialist in anaesthesiology with clinical experience in anaesthesia, intensive care and pre-hospital medicine — and <strong>Daniel Pott</strong>, app developer.',
+      'about-p2': 'The idea arose from a simple frustration: there was no good way to document and learn from the clinical experiences that fill everyday work — the difficult intubations, the complex decisions, the moments where you think <em>"I need to remember this."</em>',
+      'about-p3': 'Clinlog is not another outpatient record system. It is a <strong>personal learning tool</strong> — designed for the busy clinician who wants to spend 5 minutes becoming a better doctor.',
+      'cred1': 'Anaesthesiology', 'cred2': 'Intensive care', 'cred3': 'Pre-hospital medicine',
+      'wl-label': 'Become a beta tester',
+      'wl-h2': 'Be part of it from the start',
+      'wl-sub': 'Join the waitlist and be notified when beta access opens — and get the chance to influence which features are built first.',
+      'wl-placeholder': 'your@email.com',
+      'wl-btn': 'Join waitlist →',
+      'wl-note': 'No spam. Unsubscribe any time. Your data is not shared with third parties.',
+      'wl-success': 'You\'re on the waitlist! We\'ll be in touch when beta opens.',
+      'wl-duplicate': 'This email is already registered. See you at beta!',
+      'wl-error': 'Something went wrong. Try again or write to frank@clinlog.dk',
+      'wl-invalid': 'Please enter a valid email address.',
+      'wl-loading': 'Joining…',
+      'wl-done': 'Thanks! 🎉',
+      'badge-coming': 'Coming to',
+      'store-coming': 'App launching in 2026',
+      'contact-label': 'Contact',
+      'contact-h2': 'Questions or feedback?',
+      'contact-p': 'Interested in testing Clinlog, collaborating on clinical validation, or just curious about the project? Feel free to reach out directly.',
+      'footer-privacy': 'Privacy policy',
+      'footer-built': 'Built in Denmark',
+      'cookie-text': 'We use technical cookies to make this site work correctly. We collect no tracking data and do not sell your information.',
+      'cookie-decline': 'Decline non-essential',
+      'cookie-accept': 'Accept',
+      'portal-refs-title': 'References',
+      'portal-search-ph': 'Search notes…',
+      'portal-back': '← Back',
+      'portal-notes-title': 'My notes',
+      'portal-loading': 'Loading notes…',
+      'portal-empty': 'You have no notes synced from the app yet.',
+      'portal-saved': 'Changes saved ✓',
+      'portal-save-err': 'Error saving',
+      'portal-refs-loading': 'Searching PubMed…',
+      'portal-refs-none': 'No relevant references found for this note.',
+    },
+    de: {
+      'nav-features': 'Funktionen',
+      'nav-how': 'So funktioniert es',
+      'nav-about': 'Über uns',
+      'nav-contact': 'Kontakt',
+      'nav-waitlist': 'Warteliste beitreten',
+      'hero-badge': 'Demnächst · Beta 2026',
+      'hero-h1': 'Ihr klinisches <em>Lerntagebuch</em>',
+      'hero-p': 'Clinlog hilft Ärzten, Pflegekräften, Studierenden und anderen Gesundheitsfachleuten dabei, klinische Erfahrungen zu dokumentieren, zu reflektieren und daraus zu lernen — diktieren mit medizinischer Spracherkennung, strukturiert durch KI, fachspezifisch und DSGVO-sicher.',
+      'hero-cta': 'Warteliste beitreten',
+      'hero-cta2': 'Funktionen ansehen →',
+      'phone-tag': 'Anästhesie',
+      'phone-note1-label': 'Patientenfall',
+      'phone-note1-text': '67-jähriger Mann, ASA III. Laparoskopische Kolektomie. Epidural + Vollnarkose, RSI wegen früherer Aspiration…',
+      'phone-note2-label': 'Klinisches Lernen',
+      'phone-note2-text': 'Sugammadex vs. Neostigmin — Sugammadex gewählt wegen TOF-Ratio < 0,9. Richtige Entscheidung.',
+      'phone-epa': 'EPA Stufe 3',
+      'feat-label': 'Funktionen',
+      'feat-h2': 'Alles, was Sie brauchen<br>für klinische Reflexion',
+      'feat-sub': 'Entworfen von einem praktizierenden Anästhesiologen — für alle Fachgebiete.',
+      'feat1-h': 'Medizinische Spracheingabe',
+      'feat1-p': 'Diktieren Sie Ihre Notizen direkt während oder nach der klinischen Arbeit — fortschrittliche Spracherkennung mit vollem Wissen über medizinische Fachterminologie. Clinlog versteht „Sugammadex", „Laryngoskopie" und „CUSUM" fehlerfrei.',
+      'feat2-h': 'KI-strukturierte Notizen',
+      'feat2-p': 'Schreiben oder diktieren Sie frei — die KI organisiert Ihren Text automatisch in klinisch relevante Abschnitte: Patientenfall, Verlauf, Lernen und Reflexion.',
+      'feat3-h': 'CUSUM & EPA-Bewertung',
+      'feat3-p': 'Automatische Kompetenzbeurteilung auf Basis anerkannter internationaler Weiterbildungsstandards und fachgesellschaftlicher Rahmenwerke — angepasst an Ihren lokalen Kontext.',
+      'feat4-h': 'DSGVO-sichere Anonymisierung',
+      'feat4-p': 'Benutzer werden darauf hingewiesen, keine personenbezogenen Daten weiterzugeben — weder per Text, Sprache noch Bildmaterial. Algorithmen stellen sicher, dass personenbezogene Daten automatisch auf Ihrem Gerät ersetzt werden, bevor etwas gespeichert oder an KI gesendet wird.',
+      'feat5-h': 'Lernanalyse',
+      'feat5-p': 'Verfolgen Sie Ihre fachliche Entwicklung über die Zeit. Sehen Sie Muster in Ihren Kompetenzen und identifizieren Sie Stärken und Entwicklungsbereiche.',
+      'feat6-h': 'PDF & DOCX-Export',
+      'feat6-p': 'Exportieren Sie Ihre Notizen und Lernberichte mit einem Tipp in Ihr Ausbildungsportfolio, zu Ihrem Betreuer oder in Ihr Logbuch.',
+      'feat7-h': 'Alle medizinischen Fachgebiete',
+      'feat7-p': 'Umfasst alle wichtigen medizinischen und chirurgischen Fachgebiete — angepasst an die jeweilige Weiterbildungsstruktur, Kompetenzanforderungen und klinische Terminologie.',
+      'comm-label': '✦ Einzigartiges Feature',
+      'comm-h2': 'Eine lebendige Wissensbasis<br>von Klinikern — für Kliniker',
+      'comm-sub': 'Im Laufe der Zeit baut Clinlog eine einzigartige, anonymisierte Datenbank realer klinischer Erfahrungen über Fachgebiete und Krankenhäuser hinweg auf.',
+      'comm1-h': 'Anonymisierte Erfahrungen durchsuchen',
+      'comm1-p': 'Erfahren Sie, wie Kollegen ähnliche Fälle gehandhabt haben — über Fachgebiete, Abteilungen und Krankenhäuser hinweg.',
+      'comm2-h': 'Selbst entscheiden, ob Sie kontaktiert werden können',
+      'comm2-p': 'Benutzer können aktiv wählen, ob sie kontaktierbar sind. Finden Sie eine besonders relevante Erfahrung, können Sie Kontakt anfordern — zu Ihren eigenen Bedingungen.',
+      'comm3-h': 'Erfahrungen, die an Wert gewinnen',
+      'comm3-p': 'Die Datenbank wird mit jedem beitragenden Benutzer informativer. Es ist kollektive Intelligenz von der Front.',
+      'comm4-h': 'Über das gesamte Gesundheitswesen hinweg',
+      'comm4-p': 'Erfahrungen aus Universitätskliniken, Regionalkrankenhäusern und dem präklinischen Umfeld an einem Ort gesammelt.',
+      'evidence-strong': 'Ein Hinweis zur Evidenz:',
+      'evidence-p': 'Klinische Erfahrungsaufzeichnungen entsprechen C-Evidenz in der Evidenzhierarchie — und können keine randomisierten Studien ersetzen. Aber diese Sammlung repräsentiert klinische Praxis in einem Maßstab und Detailgrad, der anderswo nicht existiert.',
+      'cv-title': 'Erfahrungsdatenbank durchsuchen',
+      'cv-badge': 'Beta · Anonymisiert',
+      'cv-search': 'schwieriger Atemweg + adipöser Patient',
+      'cv-btn': 'Suchen',
+      'cv-r1': 'Geplante Allgemeinanästhesie für bariatrische Chirurgie. Cormack-Lehane Grad III. Videolaryngoskop (C-MAC) löste die Situation — Intubation gelang im 2. Versuch. CUSUM +1,0.',
+      'cv-r2': 'Notfall-Sectio, BMI 47. Spinalanästhesie gegenüber Allgemeinanästhesie bevorzugt wegen Atemwegsrisiko. Ultraschall leitete die Nadelplatzierung.',
+      'cv-r3': 'Präklinische RSI, GCS 6, V.a. HWS-Verletzung. Bougie-First-Pass-Strategie. Kommunikation mit dem Partner ist entscheidend.',
+      'cv-contact1': '✉ Beitragsleister ist kontaktierbar',
+      'cv-contact2': '✉ Beitragsleister ist kontaktierbar',
+      'cv-contact3': '🔒 Nicht kontaktierbar',
+      'cv-stat': 'anonymisierte Erfahrungen in der Datenbank · täglich wachsend',
+      'how-label': 'So funktioniert es',
+      'how-h2': 'Vom Dienst zum Lernen<br>in Minuten',
+      'how-sub': 'Keine Formulare. Keine Vorlagen. Nur freier Text — die KI erledigt den Rest.',
+      'step1-h': 'Diktieren oder schreiben',
+      'step1-p': 'Sprechen Sie frei während oder nach der klinischen Arbeit — medizinische Spracherkennung erfasst Fachbegriffe korrekt.',
+      'step2-h': 'DSGVO-Warnung & Anonymisierung',
+      'step2-p': 'Die App erinnert Sie daran, keine personenbezogenen Daten weiterzugeben. Algorithmen scannen und anonymisieren automatisch.',
+      'step3-h': 'Erkenntnisse gewinnen',
+      'step3-p': 'Sehen Sie Kompetenzbewertungen, Lernanalysen und Vorschläge zur Vertiefung — angepasst an Ihr Fachgebiet.',
+      'step4-h': 'Exportieren',
+      'step4-p': 'Teilen Sie mit Ihrem Betreuer oder fügen Sie es Ihrem Ausbildungsportfolio mit PDF/DOCX-Export hinzu.',
+      'aud-label': 'Für wen',
+      'aud-h2': 'Für alle<br>Gesundheitsfachleute entwickelt',
+      'aud-sub': 'Unabhängig von Fachgebiet oder Erfahrungsniveau — Clinlog passt sich Ihrem beruflichen Hintergrund und Weiterbildungskontext an.',
+      'aud1-h': 'Assistenzärzte', 'aud1-p': 'Strukturieren Sie Ihre frühen klinischen Erfahrungen und erreichen Sie Ihre Kompetenzziele',
+      'aud2-h': 'Jungärzte', 'aud2-p': 'Dokumentieren Sie Ihre fachliche Progression zum Facharzt',
+      'aud3-h': 'Fachärzte in Weiterbildung', 'aud3-p': 'EPA-Niveau und CUSUM automatisch an Ihr Fachgebiet angepasst',
+      'aud4-h': 'Pflegekräfte', 'aud4-p': 'Klinische Reflexion angepasst an pflegerische Kompetenzen',
+      'aud5-h': 'Medizinstudierende', 'aud5-p': 'Entwickeln Sie gute Reflexionsgewohnheiten vom ersten Tag in der Klinik',
+      'aud6-h': 'Weitere Gesundheitsfachleute', 'aud6-p': 'Biomedizinische Wissenschaftler, Physiotherapeuten, Rettungssanitäter und andere klinische Gruppen',
+      'about-label': 'Über Clinlog',
+      'about-h2': 'Entwickelt von einem praktizierenden Anästhesiologen',
+      'about-p1': 'Clinlog wurde von <strong>Frank Pott</strong>, Facharzt für Anästhesiologie mit klinischer Tätigkeit in Anästhesie, Intensivmedizin und Notfallmedizin — und <strong>Daniel Pott</strong>, App-Entwickler, entwickelt.',
+      'about-p2': 'Die Idee entstand aus einer einfachen Frustration: Es gab keine gute Möglichkeit, die klinischen Erlebnisse zu dokumentieren und daraus zu lernen — die schwierigen Intubationen, die komplexen Entscheidungen, die Momente, in denen man denkt: <em>„Das muss ich mir merken."</em>',
+      'about-p3': 'Clinlog ist kein weiteres ambulantes Dokumentationssystem. Es ist ein <strong>persönliches Lernwerkzeug</strong> — entworfen für den beschäftigten Kliniker, der 5 Minuten damit verbringen möchte, ein besserer Arzt zu werden.',
+      'cred1': 'Anästhesiologie', 'cred2': 'Intensivmedizin', 'cred3': 'Notfallmedizin',
+      'wl-label': 'Beta-Tester werden',
+      'wl-h2': 'Von Anfang an dabei sein',
+      'wl-sub': 'Tragen Sie sich in die Warteliste ein und werden Sie benachrichtigt, wenn der Beta-Zugang öffnet — mit der Möglichkeit, die Entwicklung mitzugestalten.',
+      'wl-placeholder': 'ihre@email.de',
+      'wl-btn': 'Eintragen →',
+      'wl-note': 'Kein Spam. Jederzeit abmelden. Ihre Daten werden nicht an Dritte weitergegeben.',
+      'wl-success': 'Sie stehen auf der Warteliste! Wir melden uns, wenn Beta öffnet.',
+      'wl-duplicate': 'Diese E-Mail ist bereits registriert. Bis zum Beta!',
+      'wl-error': 'Etwas ist schiefgelaufen. Versuchen Sie es erneut oder schreiben Sie an frank@clinlog.dk',
+      'wl-invalid': 'Bitte geben Sie eine gültige E-Mail-Adresse ein.',
+      'wl-loading': 'Wird eingetragen…',
+      'wl-done': 'Danke! 🎉',
+      'badge-coming': 'Demnächst für',
+      'store-coming': 'App erscheint 2026',
+      'contact-label': 'Kontakt',
+      'contact-h2': 'Fragen oder Feedback?',
+      'contact-p': 'Interessiert daran, Clinlog zu testen, an der klinischen Validierung mitzuwirken oder einfach neugierig auf das Projekt? Schreiben Sie uns gerne direkt.',
+      'footer-privacy': 'Datenschutzrichtlinie',
+      'footer-built': 'Entwickelt in Dänemark',
+      'cookie-text': 'Wir verwenden technische Cookies, damit die Website korrekt funktioniert. Wir erheben keine Tracking-Daten und verkaufen Ihre Informationen nicht.',
+      'cookie-decline': 'Nicht-wesentliche ablehnen',
+      'cookie-accept': 'Akzeptieren',
+      'portal-refs-title': 'Referenzen',
+      'portal-search-ph': 'Notizen durchsuchen…',
+      'portal-back': '← Zurück',
+      'portal-notes-title': 'Meine Notizen',
+      'portal-loading': 'Notizen werden geladen…',
+      'portal-empty': 'Sie haben noch keine Notizen aus der App synchronisiert.',
+      'portal-saved': 'Änderungen gespeichert ✓',
+      'portal-save-err': 'Speicherfehler',
+      'portal-refs-loading': 'PubMed wird durchsucht…',
+      'portal-refs-none': 'Keine relevanten Referenzen für diese Notiz gefunden.',
+    }
+  };
+
+  let lang = 'da';
+
+  function applyTranslations() {
+    const t = T[lang];
+    // data-t: innerHTML
+    document.querySelectorAll('[data-t]').forEach(el => {
+      const key = el.getAttribute('data-t');
+      if (t[key] !== undefined) el.innerHTML = t[key];
+    });
+    // data-t-placeholder: placeholder
+    document.querySelectorAll('[data-t-placeholder]').forEach(el => {
+      const key = el.getAttribute('data-t-placeholder');
+      if (t[key] !== undefined) el.placeholder = t[key];
+    });
+    // data-t-val: value (readonly inputs like search)
+    document.querySelectorAll('[data-t-val]').forEach(el => {
+      const key = el.getAttribute('data-t-val');
+      if (t[key] !== undefined) el.value = t[key];
+    });
+    // html lang attribute
+    document.getElementById('html-root').lang = lang;
+    // page title + meta
+    document.title = lang === 'da'
+      ? 'Clinlog – Klinisk læringsdagbog for sundhedsprofessionelle'
+      : 'Clinlog – Clinical learning diary for healthcare professionals';
+  }
+
+  function setLang(newLang) {
+    lang = newLang;
+    ['da','en','de'].forEach(l => {
+      const desktop  = document.getElementById('lang-' + l);
+      const mobile   = document.getElementById('mlang-' + l);
+      const mobile2  = document.getElementById('mlang2-' + l);
+      if (desktop) desktop.classList.toggle('active', l === lang);
+      if (mobile)  mobile.classList.toggle('active', l === lang);
+      if (mobile2) mobile2.classList.toggle('active', l === lang);
+    });
+    applyTranslations();
+  }
+
+  // ══════════════════════════════════════════════════════════
+  // WAITLIST — Supabase
+  // ══════════════════════════════════════════════════════════
+  const SUPABASE_URL      = 'https://rcrwqyctpjltnofxssmy.supabase.co';
+  const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJjcndxeWN0cGpsdG5vZnhzc215Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ4ODQzODgsImV4cCI6MjA5MDQ2MDM4OH0.qP_fUOe3ucAojfCoHuis8-Mc91rqG6zPocyEbfLaY54';
+
+  document.getElementById('waitlist-btn').addEventListener('click', async function () {
+    const input = document.getElementById('waitlist-email');
+    const msgEl = document.getElementById('waitlist-msg');
+    const btn   = this;
+    const t     = T[lang];
+    const email = input.value.trim();
+
+    if (!email || !email.includes('@') || email.indexOf('.') < email.indexOf('@')) {
+      input.style.borderColor = 'var(--error)';
+      msgEl.textContent = t['wl-invalid'];
+      msgEl.className = 'waitlist-message error';
+      return;
+    }
+
+    btn.disabled = true;
+    btn.textContent = t['wl-loading'];
+    input.style.borderColor = '';
+    msgEl.textContent = '';
+    msgEl.className = 'waitlist-message';
+
+    try {
+      const res = await fetch(`${SUPABASE_URL}/rest/v1/waitlist`, {
+        method: 'POST',
+        headers: {
+          'Content-Type':  'application/json',
+          'apikey':        SUPABASE_ANON_KEY,
+          'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+          'Prefer':        'return=minimal'
+        },
+        body: JSON.stringify({ email, signed_up_at: new Date().toISOString() })
+      });
+
+      if (res.ok || res.status === 201) {
+        input.value = '';
+        input.style.borderColor = 'var(--success)';
+        input.placeholder = '✓';
+        btn.textContent = t['wl-done'];
+        btn.style.background = '#16a34a';
+        msgEl.textContent = t['wl-success'];
+        msgEl.className = 'waitlist-message success';
+      } else if (res.status === 409 || res.status === 422) {
+        msgEl.textContent = t['wl-duplicate'];
+        msgEl.className = 'waitlist-message success';
+        btn.disabled = false;
+        btn.textContent = T[lang]['wl-btn'];
+      } else {
+        const body = await res.text().catch(() => '');
+        throw new Error(`${res.status}: ${body.slice(0, 120)}`);
+      }
+    } catch (err) {
+      console.error('Waitlist:', err);
+      msgEl.textContent = t['wl-error'];
+      msgEl.className = 'waitlist-message error';
+      btn.disabled = false;
+      btn.textContent = T[lang]['wl-btn'];
+    }
+  });
+
+  document.getElementById('waitlist-email').addEventListener('keydown', function (e) {
+    if (e.key === 'Enter') document.getElementById('waitlist-btn').click();
+  });
+
+  // ══════════════════════════════════════════════════════════
+  // COOKIE BANNER
+  // ══════════════════════════════════════════════════════════
+  (function () {
+    if (localStorage.getItem('cookieConsent')) {
+      document.getElementById('cookie-banner').classList.add('hidden');
+    }
+    document.getElementById('cookie-accept').addEventListener('click', function () {
+      localStorage.setItem('cookieConsent', 'accepted');
+      document.getElementById('cookie-banner').classList.add('hidden');
+    });
+    document.getElementById('cookie-decline').addEventListener('click', function () {
+      localStorage.setItem('cookieConsent', 'declined');
+      document.getElementById('cookie-banner').classList.add('hidden');
+    });
+  })();
+
+  // ══════════════════════════════════════════════════════════
+  // SCROLL REVEAL
+  // ══════════════════════════════════════════════════════════
+  const revealEls = document.querySelectorAll('.reveal');
+
+  const revealObserver = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        e.target.classList.add('visible');
+        revealObserver.unobserve(e.target);
+      }
+    });
+  }, { threshold: 0.1 });
+
+  revealEls.forEach(el => revealObserver.observe(el));
+
+  // ══════════════════════════════════════════════════════════
+  // DB COUNTER ANIMATION
+  // ══════════════════════════════════════════════════════════
+  (function () {
+    const el = document.getElementById('db-counter');
+    if (!el) return;
+    const target = 1247;
+    let current = 0;
+    const counterObserver = new IntersectionObserver(entries => {
+      if (entries[0].isIntersecting) {
+        const step = Math.ceil(target / 60);
+        const timer = setInterval(() => {
+          current = Math.min(current + step, target);
+          el.textContent = current.toLocaleString('da-DK');
+          if (current >= target) clearInterval(timer);
+        }, 20);
+        counterObserver.disconnect();
+      }
+    });
+    counterObserver.observe(el);
+  })();
+
+  // ══════════════════════════════════════════════════════════
+  // FOOTER YEAR
+  // ══════════════════════════════════════════════════════════
+  document.getElementById('footer-year').textContent = new Date().getFullYear();
+
+  // ══════════════════════════════════════════════════════════
+  // AUTH — Supabase (initialiseres efter siden er loadet)
+  // ══════════════════════════════════════════════════════════
+  window.addEventListener('load', function () {
+  const supabase = (window.supabase && window.supabase.createClient)
+    ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
+    : null;
+
+  if (!supabase) {
+    // SDK ikke loadet — skjul login-knap og fortsæt normalt
+    const nb = document.getElementById('nav-login-item');
+    if (nb) nb.style.display = 'none';
+  } else {
+
+  const loginOverlay   = document.getElementById('login-overlay');
+  const loginEmail     = document.getElementById('login-email');
+  const loginPassword  = document.getElementById('login-password');
+  const loginSubmitBtn = document.getElementById('login-submit-btn');
+  const loginMsg       = document.getElementById('login-msg');
+  const loginTitle     = document.getElementById('login-modal-title');
+  const loginSub       = document.getElementById('login-modal-sub');
+  const loginToggleBtn = document.getElementById('login-toggle-btn');
+  const navLoginItem   = document.getElementById('nav-login-item');
+  const navUserItem    = document.getElementById('nav-user-item');
+  const navUserEmail   = document.getElementById('nav-user-email');
+  const landingContent = document.getElementById('landing-content');
+  const portal         = document.getElementById('portal');
+
+  let authMode = 'login'; // 'login' | 'signup'
+
+  function showLogin() {
+    loginOverlay.classList.add('open');
+    loginEmail.focus();
+  }
+
+  function hideLogin() {
+    loginOverlay.classList.remove('open');
+    loginMsg.textContent = '';
+    loginMsg.className = 'login-msg';
+    loginEmail.value = '';
+    loginPassword.value = '';
+  }
+
+  function setAuthMode(mode) {
+    authMode = mode;
+    if (mode === 'signup') {
+      loginTitle.textContent = 'Opret konto';
+      loginSub.textContent = 'Opret en gratis ClinLog-konto';
+      loginSubmitBtn.textContent = 'Opret konto';
+      loginToggleBtn.textContent = 'Log ind i stedet';
+      loginPassword.autocomplete = 'new-password';
+    } else {
+      loginTitle.textContent = 'Log ind';
+      loginSub.textContent = 'Velkommen tilbage til ClinLog';
+      loginSubmitBtn.textContent = 'Log ind';
+      loginToggleBtn.textContent = 'Opret konto';
+      loginPassword.autocomplete = 'current-password';
+    }
+    loginMsg.textContent = '';
+    loginMsg.className = 'login-msg';
+  }
+
+  function escHtml(str) {
+    return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  }
+
+  // ── NOTE DATA + FILTRERING ──
+  let allNotes = [];
+  let activeCategory = '';
+  let searchQuery = '';
+  let currentUserId = null;
+
+  function filteredNotes() {
+    return allNotes.filter(n => {
+      const matchCat = !activeCategory || n.category === activeCategory;
+      const q = searchQuery.toLowerCase();
+      const matchQ = !q || (n.title || '').toLowerCase().includes(q) || (n.content || '').toLowerCase().includes(q);
+      return matchCat && matchQ;
+    });
+  }
+
+  function renderNoteList() {
+    const loading = document.getElementById('portal-notes-loading');
+    const empty   = document.getElementById('portal-notes-empty');
+    const list    = document.getElementById('portal-notes-list');
+    loading.style.display = 'none';
+    const notes = filteredNotes();
+    if (notes.length === 0) {
+      list.style.display = 'none';
+      empty.style.display = '';
+      return;
+    }
+    empty.style.display = 'none';
+    list.style.display = '';
+    list.innerHTML = '';
+    notes.forEach(note => {
+      const date = new Date(note.created_at).toLocaleDateString('da-DK', { day:'numeric', month:'short', year:'numeric' });
+      const preview = (note.content || '').slice(0, 180).trim();
+      const card = document.createElement('div');
+      card.className = 'note-card';
+      card.dataset.id = note.id;
+      card.innerHTML = `
+        <div class="note-card-header">
+          <span class="note-card-title">${escHtml(note.title || 'Uden titel')}</span>
+          <span class="note-card-meta">${date}</span>
+        </div>
+        ${note.category ? `<span class="note-card-category">${escHtml(note.category)}</span>` : ''}
+        <div class="note-card-content">${escHtml(preview)}${preview.length >= 180 ? '…' : ''}</div>
+      `;
+      card.addEventListener('click', () => openNote(note.id));
+      list.appendChild(card);
+    });
+  }
+
+  function buildCategoryButtons() {
+    const cats = [...new Set(allNotes.map(n => n.category).filter(Boolean))].sort();
+    const container = document.getElementById('portal-cats');
+    container.innerHTML = '<button class="portal-cat active" data-cat="">Alle</button>';
+    cats.forEach(cat => {
+      const btn = document.createElement('button');
+      btn.className = 'portal-cat';
+      btn.dataset.cat = cat;
+      btn.textContent = cat;
+      container.appendChild(btn);
+    });
+  }
+
+  async function loadNotes(userId) {
+    currentUserId = userId;
+    const loading = document.getElementById('portal-notes-loading');
+    loading.style.display = '';
+    document.getElementById('portal-notes-list').style.display = 'none';
+    document.getElementById('portal-notes-empty').style.display = 'none';
+    try {
+      const { data, error } = await supabase
+        .from('noter')
+        .select('id, title, content, category, created_at, updated_at, structured_content, edited_note')
+        .eq('user_id', userId)
+        .order('created_at', { ascending: false });
+      if (error) throw error;
+      allNotes = data || [];
+      buildCategoryButtons();
+      renderNoteList();
+    } catch (err) {
+      loading.style.display = 'none';
+      document.getElementById('portal-notes-empty').style.display = '';
+    }
+  }
+
+  // ── SØGNING + KATEGORI ──
+  document.getElementById('portal-search').addEventListener('input', function () {
+    searchQuery = this.value.trim();
+    renderNoteList();
+  });
+
+  document.getElementById('portal-cats').addEventListener('click', function (e) {
+    const btn = e.target.closest('.portal-cat');
+    if (!btn) return;
+    document.querySelectorAll('.portal-cat').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    activeCategory = btn.dataset.cat;
+    renderNoteList();
+  });
+
+  // ── NOTE DETAIL ──
+  let saveTimer = null;
+  let openNoteId = null;
+
+  const STRUCT_SECTIONS = [
+    { key: 'patientCase',        label: 'PATIENTCASE' },
+    { key: 'kliniskForlob',      label: 'KLINISK FORLØB' },
+    { key: 'fagligLaering',      label: 'FAGLIG LÆRING' },
+    { key: 'outcome_structured', label: 'OUTCOME' },
+    { key: 'emotioneltEtisk',    label: 'EMOTIONELT / ETISK' },
+  ];
+
+  function parseStructured(note) {
+    if (!note.structured_content) return null;
+    try { return typeof note.structured_content === 'string' ? JSON.parse(note.structured_content) : note.structured_content; } catch { return null; }
+  }
+
+  function buildCombinedText(note) {
+    // Brug edited_note hvis den findes
+    if (note.edited_note) return note.edited_note;
+    const sc = parseStructured(note);
+    const parts = [];
+    if (note.content) parts.push(note.content.trim());
+    if (sc) {
+      STRUCT_SECTIONS.forEach(s => {
+        if (sc[s.key]) parts.push('\n' + s.label + '\n' + sc[s.key].trim());
+      });
+    }
+    return parts.join('\n\n');
+  }
+
+  function autoResizeTextarea(ta) {
+    ta.style.height = 'auto';
+    ta.style.height = ta.scrollHeight + 'px';
+  }
+
+  function openNote(id) {
+    const note = allNotes.find(n => n.id === id);
+    if (!note) return;
+    openNoteId = id;
+    const badge = document.getElementById('detail-save-badge');
+    badge.textContent = '';
+    badge.className = 'detail-save-badge';
+    document.getElementById('detail-title').value = note.title || '';
+    const ta = document.getElementById('detail-textarea');
+    ta.value = buildCombinedText(note);
+    document.getElementById('detail-refs-content').innerHTML = `<p class="refs-loading">${T[lang]['portal-refs-loading'] || 'Søger i PubMed…'}</p>`;
+    document.getElementById('portal-list-view').style.display = 'none';
+    document.getElementById('portal-detail').classList.add('open');
+    // Resize efter DOM er renderet
+    requestAnimationFrame(() => autoResizeTextarea(ta));
+    fetchRefs(note);
+  }
+
+  function closeDetail() {
+    document.getElementById('portal-detail').classList.remove('open');
+    document.getElementById('portal-list-view').style.display = '';
+    openNoteId = null;
+    clearTimeout(saveTimer);
+  }
+
+  document.getElementById('detail-back-btn').addEventListener('click', closeDetail);
+
+  function scheduleAutoSave() {
+    clearTimeout(saveTimer);
+    saveTimer = setTimeout(saveNote, 1500);
+  }
+
+  async function saveNote() {
+    if (!openNoteId || !currentUserId) return;
+    const title      = document.getElementById('detail-title').value;
+    const editedNote = document.getElementById('detail-textarea').value;
+    const badge      = document.getElementById('detail-save-badge');
+    const note       = allNotes.find(n => n.id === openNoteId);
+    if (note) { note.title = title; note.edited_note = editedNote; }
+    try {
+      await supabase.from('noter')
+        .update({ title, edited_note: editedNote, updated_at: new Date().toISOString() })
+        .eq('id', openNoteId).eq('user_id', currentUserId);
+      badge.textContent = T[lang]['portal-saved'] || 'Ændringer gemt ✓';
+      badge.className = 'detail-save-badge persistent';
+    } catch (e) {
+      badge.textContent = T[lang]['portal-save-err'] || 'Fejl ved gemning';
+      badge.className = 'detail-save-badge persistent';
+      badge.style.color = 'var(--error)';
+    }
+  }
+
+  document.getElementById('detail-title').addEventListener('input', scheduleAutoSave);
+  document.getElementById('detail-textarea').addEventListener('input', function () {
+    autoResizeTextarea(this);
+    scheduleAutoSave();
+  });
+
+  // ── PUBMED REFERENCER ──
+  // Dansk→Engelsk medicinsk ordbog for præcise søgetermer
+  const DA_EN_MEDICAL = {
+    'sugammadex':'sugammadex','neostigmin':'neostigmine','intubation':'intubation',
+    'laryngoskopi':'laryngoscopy','laryngoskop':'laryngoscope','videolaryngoskop':'videolaryngoscope',
+    'luftvej':'airway','luftvejshåndtering':'airway management','vanskelig luftvej':'difficult airway',
+    'narkose':'general anesthesia','spinalanæstesi':'spinal anesthesia','epidural':'epidural anesthesia',
+    'regionalanæstesi':'regional anesthesia','lokalanæstesi':'local anesthesia',
+    'intuberet':'intubated','reintubation':'reintubation','ekstubation':'extubation',
+    'anæstesi':'anesthesia','anæstesiologi':'anesthesiology','anæstesilæge':'anesthesiologist',
+    'intensiv':'intensive care','intensivafdeling':'intensive care unit','icu':'ICU',
+    'respirator':'mechanical ventilation','ventilator':'ventilator','respiratorbehandling':'mechanical ventilation',
+    'sepsis':'sepsis','septisk shock':'septic shock','shock':'shock',
+    'hjertestop':'cardiac arrest','genoplivning':'resuscitation','hjertemassage':'chest compression',
+    'defibrillering':'defibrillation','adrenalin':'epinephrine','noradrenalin':'norepinephrine',
+    'akut':'acute','akutmedicin':'emergency medicine','skadestue':'emergency department',
+    'traume':'trauma','polytraume':'polytrauma','traumatologi':'traumatology',
+    'blødning':'hemorrhage','transfusion':'transfusion','koagulation':'coagulation',
+    'operationsstue':'operating room','postoperativ':'postoperative','perioperativ':'perioperative',
+    'smertebehandling':'pain management','smertelindring':'analgesia','opioid':'opioid',
+    'morfin':'morphine','fentanyl':'fentanyl','ketamin':'ketamine','propofol':'propofol',
+    'remifentanil':'remifentanil','midazolam':'midazolam','rocuronium':'rocuronium',
+    'neuromuskulær':'neuromuscular','blokade':'blockade','revertering':'reversal',
+    'cusum':'CUSUM','epa':'EPA','kompetence':'competency','refleksion':'reflection',
+    'kardiologi':'cardiology','hjerte':'cardiac','myokardie':'myocardial',
+    'infarkt':'infarction','koronar':'coronary','arytmi':'arrhythmia',
+    'neurologi':'neurology','stroke':'stroke','apopleksi':'stroke',
+    'pædiatri':'pediatrics','børn':'children','neonatal':'neonatal',
+    'obstetrik':'obstetrics','sectio':'cesarean section','fødsel':'delivery',
+    'onkologi':'oncology','kemoterapi':'chemotherapy',
+    'ultralyd':'ultrasound','ekkokardiografi':'echocardiography',
+    'pneumoni':'pneumonia','lungebetændelse':'pneumonia','ards':'ARDS',
+    'nyresvigt':'renal failure','dialyse':'dialysis','leversvigt':'liver failure',
+    'diabetes':'diabetes','insulin':'insulin','glukose':'glucose',
+    'antibiotika':'antibiotics','antibiotikaresistens':'antibiotic resistance',
+    'blodtryk':'blood pressure','hypertension':'hypertension','hypotension':'hypotension',
+    'iltmætning':'oxygen saturation','ilttilskud':'oxygen therapy',
+    'patientsikkerhed':'patient safety','fejl':'medical error','hændelse':'adverse event',
+  };
+
+  function extractMedicalTerms(note) {
+    const sc = parseStructured(note);
+
+    // Vægt fagligLaering og tags højest — mest præcise kliniske termer
+    const primaryText = [
+      sc?.fagligLaering || '',
+      Array.isArray(sc?.tags) ? sc.tags.join(' ') : '',
+    ].join(' ').toLowerCase();
+
+    const secondaryText = [
+      note.title || '',
+      sc?.patientCase || '',
+      sc?.kliniskForlob || '',
+      sc?.outcome_structured || '',
+      sc?.emotioneltEtisk || '',
+      note.content || '',
+    ].join(' ').toLowerCase();
+
+    const found = new Set();
+
+    // Primær: søg i fagligLaering + tags
+    Object.entries(DA_EN_MEDICAL).forEach(([da, en]) => {
+      if (primaryText.includes(da)) found.add(en);
+    });
+    // Sekundær: resten af noten
+    if (found.size < 4) {
+      Object.entries(DA_EN_MEDICAL).forEach(([da, en]) => {
+        if (secondaryText.includes(da)) found.add(en);
+      });
+    }
+
+    // Fallback: lange ukendte ord
+    const stopwords = new Set(['patient','havde','efter','under','inden','eller','dette','disse','ingen','andre','samme','kunne','skulle','ville','været','mange','første','anden','tredje','videre','derfor','nemlig','herved','eftersom']);
+    if (found.size < 3) {
+      (primaryText + ' ' + secondaryText)
+        .replace(/[^\wæøå]/g, ' ').split(/\s+/)
+        .filter(w => w.length > 6 && !stopwords.has(w) && !/^\d+$/.test(w))
+        .slice(0, 5)
+        .forEach(w => found.add(w));
+    }
+
+    return [...found].slice(0, 4);
+  }
+
+  const PUBMED_CAT_MESH = {
+    'Anæstesi':                        'anesthesia',
+    'Anæstesiologi og intensiv medicin':'anesthesia',
+    'Intensiv':                        'intensive care',
+    'Akutlæge':                        'emergency medicine',
+    'Akutmedicin':                     'emergency medicine',
+    'Kardiologi':                      'cardiology',
+    'Karkirurgi':                      'vascular surgery',
+    'Neurologi':                       'neurology',
+    'Neurokirurgi':                    'neurosurgery',
+    'Pædiatri':                        'pediatrics',
+    'Onkologi':                        'oncology',
+    'Gynækologi og obstetrik':         'obstetrics',
+    'Ortopædkirurgi':                  'orthopedic surgery',
+    'Præhospital medicin':             'emergency medical services',
+    'Psykiatri':                       'psychiatry',
+    'Lungemedicin':                    'pulmonary medicine',
+    'Gastroenterologi':                'gastroenterology',
+    'Nefrologi':                       'nephrology',
+    'Infektionsmedicin':               'infectious diseases',
+    'Hæmatologi':                      'hematology',
+    'Radiologi':                       'radiology',
+    'Abdominal kirurgi':               'general surgery',
+    'Thoraxkirurgi':                   'thoracic surgery',
+    'Intern medicin':                  'internal medicine',
+    'Almen medicin':                   'primary care',
+  };
+
+  const ARTICLE_FILTER = '(Review[pt] OR Guideline[pt] OR "Clinical Trial"[pt])';
+  const DATE_FILTER    = '("2018/01/01"[PDAT] : "3000/01/01"[PDAT])';
+
+  function getTagTerms(note) {
+    const sc = parseStructured(note);
+    const tags = sc?.tags;
+    if (Array.isArray(tags) && tags.length) {
+      return tags
+        .slice(0, 3)
+        .map(t => DA_EN_MEDICAL[t.toLowerCase()] || t)
+        .filter(Boolean);
+    }
+    return [];
+  }
+
+  function buildTermClause(terms) {
+    return terms.length ? '(' + terms.join(' OR ') + ')' : null;
+  }
+
+  function buildPubmedQuery(note, { noArticleFilter = false, noMesh = false } = {}) {
+    const mesh      = noMesh ? null : PUBMED_CAT_MESH[note.category];
+    const tagTerms  = getTagTerms(note);
+    const terms     = tagTerms.length ? tagTerms : extractMedicalTerms(note);
+    const termClause = buildTermClause(terms);
+
+    const parts = [];
+    if (termClause) parts.push(termClause);
+    if (mesh)       parts.push(`${mesh}[MeSH Terms]`);
+    if (!noArticleFilter) parts.push(ARTICLE_FILTER);
+    parts.push(DATE_FILTER);
+    return parts.join(' AND ') || 'clinical case';
+  }
+
+  async function pubmedSearch(query) {
+    const res = await fetch(
+      `https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?db=pubmed&term=${encodeURIComponent(query)}&retmax=5&sort=relevance&retmode=json`
+    );
+    if (!res.ok) throw new Error('PubMed esearch fejlede');
+    const json = await res.json();
+    return json.esearchresult?.idlist || [];
+  }
+
+  async function fetchRefs(note) {
+    const refsEl = document.getElementById('detail-refs-content');
+    refsEl.innerHTML = `<p class="refs-loading">${T[lang]['portal-refs-loading'] || 'Søger i PubMed…'}</p>`;
+
+    try {
+      // Trin 1: primær query (termer + MeSH + artikeltype + dato)
+      let ids = await pubmedSearch(buildPubmedQuery(note));
+
+      // Trin 2 fallback: fjern artikeltype-filter
+      if (ids.length === 0) {
+        ids = await pubmedSearch(buildPubmedQuery(note, { noArticleFilter: true }));
+      }
+
+      // Trin 3 fallback: kun termer, ingen MeSH eller filter
+      if (ids.length === 0) {
+        const terms = getTagTerms(note).length ? getTagTerms(note) : extractMedicalTerms(note);
+        ids = await pubmedSearch(buildTermClause(terms) || 'clinical case');
+      }
+
+      // Trin 4 fallback (sidste udvej): MeSH-term alene eller 'clinical case'
+      if (ids.length === 0) {
+        const mesh = PUBMED_CAT_MESH[note.category];
+        ids = await pubmedSearch(mesh ? `${mesh}[MeSH Terms]` : 'clinical case');
+      }
+
+      if (ids.length === 0) {
+        refsEl.innerHTML = `<p class="refs-loading">${T[lang]['portal-refs-none'] || 'Ingen relevante referencer fundet.'}</p>`;
+        return;
+      }
+
+      const summaryRes = await fetch(
+        `https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esummary.fcgi?db=pubmed&id=${ids.join(',')}&retmode=json`
+      );
+      const summaryJson = await summaryRes.json();
+      const result = summaryJson.result;
+
+      refsEl.innerHTML = '';
+      ids.slice(0, 3).forEach((id, i) => {
+        const art = result[id];
+        if (!art) return;
+        const title   = art.title || 'Uden titel';
+        const authors = (art.authors || []).map(a => a.name).slice(0, 2).join(', ');
+        const journal = art.source || '';
+        const year    = (art.pubdate || '').slice(0, 4);
+        const pmcId   = (art.articleids || []).find(a => a.idtype === 'pmc')?.value;
+        const href    = pmcId
+          ? `https://www.ncbi.nlm.nih.gov/pmc/articles/${pmcId}/`
+          : `https://pubmed.ncbi.nlm.nih.gov/${id}/`;
+        const label   = pmcId ? '📄 Full text' : '🔗 PubMed';
+        refsEl.innerHTML += `
+          <div class="ref-item">
+            <div class="ref-num">${i + 1}</div>
+            <div class="ref-body">
+              <a class="ref-title" href="${href}" target="_blank" rel="noopener">${escHtml(title)}</a>
+              <div class="ref-meta">${escHtml(authors)}${authors ? ' · ' : ''}${escHtml(journal)}${year ? ' ' + year : ''} · <span style="color:var(--teal2)">${label} ↗</span></div>
+            </div>
+          </div>`;
+      });
+    } catch (e) {
+      refsEl.innerHTML = `<p class="refs-loading">Kunne ikke hente referencer.<br><small style="color:var(--muted)">${escHtml(e.message)}</small></p>`;
+    }
+  }
+
+  function showPortal(user) {
+    navLoginItem.style.display = 'none';
+    navUserItem.style.display = '';
+    navUserEmail.textContent = user.email;
+    const mb = document.getElementById('nav-login-btn-mobile');
+    const mu = document.getElementById('nav-user-item-mobile');
+    if (mb) mb.style.display = 'none';
+    if (mu) mu.style.display = 'flex';
+    if (landingContent) landingContent.style.display = 'none';
+    portal.classList.add('open');
+    loadNotes(user.id);
+  }
+
+  function showLanding() {
+    navLoginItem.style.display = '';
+    navUserItem.style.display = 'none';
+    const mb = document.getElementById('nav-login-btn-mobile');
+    const mu = document.getElementById('nav-user-item-mobile');
+    if (mb) mb.style.display = '';
+    if (mu) mu.style.display = 'none';
+    if (landingContent) landingContent.style.display = '';
+    portal.classList.remove('open');
+  }
+
+  // Tjek eksisterende session ved sideload
+  supabase.auth.getSession().then(({ data: { session } }) => {
+    if (session) showPortal(session.user);
+  });
+
+  // Auth state changes (login/logout)
+  supabase.auth.onAuthStateChange((_event, session) => {
+    if (session) {
+      showPortal(session.user);
+      hideLogin();
+    } else {
+      showLanding();
+    }
+  });
+
+  document.getElementById('nav-login-btn').addEventListener('click', showLogin);
+  const mobileLoginBtn = document.getElementById('nav-login-btn-mobile');
+  if (mobileLoginBtn) mobileLoginBtn.addEventListener('click', showLogin);
+  const mobileLogoutBtn = document.getElementById('nav-logout-btn-mobile');
+  if (mobileLogoutBtn) mobileLogoutBtn.addEventListener('click', async function () {
+    await supabase.auth.signOut();
+  });
+
+  document.getElementById('login-close-btn').addEventListener('click', hideLogin);
+  loginOverlay.addEventListener('click', function (e) {
+    if (e.target === loginOverlay) hideLogin();
+  });
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape') hideLogin();
+  });
+
+  loginToggleBtn.addEventListener('click', function () {
+    setAuthMode(authMode === 'login' ? 'signup' : 'login');
+  });
+
+  loginSubmitBtn.addEventListener('click', async function () {
+    const email    = loginEmail.value.trim();
+    const password = loginPassword.value;
+    loginMsg.textContent = '';
+    loginMsg.className = 'login-msg';
+
+    if (!email || !email.includes('@')) {
+      loginMsg.textContent = 'Indtast en gyldig e-mail.';
+      loginMsg.className = 'login-msg error';
+      return;
+    }
+    if (password.length < 6) {
+      loginMsg.textContent = 'Adgangskode skal være mindst 6 tegn.';
+      loginMsg.className = 'login-msg error';
+      return;
+    }
+
+    loginSubmitBtn.disabled = true;
+    loginSubmitBtn.textContent = authMode === 'login' ? 'Logger ind…' : 'Opretter konto…';
+
+    try {
+      let error;
+      if (authMode === 'login') {
+        ({ error } = await supabase.auth.signInWithPassword({ email, password }));
+      } else {
+        ({ error } = await supabase.auth.signUp({ email, password }));
+        if (!error) {
+          loginMsg.textContent = 'Bekræft din e-mail for at aktivere kontoen.';
+          loginMsg.className = 'login-msg success';
+          loginSubmitBtn.disabled = false;
+          loginSubmitBtn.textContent = 'Opret konto';
+          return;
+        }
+      }
+
+      if (error) {
+        const msgs = {
+          'Invalid login credentials': 'Forkert e-mail eller adgangskode.',
+          'Email not confirmed':        'Bekræft din e-mail først.',
+          'User already registered':    'E-mail er allerede registreret. Log ind i stedet.',
+        };
+        loginMsg.textContent = msgs[error.message] || error.message;
+        loginMsg.className = 'login-msg error';
+        loginSubmitBtn.disabled = false;
+        loginSubmitBtn.textContent = authMode === 'login' ? 'Log ind' : 'Opret konto';
+      }
+    } catch (err) {
+      loginMsg.textContent = 'Noget gik galt. Prøv igen.';
+      loginMsg.className = 'login-msg error';
+      loginSubmitBtn.disabled = false;
+      loginSubmitBtn.textContent = authMode === 'login' ? 'Log ind' : 'Opret konto';
+    }
+  });
+
+  loginPassword.addEventListener('keydown', function (e) {
+    if (e.key === 'Enter') loginSubmitBtn.click();
+  });
+  loginEmail.addEventListener('keydown', function (e) {
+    if (e.key === 'Enter') loginPassword.focus();
+  });
+
+  document.getElementById('nav-logout-btn').addEventListener('click', async function () {
+    await supabase.auth.signOut();
+  });
+
+  } // end if (supabase)
+  }); // end window.load
+
+  </script>
+</body>
+</html>
