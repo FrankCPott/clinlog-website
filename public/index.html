@@ -621,6 +621,144 @@
       footer { flex-direction: column; text-align: center; }
       .footer-links { justify-content: center; }
     }
+
+    /* ── APP SCREENSHOTS ── */
+    #screenshots { background: var(--navy2); }
+    .screenshots-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 2rem;
+    }
+    .screenshot-item { display: flex; flex-direction: column; align-items: center; gap: 1rem; }
+    .screenshot-frame {
+      position: relative;
+      background: #0a111e;
+      border-radius: 28px;
+      border: 1.5px solid var(--border);
+      box-shadow: 0 16px 60px rgba(0,0,0,0.55), 0 0 0 1px rgba(255,255,255,0.04);
+      overflow: hidden;
+      width: 100%;
+      max-width: 220px;
+    }
+    .screenshot-frame img {
+      width: 100%;
+      display: block;
+      border-radius: 26px;
+    }
+    .screenshot-caption {
+      text-align: center;
+      max-width: 220px;
+    }
+    .screenshot-caption strong {
+      display: block;
+      font-size: .88rem;
+      font-weight: 600;
+      color: var(--white);
+      margin-bottom: .25rem;
+    }
+    .screenshot-caption p {
+      font-size: .78rem;
+      color: var(--muted);
+      line-height: 1.55;
+    }
+    @media (max-width: 900px) {
+      .screenshots-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+    @media (max-width: 540px) {
+      .screenshots-grid { grid-template-columns: repeat(1, 1fr); align-items: center; }
+      .screenshot-frame { max-width: 280px; }
+    }
+
+    /* ── DEMO CASE ── */
+    #demo-case { background: var(--navy); }
+    .demo-badge {
+      display: inline-flex; align-items: center; gap: .4rem;
+      background: rgba(240,192,96,0.1); border: 1px solid rgba(240,192,96,0.2);
+      color: var(--gold); font-size: .72rem; font-weight: 600;
+      letter-spacing: .06em; text-transform: uppercase;
+      padding: .3rem .85rem; border-radius: 99px; margin-bottom: 2.5rem;
+    }
+    .demo-window {
+      background: var(--navy2);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      overflow: hidden;
+      box-shadow: 0 24px 80px rgba(0,0,0,0.5);
+      max-width: 820px;
+      margin: 0 auto;
+    }
+    .demo-topbar {
+      display: flex; align-items: center; gap: 1rem;
+      padding: 1rem 1.5rem;
+      border-bottom: 1px solid var(--border);
+      background: #0f1929;
+    }
+    .demo-dots { display: flex; gap: .4rem; }
+    .demo-dot { width: 10px; height: 10px; border-radius: 50%; background: rgba(255,255,255,0.12); }
+    .demo-title-area { flex: 1; }
+    .demo-note-title {
+      font-family: 'DM Serif Display', serif;
+      font-size: 1.15rem; color: var(--white);
+      letter-spacing: -0.01em;
+    }
+    .demo-note-meta { font-size: .75rem; color: var(--muted); margin-top: .15rem; }
+    .demo-readonly-badge {
+      font-size: .68rem; font-weight: 600; letter-spacing: .05em;
+      background: rgba(14,165,197,0.1); color: var(--teal2);
+      border: 1px solid rgba(14,165,197,0.2);
+      border-radius: 99px; padding: .2rem .6rem;
+      white-space: nowrap;
+    }
+    .demo-tabbar {
+      display: flex; border-bottom: 1px solid var(--border);
+      background: var(--navy2); overflow-x: auto;
+    }
+    .demo-tab {
+      padding: .65rem 1.25rem; font-size: .82rem; font-weight: 500;
+      color: var(--muted); border: none; background: transparent;
+      border-bottom: 2px solid transparent;
+      white-space: nowrap; flex-shrink: 0;
+    }
+    .demo-tab.active { color: var(--teal2); border-bottom-color: var(--teal2); }
+    .demo-body {
+      padding: 1.5rem 2rem 2rem;
+      max-height: 480px; overflow-y: auto;
+    }
+    .demo-orig-toggle {
+      display: flex; align-items: center; gap: .5rem;
+      background: none; border: none; cursor: pointer;
+      padding: .4rem 0; margin-bottom: .75rem;
+      color: var(--muted); font-size: .82rem; font-family: inherit;
+    }
+    .demo-orig-toggle:hover { color: var(--white); }
+    .demo-orig-arrow { font-size: .65rem; transition: transform .2s; display: inline-block; }
+    .demo-orig-arrow.open { transform: rotate(90deg); }
+    .demo-orig-text {
+      font-size: .875rem; color: var(--muted); line-height: 1.75;
+      white-space: pre-wrap; margin-bottom: 1.25rem; display: none;
+      border-left: 2px solid var(--border); padding-left: .9rem;
+    }
+    .demo-orig-text.open { display: block; }
+    .demo-section { margin-bottom: 1.4rem; }
+    .demo-section-header { display: flex; align-items: center; gap: .5rem; margin-bottom: .5rem; }
+    .demo-section-icon { font-size: 1rem; }
+    .demo-section-label {
+      font-size: .7rem; font-weight: 700; letter-spacing: .12em;
+      text-transform: uppercase; color: var(--teal);
+    }
+    .demo-section-text { font-size: .9rem; color: var(--white); line-height: 1.75; }
+    .demo-divider { border: none; border-top: 1px solid var(--border); margin: 1.25rem 0; }
+    .demo-tags { display: flex; flex-wrap: wrap; gap: .4rem; margin-top: 1.25rem; }
+    .demo-tag {
+      font-size: .72rem; padding: .2rem .55rem; border-radius: 999px;
+      background: rgba(14,165,197,0.12); color: var(--teal2);
+      border: 1px solid rgba(14,165,197,0.2);
+    }
+    .demo-note { font-size: .78rem; color: var(--muted); margin-top: 2rem; text-align: center; }
+    @media (max-width: 768px) {
+      .demo-body { padding: 1rem; max-height: 420px; }
+      .demo-topbar { padding: .75rem 1rem; }
+    }
   </style>
 </head>
 <body>
@@ -1011,6 +1149,184 @@
       </div>
     </div>
   </section>
+
+  <div class="divider"></div>
+
+  <!-- ══ APP SCREENSHOTS ══ -->
+  <section id="screenshots">
+    <div class="section-inner">
+      <span class="section-label reveal">Se appen i aktion</span>
+      <h2 class="section-title reveal">Fra diktation til struktureret læring<br><em style="font-style:italic;color:var(--teal2)">på under 2 minutter</em></h2>
+      <p class="section-sub reveal">Appen guider dig gennem hele forløbet — fra frisk diktation til AI-struktureret note med klinisk refleksion, referencer og kompetencevurdering.</p>
+      <div class="screenshots-grid">
+
+        <div class="screenshot-item reveal">
+          <div class="screenshot-frame">
+            <img src="screenshots/screen1.png" alt="Skriv en ny note" loading="lazy" />
+          </div>
+          <div class="screenshot-caption">
+            <strong>Skriv en ny note</strong>
+            <p>Giv noten en titel — eller lad AI generere den automatisk. Vælg kategori, eller lad AI'en vælge det rette speciale.</p>
+          </div>
+        </div>
+
+        <div class="screenshot-item reveal">
+          <div class="screenshot-frame">
+            <img src="screenshots/screen2.png" alt="Diktér og vedhæft" loading="lazy" />
+          </div>
+          <div class="screenshot-caption">
+            <strong>Diktér og vedhæft</strong>
+            <p>Tryk "Optag tale" og fortæl frit om hvad der skete. Tilføj evt. et billede fra klinikken — anonymiseret automatisk.</p>
+          </div>
+        </div>
+
+        <div class="screenshot-item reveal">
+          <div class="screenshot-frame">
+            <img src="screenshots/screen3.png" alt="Arkiv med kategorifilter" loading="lazy" />
+          </div>
+          <div class="screenshot-caption">
+            <strong>Arkiv med søgning</strong>
+            <p>Find alle dine noter hurtigt med fritekstsøgning og kategorifilter — præhospital, intensiv, traumatologi og mere.</p>
+          </div>
+        </div>
+
+        <div class="screenshot-item reveal">
+          <div class="screenshot-frame">
+            <img src="screenshots/screen4.png" alt="Original fortælling" loading="lazy" />
+          </div>
+          <div class="screenshot-caption">
+            <strong>Original fortælling</strong>
+            <p>Din rå diktation gemmes — præcis som du fortalte den. Du kan altid se og redigere den originale tekst.</p>
+          </div>
+        </div>
+
+        <div class="screenshot-item reveal">
+          <div class="screenshot-frame">
+            <img src="screenshots/screen5.png" alt="AI-strukturerede sektioner" loading="lazy" />
+          </div>
+          <div class="screenshot-caption">
+            <strong>AI-struktureret note</strong>
+            <p>AI'en opdeler automatisk din fortælling i patientcase, klinisk forløb, faglig læring og outcome.</p>
+          </div>
+        </div>
+
+        <div class="screenshot-item reveal">
+          <div class="screenshot-frame">
+            <img src="screenshots/screen6.png" alt="Faglig læring og refleksion" loading="lazy" />
+          </div>
+          <div class="screenshot-caption">
+            <strong>Faglig læring &amp; refleksion</strong>
+            <p>Den dybeste sektion: hvad lærte du? AI'en hjælper med at formulere klinisk relevant refleksion og outcome.</p>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- ══ DEMO CASE ══ -->
+  <section id="demo-case">
+    <div class="section-inner">
+      <span class="section-label reveal">Eksempel fra portalen</span>
+      <h2 class="section-title reveal">Sådan ser et rigtigt notat ud</h2>
+      <p class="section-sub reveal">Her ser du et anonymiseret præhospitalt notat fra en rigtig klinisk situation — præcis som det vises for en registreret bruger på portalen. Læs, reflektér, og se hvad Clinlog kan.</p>
+
+      <div class="demo-badge reveal">🔍 Eksempel · Kun læsning · Anonymiseret</div>
+
+      <div class="demo-window reveal">
+        <!-- Topbar -->
+        <div class="demo-topbar">
+          <div class="demo-dots">
+            <div class="demo-dot"></div>
+            <div class="demo-dot"></div>
+            <div class="demo-dot"></div>
+          </div>
+          <div class="demo-title-area">
+            <div class="demo-note-title">Bradykardi</div>
+            <div class="demo-note-meta">Præhospital · 09. apr. 2026</div>
+          </div>
+          <span class="demo-readonly-badge">👁 Eksempel · skrivebeskyttet</span>
+        </div>
+        <!-- Tabbar -->
+        <div class="demo-tabbar">
+          <button class="demo-tab active">Notat</button>
+          <button class="demo-tab" style="opacity:.45;cursor:default">💊 Farmakologi</button>
+          <button class="demo-tab" style="opacity:.45;cursor:default">📖 Referencer</button>
+        </div>
+        <!-- Body -->
+        <div class="demo-body">
+          <!-- Original fortælling (collapsible) -->
+          <button class="demo-orig-toggle" id="demo-orig-btn">
+            <span class="demo-orig-arrow" id="demo-orig-arrow">▶</span>
+            <span>📝 Original fortælling</span>
+          </button>
+          <div class="demo-orig-text" id="demo-orig-text">Vi havde en circa 73-årig dame, som var kendt med koloncancer og stomi og lungemetastaser, men fungerede fint derhjemme. Som igennem nogle dage havde det dårligt, almen dårligt, og var plaget af svimmelhed, som så var tiltagende i dag, hvorfor hun ringede efter ambulancen. Ambulancen fandt en puls på 24, blodtryk egentlig fint omkring de 100 systolisk, og perifert kølig, svært at palpere, men hun havde pæne farver og var ikke dyspnødisk. Hun var vognklar orienteret. De gav hende noget uden effekt, og kaldte [KLINIKER], fordi de ikke kunne behandle det. Vi havde længere kørevare og forberedt os noget isoprenalin. Vi mødte ambulancen på et rendezvouspoint og startede isoprenalin — en blanding på 1 milligram i 20 milliliter salt — og vi startede pumpen med 4 milliliter i timen og øgede så gradvist til 14 milliliter i timen, hvorefter hendes puls steg til ca. 50 per minut. EKG viste smalle komplekser, ingen P-takker umiddelbart. Patienten blev overflyttet til [AFDELING].</div>
+          <hr class="demo-divider">
+
+          <!-- Patientcase -->
+          <div class="demo-section">
+            <div class="demo-section-header">
+              <span class="demo-section-icon">👤</span>
+              <span class="demo-section-label">Patientcase</span>
+            </div>
+            <div class="demo-section-text">Dame i 70'erne, kendt med koloncancer, stomi og lungemetastaser, men hidtil funktionsdygtig i hjemmet. Indkaldte ambulance efter tiltagende almen dårlighedsfornemmelse og svimmelhed gennem flere dage. Ambulancen fandt puls 24/min, systolisk BT ~100 mmHg, perifer kølighed, men bevarede farver, ingen dyspnø og patient vågen og orienteret.</div>
+          </div>
+          <hr class="demo-divider">
+
+          <!-- Klinisk forløb -->
+          <div class="demo-section">
+            <div class="demo-section-header">
+              <span class="demo-section-icon">📋</span>
+              <span class="demo-section-label">Klinisk forløb</span>
+            </div>
+            <div class="demo-section-text">Ambulancen registrerede bradykardi med puls 24/min og administrerede behandling uden effekt, hvorefter lægeambulancen blev tilkaldt. EKG viste smalle komplekser uden tydelige P-takker, forenelig med junctionalt eller nodalt escape-rytme. Isoprenalin blev forberedt under kørslen som 1 mg/20 ml NaCl-opløsning. På rendezvouspoint startede infusion ved 4 ml/t og gradvist titreret op til 14 ml/t, hvorefter pulsen steg til ca. 50/min. Patienten forblev hæmodynamisk stabil og blev overflyttet til hospitalet.</div>
+          </div>
+          <hr class="demo-divider">
+
+          <!-- Faglig læring -->
+          <div class="demo-section">
+            <div class="demo-section-header">
+              <span class="demo-section-icon">🎓</span>
+              <span class="demo-section-label">Faglig læring</span>
+            </div>
+            <div class="demo-section-text">Casen illustrerer kompetent præhospital håndtering af svær symptomatisk bradykardi med bevaret hæmodynamik, hvor korrekt valg af kronotropt agens og gradueret titrering opnåede klinisk acceptabel frekvens. Fraværet af P-takker på smalt-kompleks-EKG peger mod AV-nodal eller sinusknude-dysfunktion med junctionalt escape — vigtig differentialdiagnostisk distinktion i forhold til komplet AV-blok med ventrikulært escape. Isoprenalin var et velovervejet valg ved smalt kompleks bradykardi med bevaret BT, særligt i en patient med potentiel metastasebetinget kardiel påvirkning. Det er værd at overveje, om baggrunden for bradykardien — elektrolytforstyrrelser (fx hyperkaliæmi ved cancerrelateret metabolisk dysregulation), kardielle metastaser eller paraneoplastisk patologi — bør guidere den videre in-hospital udredning med hurtig EKG-analyse, telemetri og biokemi.</div>
+          </div>
+          <hr class="demo-divider">
+
+          <!-- Outcome -->
+          <div class="demo-section">
+            <div class="demo-section-header">
+              <span class="demo-section-icon">🎯</span>
+              <span class="demo-section-label">Outcome</span>
+            </div>
+            <div class="demo-section-text">Patienten opnåede stigning i puls til ca. 50/min efter titrering af isoprenalin til 14 ml/t. Hæmodynamikken var bevaret under hele forløbet. Stabil overflytning til hospitalet for videre udredning og behandling.</div>
+          </div>
+
+          <!-- Tags -->
+          <div class="demo-tags">
+            <span class="demo-tag">bradykardi</span>
+            <span class="demo-tag">isoprenalin</span>
+            <span class="demo-tag">EKG</span>
+            <span class="demo-tag">præhospital</span>
+            <span class="demo-tag">escape-rytme</span>
+            <span class="demo-tag">hæmodynamik</span>
+          </div>
+
+          <p class="demo-note">💡 Dette er et anonymiseret eksempelnotat. Registrerede brugere ser alle deres egne noter på samme måde — med søgbare referencer og faglig analyse.</p>
+        </div>
+      </div>
+
+      <div style="text-align:center;margin-top:2.5rem">
+        <a href="#waitlist" class="btn-primary reveal">
+          Tilmeld venteliste og prøv selv →
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
 
   <!-- ══ WAITLIST ══ -->
   <section id="waitlist">
@@ -1663,6 +1979,18 @@
   // FOOTER YEAR
   // ══════════════════════════════════════════════════════════
   document.getElementById('footer-year').textContent = new Date().getFullYear();
+
+  // ── DEMO CASE toggle ──
+  (function () {
+    const btn = document.getElementById('demo-orig-btn');
+    if (!btn) return;
+    btn.addEventListener('click', function () {
+      const arrow = document.getElementById('demo-orig-arrow');
+      const txt = document.getElementById('demo-orig-text');
+      const open = txt.classList.toggle('open');
+      arrow.classList.toggle('open', open);
+    });
+  })();
 
   // ══════════════════════════════════════════════════════════
   // AUTH — Supabase (initialiseres efter siden er loadet)
