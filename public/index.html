@@ -2288,7 +2288,7 @@
     try {
       const res = await fetch(CLAUDE_PROXY, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + (currentSession?.access_token || '') },
         body: JSON.stringify({
           model: 'claude-sonnet-4-6',
           max_tokens: 1200,
@@ -2707,7 +2707,7 @@
     try {
       const res = await fetch(CLAUDE_PROXY, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + (currentSession?.access_token || '') },
         body: JSON.stringify({
           model: 'claude-haiku-4-5-20251001',
           max_tokens: 80,
@@ -2815,7 +2815,7 @@
     try {
       const res = await fetch(CLAUDE_PROXY, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + (currentSession?.access_token || '') },
         body: JSON.stringify({
           model: 'claude-haiku-4-5-20251001',
           max_tokens: 200,
