@@ -903,6 +903,9 @@
           </button>
         </div>
       </li>
+      <li>
+        <button id="translate-hint-btn" onclick="showTranslateTip()" title="Other language? Use your browser's translate function" style="background:none;border:none;cursor:pointer;color:var(--muted);font-size:.78rem;padding:.2rem .3rem;opacity:.7;white-space:nowrap;transition:opacity .2s;" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='.7'">🌐</button>
+      </li>
     </ul>
 
     <!-- Mobil: flag + login (kun synlig på mobil) -->
@@ -1838,6 +1841,32 @@
       : 'Clinlog – Clinical learning diary for healthcare professionals';
   }
 
+  const translateTipText = {
+    da: '🌐 Bruger du et andet sprog? Højreklik på siden og vælg "Oversæt til dansk" — eller brug Google Translate (translate.google.com).',
+    en: '🌐 Need another language? Right-click the page and choose "Translate to English" (Chrome/Edge) — or use Google Translate (translate.google.com).',
+    de: '🌐 Andere Sprache? Rechtsklick auf die Seite und „Auf Deutsch übersetzen" wählen (Chrome/Edge) — oder Google Translate (translate.google.com) nutzen.',
+  };
+
+  function showTranslateTip(autoTriggered) {
+    const tipId = 'translate-tip-banner';
+    let tip = document.getElementById(tipId);
+    if (tip) { tip.remove(); }
+    tip = document.createElement('div');
+    tip.id = tipId;
+    tip.style.cssText = 'position:fixed;bottom:1.2rem;left:50%;transform:translateX(-50%);background:rgba(20,184,166,0.97);color:#fff;font-size:.85rem;padding:.75rem 1.3rem;border-radius:10px;max-width:520px;width:92%;text-align:center;z-index:9999;box-shadow:0 4px 24px rgba(0,0,0,0.32);line-height:1.5;display:flex;align-items:center;gap:.8rem;';
+    const txt = document.createElement('span');
+    txt.textContent = translateTipText[lang] || translateTipText.en;
+    const close = document.createElement('button');
+    close.textContent = '✕';
+    close.style.cssText = 'background:none;border:none;color:#fff;font-size:1rem;cursor:pointer;opacity:.8;flex-shrink:0;';
+    close.onclick = () => tip.remove();
+    tip.appendChild(txt);
+    tip.appendChild(close);
+    document.body.appendChild(tip);
+    const timeout = autoTriggered ? 12000 : 9000;
+    setTimeout(() => { if (tip && tip.parentNode) tip.remove(); }, timeout);
+  }
+
   function setLang(newLang) {
     lang = newLang;
     ['da','en','de'].forEach(l => {
@@ -1849,7 +1878,22 @@
       if (mobile2) mobile2.classList.toggle('active', l === lang);
     });
     applyTranslations();
+
+    // Opdater tooltip på 🌐-knap
+    const hintBtn = document.getElementById('translate-hint-btn');
+    if (hintBtn) {
+      const titles = { da: 'Andet sprog? Brug browserens oversættelsesfunktion', en: 'Other language? Use your browser\'s translate function', de: 'Andere Sprache? Nutzen Sie die Browser-Übersetzung' };
+      hintBtn.title = titles[lang] || titles.en;
+    }
   }
+
+  // Auto-vis oversættelsestip hvis browsersprog ikke er DA/EN/DE
+  window.addEventListener('load', function() {
+    const bl = (navigator.language || navigator.userLanguage || '').toLowerCase().slice(0,2);
+    if (!['da','en','de'].includes(bl)) {
+      setTimeout(() => showTranslateTip(true), 2500);
+    }
+  });
 
   // ══════════════════════════════════════════════════════════
   // WAITLIST — Supabase
