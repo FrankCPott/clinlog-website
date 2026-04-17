@@ -7,6 +7,13 @@ const ALLOWED_ORIGINS = [
   'https://clinlog.netlify.app',
 ];
 
+const ALLOWED_MODELS = [
+  'claude-sonnet-4-6',
+  'claude-haiku-4-5-20251001',
+];
+
+const MAX_TOKENS_CAP = 1500;
+
 exports.handler = async (event) => {
   if (event.httpMethod !== 'POST') {
     return { statusCode: 405, body: 'Method Not Allowed' };
@@ -40,14 +47,29 @@ exports.handler = async (event) => {
     return { statusCode: 401, body: JSON.stringify({ error: 'Unauthorized: could not verify session' }) };
   }
 
-  // ── 3. Forward request to Anthropic ─────────────────────────
+  // ── 3. Parse og sanitér request body ────────────────────────
+  let body;
+  try {
+    body = JSON.parse(event.body);
+  } catch {
+    return { statusCode: 400, body: JSON.stringify({ error: 'Invalid JSON' }) };
+  }
+
+  // Model allowlist — bloker dyre/uønskede modeller
+  if (!ALLOWED_MODELS.includes(body.model)) {
+    return { statusCode: 400, body: JSON.stringify({ error: 'Model not allowed' }) };
+  }
+
+  // Server-side cap på max_tokens — ignorer klientens værdi hvis den er for høj
+  body.max_tokens = Math.min(body.max_tokens || 1000, MAX_TOKENS_CAP);
+
+  // ── 4. Forward request til Anthropic ────────────────────────
   const apiKey = process.env.ANTHROPIC_API_KEY;
   if (!apiKey) {
     return { statusCode: 500, body: JSON.stringify({ error: 'ANTHROPIC_API_KEY not configured' }) };
   }
 
   try {
-    const body = JSON.parse(event.body);
     const response = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
       headers: {

@@ -1999,9 +1999,9 @@
   const supabase = (window.supabase && window.supabase.createClient)
     ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
         auth: {
-          storage: window.localStorage,
+          storage: null,
           autoRefreshToken: true,
-          persistSession: true,
+          persistSession: false,
           detectSessionInUrl: false,
         }
       })
@@ -2874,17 +2874,8 @@
     portal.classList.remove('open');
   }
 
-  // Gendan session fra manuelt gemt token
-  (async function restoreSession() {
-    try {
-      const stored = localStorage.getItem('clinlog_session');
-      if (!stored) { showLanding(); return; }
-      const { access_token, refresh_token } = JSON.parse(stored);
-      const { data, error } = await supabase.auth.setSession({ access_token, refresh_token });
-      if (error || !data?.session) { localStorage.removeItem('clinlog_session'); showLanding(); }
-      // onAuthStateChange håndterer showPortal når setSession lykkes
-    } catch { showLanding(); }
-  })();
+  // Session håndteres af onAuthStateChange — ingen localStorage
+  showLanding();
 
   // Auth state — INITIAL_SESSION håndterer session-restore fra localStorage
   supabase.auth.onAuthStateChange((_event, session) => {
@@ -2913,7 +2904,7 @@
   if (mobileLoginBtn) mobileLoginBtn.addEventListener('click', showLogin);
   const mobileLogoutBtn = document.getElementById('nav-logout-btn-mobile');
   if (mobileLogoutBtn) mobileLogoutBtn.addEventListener('click', async function () {
-    localStorage.removeItem('clinlog_session'); await supabase.auth.signOut();
+    await supabase.auth.signOut();
   });
 
   // Nav-links: vis landing-indhold og scroll til sektion — bevar login-state
@@ -2974,12 +2965,6 @@
         error = signInError;
         if (!error && signInData?.session) {
           currentSession = signInData.session;
-          localStorage.setItem('clinlog_session', JSON.stringify({
-            access_token:  signInData.session.access_token,
-            refresh_token: signInData.session.refresh_token,
-            expires_at:    signInData.session.expires_at,
-            user:          signInData.session.user,
-          }));
         }
       } else {
         ({ error } = await supabase.auth.signUp({ email, password }));
@@ -3019,7 +3004,7 @@
   });
 
   document.getElementById('nav-logout-btn').addEventListener('click', async function () {
-    localStorage.removeItem('clinlog_session'); await supabase.auth.signOut();
+    await supabase.auth.signOut();
   });
 
   } // end if (supabase)

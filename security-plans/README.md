@@ -10,11 +10,11 @@ Delvise fixes implementeret: 2026-04-17 (issue 01)
 
 | # | Titel | Sværhedsgrad | Status | Tid |
 |---|-------|-------------|--------|-----|
-| [01](01-claude-proxy-abuse.md) | Claude-proxy misbrug | 🔴 Kritisk | ⚠️ Delvist fikset | 45 min |
-| [02](02-subdomain-takeover.md) | Subdomain takeover app.clinlog.dk | 🟠 Høj | ❌ Ikke fikset | 5 min |
-| [03](03-session-tokens-localstorage.md) | Session-tokens i localStorage | 🟠 Høj | ❌ Ikke fikset | 30 min |
-| [04](04-auto-confirmed-emails.md) | Auto-confirmed emails | 🟠 Høj | ❌ Ikke fikset | 30 min |
-| [05](05-manglende-security-headers.md) | Manglende security headers | 🟡 Medium | ❌ Ikke fikset | 90 min |
+| [01](01-claude-proxy-abuse.md) | Claude-proxy misbrug | 🔴 Kritisk | ⚠️ Model+cap fikset, kvote mangler | 45 min |
+| [02](02-subdomain-takeover.md) | Subdomain takeover app.clinlog.dk | 🟠 Høj | ⏳ Kræver DNS-adgang (Simply.com) | 5 min |
+| [03](03-session-tokens-localstorage.md) | Session-tokens i localStorage | 🟠 Høj | ✅ Fikset 2026-04-17 | 30 min |
+| [04](04-auto-confirmed-emails.md) | Auto-confirmed emails | 🟠 Høj | ⏳ Kræver Supabase-dashboard | 30 min |
+| [05](05-manglende-security-headers.md) | Manglende security headers | 🟡 Medium | ✅ Fikset 2026-04-17 | 90 min |
 | 06 | *(afventer — rapport afskåret)* | ? | ⏳ Plan mangler | - |
 | 07 | *(afventer — rapport afskåret)* | ? | ⏳ Plan mangler | - |
 | 08 | *(afventer — rapport afskåret)* | ? | ⏳ Plan mangler | - |
@@ -24,13 +24,17 @@ Delvise fixes implementeret: 2026-04-17 (issue 01)
 
 ## Hvad der allerede er gjort (2026-04-17)
 
-**Issue 01 — delvist:**
-- ✅ Origin-whitelist tilføjet (kun clinlog.dk domæner)
+**Issue 01:**
+- ✅ Origin-whitelist tilføjet
 - ✅ Supabase Bearer token verificering tilføjet
-- ❌ Model-allowlist mangler
-- ❌ Server-side max_tokens cap mangler  
-- ❌ Per-user daglig token-kvote mangler
-- ❌ Anthropic billing cap (skal sættes manuelt på console.anthropic.com)
+- ✅ Model-allowlist tilføjet (kun claude-sonnet-4-6 og claude-haiku)
+- ✅ Server-side max_tokens cap (1500) tilføjet
+- ❌ Per-user daglig token-kvote mangler (kræver SUPABASE_SERVICE_KEY i Netlify)
+- ❌ Anthropic billing cap (sættes manuelt på console.anthropic.com)
+
+**Issue 03:** ✅ localStorage fjernet — tokens lever kun i RAM
+
+**Issue 05:** ✅ X-Frame-Options, X-Content-Type-Options, Referrer-Policy, Permissions-Policy, CSP tilføjet
 
 ---
 
