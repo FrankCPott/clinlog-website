@@ -1879,18 +1879,14 @@
     msgEl.className = 'waitlist-message';
 
     try {
-      const res = await fetch(`${SUPABASE_URL}/rest/v1/waitlist`, {
+      const res = await fetch('/.netlify/functions/waitlist', {
         method: 'POST',
-        headers: {
-          'Content-Type':  'application/json',
-          'apikey':        SUPABASE_ANON_KEY,
-          'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
-          'Prefer':        'return=minimal'
-        },
-        body: JSON.stringify({ email, signed_up_at: new Date().toISOString() })
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email })
       });
+      const data = await res.json().catch(() => ({}));
 
-      if (res.ok || res.status === 201) {
+      if (res.ok) {
         input.value = '';
         input.style.borderColor = 'var(--success)';
         input.placeholder = '✓';
@@ -1898,14 +1894,18 @@
         btn.style.background = '#16a34a';
         msgEl.textContent = t['wl-success'];
         msgEl.className = 'waitlist-message success';
-      } else if (res.status === 409 || res.status === 422) {
+      } else if (res.status === 409) {
         msgEl.textContent = t['wl-duplicate'];
         msgEl.className = 'waitlist-message success';
         btn.disabled = false;
         btn.textContent = T[lang]['wl-btn'];
+      } else if (res.status === 429) {
+        msgEl.textContent = 'For mange forsøg. Prøv igen om lidt.';
+        msgEl.className = 'waitlist-message error';
+        btn.disabled = false;
+        btn.textContent = T[lang]['wl-btn'];
       } else {
-        const body = await res.text().catch(() => '');
-        throw new Error(`${res.status}: ${body.slice(0, 120)}`);
+        throw new Error(data.error || res.status);
       }
     } catch (err) {
       console.error('Waitlist:', err);
@@ -2029,6 +2029,9 @@
   const portal         = document.getElementById('portal');
 
   let authMode = 'login'; // 'login' | 'signup'
+  let loginAttempts = 0;
+  const MAX_LOGIN_ATTEMPTS = 5;
+  const LOGIN_LOCKOUT_MS   = 5 * 60 * 1000; // 5 minutter
 
   function showLogin() {
     loginOverlay.classList.add('open');
@@ -2944,6 +2947,13 @@
     loginMsg.textContent = '';
     loginMsg.className = 'login-msg';
 
+    // Lockout check
+    if (loginAttempts >= MAX_LOGIN_ATTEMPTS) {
+      loginMsg.textContent = 'For mange fejlede forsøg. Vent 5 minutter og prøv igen.';
+      loginMsg.className = 'login-msg error';
+      return;
+    }
+
     if (!email || !email.includes('@')) {
       loginMsg.textContent = 'Indtast en gyldig e-mail.';
       loginMsg.className = 'login-msg error';
@@ -2965,6 +2975,7 @@
         error = signInError;
         if (!error && signInData?.session) {
           currentSession = signInData.session;
+          loginAttempts = 0; // reset ved succes
         }
       } else {
         ({ error } = await supabase.auth.signUp({ email, password }));
@@ -2978,6 +2989,21 @@
       }
 
       if (error) {
+        // Tæl kun fejlede login-forsøg (ikke signup-fejl)
+        if (authMode === 'login') {
+          loginAttempts++;
+          if (loginAttempts >= MAX_LOGIN_ATTEMPTS) {
+            loginSubmitBtn.disabled = true;
+            loginMsg.textContent = 'For mange fejlede forsøg. Log ind igen om 5 minutter.';
+            loginMsg.className = 'login-msg error';
+            setTimeout(() => {
+              loginAttempts = 0;
+              loginSubmitBtn.disabled = false;
+              loginMsg.textContent = '';
+            }, LOGIN_LOCKOUT_MS);
+            return;
+          }
+        }
         const msgs = {
           'Invalid login credentials': 'Forkert e-mail eller adgangskode.',
           'Email not confirmed':        'Bekræft din e-mail først.',

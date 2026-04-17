@@ -15,10 +15,10 @@ Delvise fixes implementeret: 2026-04-17 (issue 01)
 | [03](03-session-tokens-localstorage.md) | Session-tokens i localStorage | 🟠 Høj | ✅ Fikset 2026-04-17 | 30 min |
 | [04](04-auto-confirmed-emails.md) | Auto-confirmed emails | 🟠 Høj | ✅ Fikset 2026-04-17 | 30 min |
 | [05](05-manglende-security-headers.md) | Manglende security headers | 🟡 Medium | ✅ Fikset 2026-04-17 | 90 min |
-| 06 | *(afventer — rapport afskåret)* | ? | ⏳ Plan mangler | - |
-| 07 | *(afventer — rapport afskåret)* | ? | ⏳ Plan mangler | - |
-| 08 | *(afventer — rapport afskåret)* | ? | ⏳ Plan mangler | - |
-| 09 | *(afventer — rapport afskåret)* | ? | ⏳ Plan mangler | - |
+| [06](06-waitlist-spam-xss.md) | Waitlist spam + XSS | 🟡 Medium | ✅ Fikset 2026-04-17 | 30 min |
+| [07](07-ingen-rate-limit-login.md) | Ingen rate-limit på login | 🟠 Høj | ✅ Fikset 2026-04-17 | 15 min |
+| [08](08-hsts-svag.md) | Svag HSTS-konfiguration | 🟢 Lav | ✅ Fikset 2026-04-17 | 5 min |
+| [09](09-supabase-anon-key-offentlig.md) | Supabase anon-key offentlig | ℹ️ Info | ✅ Ingen handling nødvendig | 0 min |
 
 ---
 
