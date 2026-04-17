@@ -11,7 +11,7 @@ Delvise fixes implementeret: 2026-04-17 (issue 01)
 | # | Titel | Sværhedsgrad | Status | Tid |
 |---|-------|-------------|--------|-----|
 | [01](01-claude-proxy-abuse.md) | Claude-proxy misbrug | 🔴 Kritisk | ⚠️ Model+cap fikset, kvote mangler | 45 min |
-| [02](02-subdomain-takeover.md) | Subdomain takeover app.clinlog.dk | 🟠 Høj | ⏳ Kræver DNS-adgang (Simply.com) | 5 min |
+| [02](02-subdomain-takeover.md) | Subdomain takeover app.clinlog.dk | 🟠 Høj | ⚠️ DNS-record slettet, CNAME propagerer | 5 min |
 | [03](03-session-tokens-localstorage.md) | Session-tokens i localStorage | 🟠 Høj | ✅ Fikset 2026-04-17 | 30 min |
 | [04](04-auto-confirmed-emails.md) | Auto-confirmed emails | 🟠 Høj | ⏳ Kræver Supabase-dashboard | 30 min |
 | [05](05-manglende-security-headers.md) | Manglende security headers | 🟡 Medium | ✅ Fikset 2026-04-17 | 90 min |
@@ -30,7 +30,7 @@ Delvise fixes implementeret: 2026-04-17 (issue 01)
 - ✅ Model-allowlist tilføjet (kun claude-sonnet-4-6 og claude-haiku)
 - ✅ Server-side max_tokens cap (1500) tilføjet
 - ❌ Per-user daglig token-kvote mangler (kræver SUPABASE_SERVICE_KEY i Netlify)
-- ❌ Anthropic billing cap (sættes manuelt på console.anthropic.com)
+- ✅ Anthropic billing cap sat 2026-04-17
 
 **Issue 03:** ✅ localStorage fjernet — tokens lever kun i RAM
 
