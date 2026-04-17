@@ -13,7 +13,7 @@ Delvise fixes implementeret: 2026-04-17 (issue 01)
 | [01](01-claude-proxy-abuse.md) | Claude-proxy misbrug | 🔴 Kritisk | ⚠️ Model+cap fikset, kvote mangler | 45 min |
 | [02](02-subdomain-takeover.md) | Subdomain takeover app.clinlog.dk | 🟠 Høj | ⚠️ DNS-record slettet, CNAME propagerer | 5 min |
 | [03](03-session-tokens-localstorage.md) | Session-tokens i localStorage | 🟠 Høj | ✅ Fikset 2026-04-17 | 30 min |
-| [04](04-auto-confirmed-emails.md) | Auto-confirmed emails | 🟠 Høj | ⏳ Kræver Supabase-dashboard | 30 min |
+| [04](04-auto-confirmed-emails.md) | Auto-confirmed emails | 🟠 Høj | ✅ Fikset 2026-04-17 | 30 min |
 | [05](05-manglende-security-headers.md) | Manglende security headers | 🟡 Medium | ✅ Fikset 2026-04-17 | 90 min |
 | 06 | *(afventer — rapport afskåret)* | ? | ⏳ Plan mangler | - |
 | 07 | *(afventer — rapport afskåret)* | ? | ⏳ Plan mangler | - |
