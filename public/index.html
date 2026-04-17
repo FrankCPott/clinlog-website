@@ -2348,7 +2348,7 @@
         headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + (currentSession?.access_token || '') },
         body: JSON.stringify({
           model: 'claude-haiku-4-5-20251001',
-          max_tokens: 1500,
+          max_tokens: 2500,
           messages: [{
             role: 'user',
             content: `Translate the following JSON object from Danish to ${targetLang}. Translate only the string values, keep all JSON keys exactly as-is. Return ONLY valid JSON, no explanation, no markdown.\n\n${JSON.stringify(payload)}`
@@ -2497,7 +2497,12 @@
         notice.prepend(div);
       }
       translateNote(note).then(translated => {
-        if (!translated || openNoteId !== id) return;
+        const noticeEl = document.getElementById('translate-notice');
+        if (!translated || openNoteId !== id) {
+          if (noticeEl) noticeEl.remove();
+          return;
+        }
+        if (noticeEl) noticeEl.remove();
         renderOriginalNote(note, translated.originalContent || null);
         renderNoteSections(note, translated.sections || null);
         buildInterestTabs(note, translated.interestSections || null);

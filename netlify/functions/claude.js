@@ -12,7 +12,7 @@ const ALLOWED_MODELS = [
   'claude-haiku-4-5-20251001',
 ];
 
-const MAX_TOKENS_CAP = 1500;
+const MAX_TOKENS_CAP = 3000;
 
 exports.handler = async (event) => {
   if (event.httpMethod !== 'POST') {
