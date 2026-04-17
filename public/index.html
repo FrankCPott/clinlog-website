@@ -83,8 +83,12 @@
     .logo-wordmark { font-family: 'DM Serif Display', serif; font-size: 1.45rem; color: var(--white); letter-spacing: -0.02em; line-height: 1; }
     .logo-wordmark span { color: var(--teal); }
     .nav-links { display: flex; list-style: none; gap: 2rem; align-items: center; }
-    .nav-links a { color: var(--muted); text-decoration: none; font-size: .9rem; transition: color .2s; }
+    .nav-links a { color: var(--muted); text-decoration: none; font-size: .9rem; transition: color .2s; white-space: nowrap; }
     .nav-links a:hover { color: var(--white); }
+    /* Kompakt nav ved tyske tekster (lang="de" sættes af applyTranslations) */
+    :lang(de) .nav-links { gap: 1.1rem; }
+    :lang(de) .nav-links a { font-size: .78rem; }
+    :lang(de) .nav-cta { padding: .45rem .85rem; font-size: .78rem !important; }
     .nav-cta { background: var(--teal) !important; color: #fff !important; padding: .5rem 1.2rem; border-radius: 6px; font-weight: 500; transition: background .2s !important; }
     .nav-cta:hover { background: var(--teal2) !important; }
     .lang-switcher { display: flex; gap: .35rem; align-items: center; }
@@ -866,7 +870,7 @@
       <li><a href="#about" data-t="nav-about">Om Clinlog</a></li>
       <li><a href="#contact" data-t="nav-contact">Kontakt</a></li>
       <li><a href="#waitlist" class="nav-cta" data-t="nav-waitlist">Tilmeld venteliste</a></li>
-      <li id="nav-login-item" style="display:none"><button class="nav-login" id="nav-login-btn">Log ind</button></li>
+      <li id="nav-login-item" style="display:none"><button class="nav-login" id="nav-login-btn" data-t="nav-login">Log ind</button></li>
       <li id="nav-user-item" style="display:none">
         <div class="portal-nav-user">
           <button class="nav-login" id="nav-mine-noter-btn" data-t="nav-mine-noter">Mine noter</button>
@@ -933,7 +937,7 @@
           <rect y="10" width="22" height="5" fill="#FFCE00"/>
         </svg>
       </button>
-      <button class="nav-login" id="nav-login-btn-mobile" style="font-size:.8rem; padding:.4rem .85rem; display:none">Log ind</button>
+      <button class="nav-login" id="nav-login-btn-mobile" data-t="nav-login" style="font-size:.8rem; padding:.4rem .85rem; display:none">Log ind</button>
       <div id="nav-user-item-mobile" style="display:none; align-items:center; gap:.4rem;">
         <button class="nav-login" id="nav-mine-noter-btn-mobile" style="font-size:.8rem; padding:.4rem .85rem;" data-t="nav-mine-noter">Mine noter</button>
         <button class="portal-logout" id="nav-logout-btn-mobile" style="font-size:.78rem; padding:.35rem .7rem;" data-t="nav-logout">Log ud</button>
@@ -1434,6 +1438,7 @@
       'nav-about': 'Om Clinlog',
       'nav-contact': 'Kontakt',
       'nav-waitlist': 'Tilmeld venteliste',
+      'nav-login': 'Log ind',
       'nav-mine-noter': 'Mine noter',
       'nav-logout': 'Log ud',
       'hero-badge': 'Kommer snart · Beta 2026',
@@ -1562,6 +1567,7 @@
       'nav-about': 'About',
       'nav-contact': 'Contact',
       'nav-waitlist': 'Join waitlist',
+      'nav-login': 'Log in',
       'nav-mine-noter': 'My notes',
       'nav-logout': 'Log out',
       'hero-badge': 'Coming soon · Beta 2026',
@@ -1686,10 +1692,11 @@
     },
     de: {
       'nav-features': 'Funktionen',
-      'nav-how': 'So funktioniert es',
+      'nav-how': 'Funktionsweise',
       'nav-about': 'Über uns',
       'nav-contact': 'Kontakt',
-      'nav-waitlist': 'Warteliste beitreten',
+      'nav-waitlist': 'Warteliste',
+      'nav-login': 'Einloggen',
       'nav-mine-noter': 'Meine Notizen',
       'nav-logout': 'Abmelden',
       'hero-badge': 'Demnächst · Beta 2026',
