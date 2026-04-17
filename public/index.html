@@ -2075,6 +2075,7 @@
   let activeCategory = '';
   let searchQuery = '';
   let currentUserId = null;
+  const translationCache = new Map();
 
   function filteredNotes() {
     return allNotes.filter(n => {
@@ -2325,16 +2326,60 @@
     emotioneltEtisk:    { da: 'Emotionelt / etisk', en: 'Emotional / ethical', de: 'Emotional / ethisch' },
   };
 
-  function renderOriginalNote(note) {
+  async function translateNote(note) {
+    const cacheKey = `${note.id}-${lang}`;
+    if (translationCache.has(cacheKey)) return translationCache.get(cacheKey);
+
+    const sc = parseStructured(note);
+    const KEYS = ['patientCase','kliniskForlob','fagligLaering','outcome_structured','emotioneltEtisk'];
+    const payload = {
+      originalContent: sc?.anonymizedContent || note.content || '',
+      sections: {},
+      interestSections: sc?.interestSections || null,
+    };
+    KEYS.forEach(key => { if (sc?.[key]) payload.sections[key] = sc[key]; });
+
+    const langNames = { en: 'English', de: 'German' };
+    const targetLang = langNames[lang] || 'English';
+
+    try {
+      const res = await fetch(CLAUDE_PROXY, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + (currentSession?.access_token || '') },
+        body: JSON.stringify({
+          model: 'claude-haiku-4-5-20251001',
+          max_tokens: 1500,
+          messages: [{
+            role: 'user',
+            content: `Translate the following JSON object from Danish to ${targetLang}. Translate only the string values, keep all JSON keys exactly as-is. Return ONLY valid JSON, no explanation, no markdown.\n\n${JSON.stringify(payload)}`
+          }]
+        })
+      });
+      if (!res.ok) return null;
+      const data = await res.json();
+      const text = data.content?.[0]?.text?.trim() || '';
+      const jsonMatch = text.match(/\{[\s\S]*\}/);
+      if (!jsonMatch) return null;
+      const translated = JSON.parse(jsonMatch[0]);
+      translationCache.set(cacheKey, translated);
+      return translated;
+    } catch {
+      return null;
+    }
+  }
+
+  function renderOriginalNote(note, translatedContent) {
     const el = document.getElementById('panel-notat-original');
     if (!el) return;
     const sc = parseStructured(note);
-    const text = sc?.anonymizedContent || note.content || '';
+    const text = translatedContent || sc?.anonymizedContent || note.content || '';
     if (!text.trim()) { el.innerHTML = ''; return; }
+    const origLabel = { da: '📝 Original fortælling', en: '📝 Original narrative', de: '📝 Originalgeschichte' };
+    const label = origLabel[lang] || origLabel.da;
     el.innerHTML = `
       <button class="orig-toggle" id="orig-toggle-btn">
         <span class="orig-arrow" id="orig-arrow">▶</span>
-        <span>📝 Original fortælling</span>
+        <span>${label}</span>
       </button>
       <div class="orig-text" id="orig-text">${escHtml(text.trim())}</div>
       <hr class="note-section-divider">`;
@@ -2346,7 +2391,7 @@
     });
   }
 
-  function renderNoteSections(note) {
+  function renderNoteSections(note, translatedSections) {
     const el = document.getElementById('panel-notat-sections');
     if (!el) return;
     const sc = parseStructured(note);
@@ -2354,12 +2399,14 @@
 
     const KEYS = ['patientCase','kliniskForlob','fagligLaering','outcome_structured','emotioneltEtisk'];
     let html = '';
-    KEYS.forEach((key, i) => {
-      const text = sc[key];
+    let first = true;
+    KEYS.forEach(key => {
+      const text = (translatedSections && translatedSections[key]) || sc[key];
       if (!text || !text.trim()) return;
       const icon = SECTION_ICONS[key] || '📄';
       const label = (SECTION_LABELS[key]?.[lang] || SECTION_LABELS[key]?.da || key);
-      if (i > 0) html += '<hr class="note-section-divider">';
+      if (!first) html += '<hr class="note-section-divider">';
+      first = false;
       html += `<div class="note-section">
         <div class="note-section-header">
           <span class="note-section-icon">${icon}</span>
@@ -2371,7 +2418,7 @@
     el.innerHTML = html;
   }
 
-  function buildInterestTabs(note) {
+  function buildInterestTabs(note, translatedInterest) {
     const sc = parseStructured(note);
     const tabbar = document.getElementById('detail-tabbar');
     const panelsContainer = document.getElementById('detail-interest-panels');
@@ -2380,7 +2427,8 @@
     tabbar.querySelectorAll('[data-dynamic]').forEach(el => el.remove());
     panelsContainer.innerHTML = '';
 
-    if (!sc?.interestSections) return;
+    const interestSections = translatedInterest || sc?.interestSections;
+    if (!interestSections) return;
 
     const INTEREST_ICONS = {
       'farmakologi': '💊', 'pharmacology': '💊',
@@ -2393,7 +2441,7 @@
       'ledelse': '📊', 'management': '📊',
     };
 
-    Object.entries(sc.interestSections).forEach(([key, value]) => {
+    Object.entries(interestSections).forEach(([key, value]) => {
       if (!value || !value.trim()) return;
       const label = key.charAt(0).toUpperCase() + key.slice(1);
       const icon = INTEREST_ICONS[key.toLowerCase()] || '📚';
@@ -2432,12 +2480,29 @@
     badge.className = 'detail-save-badge';
     document.getElementById('detail-title').value = note.title || '';
 
-    // Notat-fane: collapsible original + strukturerede sektioner
+    // Notat-fane: render Danish content immediately
     renderOriginalNote(note);
     renderNoteSections(note);
-
-    // Dynamiske interesse-faner
     buildInterestTabs(note);
+
+    // If non-Danish language: translate in background and re-render
+    if (lang !== 'da') {
+      const noticeLabels = { en: 'Translating…', de: 'Übersetze…' };
+      const notice = document.getElementById('panel-notat-original');
+      if (notice) {
+        const div = document.createElement('div');
+        div.id = 'translate-notice';
+        div.style.cssText = 'font-size:.8rem;color:var(--accent);padding:.25rem 0 .5rem;opacity:.7;';
+        div.textContent = noticeLabels[lang] || 'Translating…';
+        notice.prepend(div);
+      }
+      translateNote(note).then(translated => {
+        if (!translated || openNoteId !== id) return;
+        renderOriginalNote(note, translated.originalContent || null);
+        renderNoteSections(note, translated.sections || null);
+        buildInterestTabs(note, translated.interestSections || null);
+      });
+    }
 
     // Referencer-fane: loading state
     document.getElementById('detail-refs-content').innerHTML =
