@@ -435,6 +435,104 @@
       transition: color .2s, border-color .2s, background .2s; white-space: nowrap;
     }
     .note-card-tldr:hover { color: var(--teal2); border-color: var(--teal); background: rgba(14,165,197,0.07); }
+    .note-card-bookmark {
+      background: none; border: 1px solid var(--border); color: var(--muted);
+      cursor: pointer; font-size: .72rem; font-family: inherit; font-weight: 500;
+      padding: .2rem .5rem; border-radius: 5px; line-height: 1.4; flex-shrink: 0;
+      transition: color .2s, border-color .2s, background .2s; white-space: nowrap;
+    }
+    .note-card-bookmark:hover { color: #fbbf24; border-color: #fbbf24; background: rgba(251,191,36,0.07); }
+    .note-card-bookmark.bookmarked { color: #fbbf24; border-color: #fbbf24; background: rgba(251,191,36,0.1); }
+    .contributor-badge {
+      display: inline-flex; align-items: center; gap: .4rem;
+      background: rgba(251,191,36,0.12); border: 1px solid rgba(251,191,36,0.4);
+      color: #fbbf24; font-size: .78rem; font-weight: 600;
+      padding: .3rem .8rem; border-radius: 99px; margin-top: .5rem;
+    }
+
+    /* ── MÅNEDENS CASE ── */
+    #maanedens-case {
+      padding: 5rem 2rem;
+      background: linear-gradient(180deg, transparent, rgba(14,165,197,0.04), transparent);
+    }
+    .maanedens-inner { max-width: 760px; margin: 0 auto; }
+    .maanedens-label {
+      font-size: .72rem; font-weight: 700; letter-spacing: .15em; text-transform: uppercase;
+      color: #fbbf24; margin-bottom: 1rem; display: block;
+    }
+    .maanedens-card {
+      background: var(--card-bg);
+      border: 1.5px solid rgba(251,191,36,0.45);
+      box-shadow: 0 0 32px rgba(251,191,36,0.08);
+      border-radius: 18px; padding: 2rem 2.25rem;
+      position: relative; overflow: hidden;
+    }
+    .maanedens-card::before {
+      content: ''; position: absolute; inset: 0;
+      background: radial-gradient(ellipse at top left, rgba(251,191,36,0.06), transparent 60%);
+      pointer-events: none;
+    }
+    .maanedens-card-label {
+      font-size: .7rem; font-weight: 700; letter-spacing: .12em; text-transform: uppercase;
+      color: #fbbf24; margin-bottom: .6rem;
+    }
+    .maanedens-card-title { font-family: 'DM Serif Display', serif; font-size: 1.4rem; color: var(--white); margin-bottom: .5rem; }
+    .maanedens-card-meta { font-size: .8rem; color: var(--muted); margin-bottom: 1rem; }
+    .maanedens-card-excerpt { font-size: .9rem; color: var(--white); line-height: 1.75; opacity: .85; }
+    .maanedens-empty { color: var(--muted); font-size: .9rem; }
+
+    /* ── KLINISKE PERLER (COMMENTS) ── */
+    #pearls-section { margin-top: 2rem; padding-top: 1.5rem; border-top: 1px solid var(--border); }
+    .pearls-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem; }
+    .pearls-label {
+      font-size: .7rem; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; color: var(--teal);
+    }
+    .pearls-add-btn {
+      background: none; border: 1px solid var(--border); color: var(--muted);
+      font-size: .78rem; font-family: inherit; cursor: pointer;
+      padding: .3rem .75rem; border-radius: 6px; transition: color .2s, border-color .2s;
+    }
+    .pearls-add-btn:hover { color: var(--teal); border-color: var(--teal); }
+    .pearls-form { margin-bottom: 1rem; display: flex; flex-direction: column; gap: .6rem; }
+    .pearls-textarea {
+      background: rgba(255,255,255,0.04); border: 1px solid var(--border);
+      color: var(--white); border-radius: 10px; padding: .75rem 1rem;
+      font-family: inherit; font-size: .875rem; resize: vertical; min-height: 80px;
+      outline: none; transition: border-color .2s;
+    }
+    .pearls-textarea:focus { border-color: var(--teal); }
+    .pearls-form-footer { display: flex; align-items: center; gap: .6rem; }
+    .pearls-type-btn {
+      background: none; border: 1px solid var(--border); color: var(--muted);
+      font-size: .75rem; font-family: inherit; cursor: pointer;
+      padding: .25rem .65rem; border-radius: 99px; transition: all .2s;
+    }
+    .pearls-type-btn.active { border-color: var(--teal); color: var(--teal); background: rgba(14,165,197,0.1); }
+    .pearls-submit-btn {
+      background: var(--teal); color: #fff; border: none;
+      font-size: .82rem; font-family: inherit; font-weight: 600;
+      padding: .4rem 1rem; border-radius: 7px; cursor: pointer;
+      margin-left: auto; transition: background .2s;
+    }
+    .pearls-submit-btn:hover { background: var(--teal2); }
+    .pearls-submit-btn:disabled { opacity: .5; cursor: not-allowed; }
+    .pearl-comment {
+      background: rgba(255,255,255,0.03); border: 1px solid var(--border);
+      border-radius: 10px; padding: .85rem 1rem; margin-bottom: .6rem;
+      display: flex; flex-direction: column; gap: .35rem;
+    }
+    .pearl-comment-top { display: flex; align-items: center; gap: .5rem; }
+    .pearl-badge {
+      font-size: .65rem; font-weight: 700; padding: .15rem .5rem;
+      border-radius: 99px; letter-spacing: .06em;
+    }
+    .pearl-badge.pearl { background: rgba(251,191,36,0.15); color: #fbbf24; border: 1px solid rgba(251,191,36,0.3); }
+    .pearl-badge.question { background: rgba(14,165,197,0.12); color: var(--teal2); border: 1px solid var(--border); }
+    .pearl-comment-date { font-size: .7rem; color: var(--muted); margin-left: auto; }
+    .pearl-comment-delete { background: none; border: none; color: var(--muted); cursor: pointer; font-size: .85rem; padding: 0 .25rem; transition: color .2s; }
+    .pearl-comment-delete:hover { color: #f87171; }
+    .pearl-comment-text { font-size: .875rem; color: var(--white); line-height: 1.65; }
+    .pearls-empty { font-size: .85rem; color: var(--muted); font-style: italic; }
 
     /* ── TL;DR MODAL ── */
     #tldr-overlay {
@@ -934,6 +1032,7 @@
     <div id="portal-list-view" class="portal-inner">
       <div class="portal-header">
         <h1 data-t="portal-notes-title">Mine noter</h1>
+        <div id="contributor-badge-area"></div>
       </div>
       <div class="portal-toolbar">
         <div class="portal-search-wrap">
@@ -970,6 +1069,23 @@
       <div class="detail-panel active" id="panel-notat">
         <div id="panel-notat-original"></div>
         <div id="panel-notat-sections"></div>
+        <div id="pearls-section" style="display:none">
+          <div class="pearls-header">
+            <span class="pearls-label">💎 Kliniske perler</span>
+            <button class="pearls-add-btn" id="pearls-add-btn">+ Tilføj</button>
+          </div>
+          <div id="pearls-form-wrap" style="display:none">
+            <div class="pearls-form">
+              <textarea class="pearls-textarea" id="pearls-textarea" maxlength="280" placeholder="Del en klinisk perle eller stil et spørgsmål (maks. 280 tegn)…"></textarea>
+              <div class="pearls-form-footer">
+                <button class="pearls-type-btn active" data-type="pearl">💎 Perle</button>
+                <button class="pearls-type-btn" data-type="question">❓ Spørgsmål</button>
+                <button class="pearls-submit-btn" id="pearls-submit-btn">Send</button>
+              </div>
+            </div>
+          </div>
+          <div id="pearls-list"></div>
+        </div>
         <div id="similar-cases-section" style="display:none">
           <div class="similar-cases-header">
             <span class="similar-cases-icon">🔍</span>
@@ -1506,6 +1622,14 @@
         </a>
       </div>
       <p class="store-coming reveal" data-t="store-coming">App'en er under udvikling og lanceres i 2026</p>
+    </div>
+  </section>
+
+  <!-- ══ MÅNEDENS CASE ══ -->
+  <section id="maanedens-case" style="display:none">
+    <div class="maanedens-inner">
+      <span class="maanedens-label reveal">★ Månedens Case</span>
+      <div id="maanedens-card-wrap"></div>
     </div>
   </section>
 
@@ -2308,6 +2432,7 @@
           <span class="note-card-title">${escHtml(note.title || 'Uden titel')}</span>
           <div style="display:flex;align-items:center;gap:.5rem;flex-shrink:0">
             <span class="note-card-meta">${date}</span>
+            <button class="note-card-bookmark${myBookmarks.has(note.id) ? ' bookmarked' : ''}" title="${myBookmarks.has(note.id) ? 'Fjern bogmærke' : 'Bogmærk'}">🔖</button>
             <button class="note-card-tldr" title="30-sekunders opsummering">⚡ TL;DR</button>
             <button class="note-card-delete" title="Slet notat">🗑️</button>
           </div>
@@ -2316,6 +2441,10 @@
         <div class="note-card-content">${escHtml(preview)}${preview.length >= 180 ? '…' : ''}</div>
       `;
       card.addEventListener('click', () => openNote(note.id));
+      card.querySelector('.note-card-bookmark').addEventListener('click', function (e) {
+        e.stopPropagation();
+        toggleBookmark(note.id, this);
+      });
       card.querySelector('.note-card-tldr').addEventListener('click', function (e) {
         e.stopPropagation();
         showTldr(note);
@@ -2712,6 +2841,13 @@
     // DDx-fane: nulstil så lazy load starter forfra
     const ddxEl = document.getElementById('detail-ddx-content');
     if (ddxEl) ddxEl.innerHTML = '';
+
+    // Perler: skjul og load
+    const pearlsSection = document.getElementById('pearls-section');
+    if (pearlsSection) pearlsSection.style.display = 'none';
+    const pearlsFormWrap = document.getElementById('pearls-form-wrap');
+    if (pearlsFormWrap) pearlsFormWrap.style.display = 'none';
+    if (window.fetchPearls) window.fetchPearls(id);
 
     // Referencer-fane: loading state
     document.getElementById('detail-refs-content').innerHTML =
@@ -3138,6 +3274,7 @@
     if (landingContent) landingContent.style.display = 'none';
     portal.classList.add('open');
     loadNotes(user.id);
+    loadBookmarksAndProfile(user.id, currentSession?.access_token || SUPABASE_ANON_KEY);
   }
 
   function showLanding() {
@@ -3443,6 +3580,215 @@
 
     // Eksponer showTldr globalt så renderNoteList kan kalde den
     window.showTldr = showTldr;
+  })();
+
+  // ══ 2A: BOOKMARKS + CONTRIBUTOR BADGE ══
+  let myBookmarks = new Set();
+
+  async function loadBookmarksAndProfile(userId, token) {
+    // Load bookmarks
+    try {
+      const res = await fetch(
+        `${SUPABASE_URL}/rest/v1/bookmarks?select=note_id&user_id=eq.${encodeURIComponent(userId)}`,
+        { headers: { 'apikey': SUPABASE_ANON_KEY, 'Authorization': `Bearer ${token}` } }
+      );
+      if (res.ok) {
+        const data = await res.json();
+        myBookmarks = new Set((data || []).map(b => b.note_id));
+      }
+    } catch {}
+
+    // Load contributor score
+    try {
+      const res = await fetch(
+        `${SUPABASE_URL}/rest/v1/profiles?select=contributor_score&id=eq.${encodeURIComponent(userId)}&limit=1`,
+        { headers: { 'apikey': SUPABASE_ANON_KEY, 'Authorization': `Bearer ${token}` } }
+      );
+      if (res.ok) {
+        const data = await res.json();
+        const score = data?.[0]?.contributor_score ?? 0;
+        const area = document.getElementById('contributor-badge-area');
+        if (area && score >= 10) {
+          area.innerHTML = '<span class="contributor-badge">✓ Verified Contributor</span>';
+        }
+      }
+    } catch {}
+  }
+
+  async function toggleBookmark(noteId, btn) {
+    if (!currentUserId || !currentSession) return;
+    const token = currentSession.access_token;
+    const wasBookmarked = myBookmarks.has(noteId);
+    // Optimistic update
+    if (wasBookmarked) {
+      myBookmarks.delete(noteId);
+      btn.classList.remove('bookmarked');
+      btn.title = 'Bogmærk';
+    } else {
+      myBookmarks.add(noteId);
+      btn.classList.add('bookmarked');
+      btn.title = 'Fjern bogmærke';
+    }
+    try {
+      if (wasBookmarked) {
+        await fetch(
+          `${SUPABASE_URL}/rest/v1/bookmarks?user_id=eq.${encodeURIComponent(currentUserId)}&note_id=eq.${encodeURIComponent(noteId)}`,
+          { method: 'DELETE', headers: { 'apikey': SUPABASE_ANON_KEY, 'Authorization': `Bearer ${token}`, 'Prefer': 'return=minimal' } }
+        );
+      } else {
+        await fetch(
+          `${SUPABASE_URL}/rest/v1/bookmarks`,
+          { method: 'POST', headers: { 'apikey': SUPABASE_ANON_KEY, 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json', 'Prefer': 'return=minimal' },
+            body: JSON.stringify({ user_id: currentUserId, note_id: noteId }) }
+        );
+      }
+    } catch {
+      // Revert on error
+      if (wasBookmarked) { myBookmarks.add(noteId); btn.classList.add('bookmarked'); }
+      else { myBookmarks.delete(noteId); btn.classList.remove('bookmarked'); }
+    }
+  }
+
+  // ══ 2B: MÅNEDENS CASE ══
+  async function loadMaanedensCase() {
+    try {
+      const res = await fetch(
+        `${SUPABASE_URL}/rest/v1/noter?select=id,title,content,category,created_at,structured_content&featured=eq.true&limit=1&order=created_at.desc`,
+        { headers: { 'apikey': SUPABASE_ANON_KEY, 'Authorization': `Bearer ${SUPABASE_ANON_KEY}` } }
+      );
+      if (!res.ok) return;
+      const data = await res.json();
+      const note = data?.[0];
+      if (!note) return;
+
+      const section = document.getElementById('maanedens-case');
+      const wrap    = document.getElementById('maanedens-card-wrap');
+      if (!section || !wrap) return;
+
+      const sc = parseStructured(note);
+      const excerpt = (sc?.anonymizedContent || note.content || '').slice(0, 220).trim();
+      const date = new Date(note.created_at).toLocaleDateString('da-DK', { month: 'long', year: 'numeric' });
+
+      wrap.innerHTML = `
+        <div class="maanedens-card">
+          <div class="maanedens-card-label">⭐ Månedens fremhævede case</div>
+          <div class="maanedens-card-title">${escHtml(note.title || 'Klinisk case')}</div>
+          <div class="maanedens-card-meta">${escHtml(note.category || '')}${note.category ? ' · ' : ''}${date}</div>
+          <div class="maanedens-card-excerpt">${escHtml(excerpt)}${excerpt.length >= 220 ? '…' : ''}</div>
+        </div>`;
+      section.style.display = '';
+    } catch {}
+  }
+  loadMaanedensCase();
+
+  // ══ 2C: KLINISKE PERLER (COMMENTS) ══
+  (function () {
+    let pearlsNoteId   = null;
+    let pearlType      = 'pearl';
+    let pearlsLoading  = false;
+
+    const addBtn      = document.getElementById('pearls-add-btn');
+    const formWrap    = document.getElementById('pearls-form-wrap');
+    const textarea    = document.getElementById('pearls-textarea');
+    const submitBtn   = document.getElementById('pearls-submit-btn');
+    const listEl      = document.getElementById('pearls-list');
+    const section     = document.getElementById('pearls-section');
+    const typeBtns    = document.querySelectorAll('.pearls-type-btn');
+
+    addBtn.addEventListener('click', () => {
+      const open = formWrap.style.display !== 'none';
+      formWrap.style.display = open ? 'none' : '';
+      if (!open) textarea.focus();
+    });
+
+    typeBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        pearlType = btn.dataset.type;
+        typeBtns.forEach(b => b.classList.toggle('active', b === btn));
+      });
+    });
+
+    submitBtn.addEventListener('click', async () => {
+      if (!pearlsNoteId || pearlsLoading) return;
+      const content = textarea.value.trim();
+      if (!content) return;
+      if (!currentSession?.access_token) return;
+      pearlsLoading = true;
+      submitBtn.disabled = true;
+      try {
+        const res = await fetch(`${SUPABASE_URL}/rest/v1/comments`, {
+          method: 'POST',
+          headers: {
+            'apikey': SUPABASE_ANON_KEY,
+            'Authorization': `Bearer ${currentSession.access_token}`,
+            'Content-Type': 'application/json',
+            'Prefer': 'return=representation',
+          },
+          body: JSON.stringify({ note_id: pearlsNoteId, author_id: currentUserId, content, type: pearlType }),
+        });
+        if (!res.ok) throw new Error('HTTP ' + res.status);
+        textarea.value = '';
+        formWrap.style.display = 'none';
+        await fetchPearls(pearlsNoteId);
+      } catch {}
+      pearlsLoading = false;
+      submitBtn.disabled = false;
+    });
+
+    async function fetchPearls(noteId) {
+      if (!currentSession?.access_token) return;
+      pearlsNoteId = noteId;
+      try {
+        const res = await fetch(
+          `${SUPABASE_URL}/rest/v1/comments?note_id=eq.${encodeURIComponent(noteId)}&order=type.asc,created_at.asc`,
+          { headers: { 'apikey': SUPABASE_ANON_KEY, 'Authorization': `Bearer ${currentSession.access_token}` } }
+        );
+        if (!res.ok) return;
+        const comments = await res.json() || [];
+        renderPearls(comments);
+        section.style.display = '';
+      } catch {}
+    }
+
+    function renderPearls(comments) {
+      if (comments.length === 0) {
+        listEl.innerHTML = '<p class="pearls-empty">Ingen perler endnu — vær den første til at bidrage.</p>';
+        return;
+      }
+      listEl.innerHTML = '';
+      comments.forEach(c => {
+        const date = new Date(c.created_at).toLocaleDateString('da-DK', { day: 'numeric', month: 'short' });
+        const isOwn = c.author_id === currentUserId;
+        const typeLabel = c.type === 'pearl' ? '💎 Perle' : '❓ Spørgsmål';
+        const div = document.createElement('div');
+        div.className = 'pearl-comment';
+        div.innerHTML = `
+          <div class="pearl-comment-top">
+            <span class="pearl-badge ${c.type}">${typeLabel}</span>
+            <span class="pearl-comment-date">${date}</span>
+            ${isOwn ? `<button class="pearl-comment-delete" data-id="${c.id}" title="Slet">✕</button>` : ''}
+          </div>
+          <div class="pearl-comment-text">${escHtml(c.content)}</div>`;
+        listEl.appendChild(div);
+      });
+
+      // Delete handlers
+      listEl.querySelectorAll('.pearl-comment-delete').forEach(btn => {
+        btn.addEventListener('click', async () => {
+          if (!currentSession?.access_token) return;
+          const cid = btn.dataset.id;
+          try {
+            await fetch(`${SUPABASE_URL}/rest/v1/comments?id=eq.${encodeURIComponent(cid)}`, {
+              method: 'DELETE',
+              headers: { 'apikey': SUPABASE_ANON_KEY, 'Authorization': `Bearer ${currentSession.access_token}`, 'Prefer': 'return=minimal' }
+            });
+            btn.closest('.pearl-comment').remove();
+          } catch {}
+        });
+      });
+    }
+
+    window.fetchPearls = fetchPearls;
   })();
 
   // ══ DIFFERENTIALDIAGNOSE ASSISTENT ══
