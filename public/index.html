@@ -481,6 +481,136 @@
     .maanedens-card-excerpt { font-size: .9rem; color: var(--white); line-height: 1.75; opacity: .85; }
     .maanedens-empty { color: var(--muted); font-size: .9rem; }
 
+    /* ── PORTAL TABS (GRUPPER / INDBAKKE / INDSTILLINGER) ── */
+    .portal-tabbar {
+      display: flex; gap: .25rem; margin-bottom: 1.75rem;
+      border-bottom: 1px solid var(--border); padding-bottom: 0;
+    }
+    .portal-tab {
+      background: none; border: none; border-bottom: 2px solid transparent;
+      color: var(--muted); font-family: inherit; font-size: .85rem; font-weight: 500;
+      padding: .55rem 1rem .65rem; cursor: pointer; white-space: nowrap;
+      transition: color .2s, border-color .2s; position: relative;
+    }
+    .portal-tab.active { color: var(--teal2); border-bottom-color: var(--teal2); }
+    .portal-tab:hover:not(.active) { color: var(--white); }
+    .portal-tab-badge {
+      display: inline-flex; align-items: center; justify-content: center;
+      background: #f87171; color: #fff; font-size: .6rem; font-weight: 700;
+      width: 16px; height: 16px; border-radius: 50%; margin-left: .35rem;
+      vertical-align: middle;
+    }
+    .portal-section { display: none; }
+    .portal-section.active { display: block; }
+
+    /* Grupper */
+    .groups-create-form {
+      background: rgba(255,255,255,0.03); border: 1px solid var(--border);
+      border-radius: 12px; padding: 1.25rem; margin-bottom: 1.5rem;
+      display: flex; flex-direction: column; gap: .75rem;
+    }
+    .groups-create-title { font-size: .82rem; font-weight: 700; color: var(--teal); letter-spacing: .06em; text-transform: uppercase; }
+    .groups-input {
+      background: rgba(255,255,255,0.05); border: 1px solid var(--border);
+      color: var(--white); border-radius: 8px; padding: .6rem .9rem;
+      font-family: inherit; font-size: .875rem; outline: none; transition: border-color .2s;
+    }
+    .groups-input:focus { border-color: var(--teal); }
+    .groups-create-btn {
+      background: var(--teal); color: #fff; border: none; border-radius: 8px;
+      padding: .55rem 1.1rem; font-family: inherit; font-size: .85rem; font-weight: 600;
+      cursor: pointer; align-self: flex-start; transition: background .2s;
+    }
+    .groups-create-btn:hover { background: var(--teal2); }
+    .groups-create-btn:disabled { opacity: .5; cursor: not-allowed; }
+    .group-card {
+      background: var(--card-bg); border: 1px solid var(--border);
+      border-radius: 12px; padding: 1rem 1.25rem; margin-bottom: .75rem;
+      display: flex; align-items: center; gap: 1rem;
+    }
+    .group-card-icon { font-size: 1.5rem; flex-shrink: 0; }
+    .group-card-info { flex: 1; min-width: 0; }
+    .group-card-name { font-weight: 600; font-size: .95rem; color: var(--white); }
+    .group-card-meta { font-size: .75rem; color: var(--muted); margin-top: .15rem; }
+    .group-card-role {
+      font-size: .68rem; font-weight: 700; padding: .15rem .5rem; border-radius: 99px;
+      background: rgba(14,165,197,0.12); color: var(--teal2); border: 1px solid var(--border);
+    }
+    .groups-empty { color: var(--muted); font-size: .9rem; text-align: center; padding: 2rem 0; }
+
+    /* Indbakke */
+    .inbox-message {
+      background: var(--card-bg); border: 1px solid var(--border);
+      border-radius: 12px; padding: 1rem 1.25rem; margin-bottom: .75rem;
+    }
+    .inbox-message.unread { border-color: rgba(14,165,197,0.4); }
+    .inbox-message-header { display: flex; align-items: center; gap: .5rem; margin-bottom: .5rem; }
+    .inbox-unread-dot { width: 8px; height: 8px; background: var(--teal); border-radius: 50%; flex-shrink: 0; }
+    .inbox-message-date { font-size: .72rem; color: var(--muted); margin-left: auto; }
+    .inbox-message-context { font-size: .75rem; color: var(--teal2); margin-bottom: .4rem; }
+    .inbox-message-text { font-size: .875rem; color: var(--white); line-height: 1.65; }
+    .inbox-mark-read-btn {
+      background: none; border: 1px solid var(--border); color: var(--muted);
+      font-size: .72rem; font-family: inherit; cursor: pointer;
+      padding: .2rem .55rem; border-radius: 5px; margin-top: .6rem;
+      transition: color .2s, border-color .2s;
+    }
+    .inbox-mark-read-btn:hover { color: var(--teal); border-color: var(--teal); }
+    .inbox-empty { color: var(--muted); font-size: .9rem; text-align: center; padding: 2rem 0; }
+
+    /* Indstillinger */
+    .settings-section-title {
+      font-size: .72rem; font-weight: 700; letter-spacing: .1em; text-transform: uppercase;
+      color: var(--teal); margin: 1.5rem 0 .75rem;
+    }
+    .settings-section-title:first-child { margin-top: 0; }
+    .settings-row {
+      display: flex; align-items: center; justify-content: space-between;
+      background: var(--card-bg); border: 1px solid var(--border);
+      border-radius: 10px; padding: .85rem 1.1rem; margin-bottom: .6rem; gap: 1rem;
+    }
+    .settings-row-info { flex: 1; min-width: 0; }
+    .settings-row-label { font-size: .9rem; color: var(--white); font-weight: 500; }
+    .settings-row-sub { font-size: .775rem; color: var(--muted); margin-top: .2rem; }
+    .settings-toggle {
+      position: relative; width: 42px; height: 24px; flex-shrink: 0; cursor: pointer;
+    }
+    .settings-toggle input { opacity: 0; width: 0; height: 0; }
+    .settings-toggle-slider {
+      position: absolute; inset: 0; background: rgba(255,255,255,0.1);
+      border-radius: 99px; transition: background .2s;
+    }
+    .settings-toggle-slider::before {
+      content: ''; position: absolute; width: 18px; height: 18px;
+      left: 3px; top: 3px; background: #fff; border-radius: 50%; transition: transform .2s;
+    }
+    .settings-toggle input:checked + .settings-toggle-slider { background: var(--teal); }
+    .settings-toggle input:checked + .settings-toggle-slider::before { transform: translateX(18px); }
+    .settings-number-input {
+      width: 70px; background: rgba(255,255,255,0.05); border: 1px solid var(--border);
+      color: var(--white); border-radius: 7px; padding: .4rem .7rem;
+      font-family: inherit; font-size: .9rem; outline: none; text-align: center;
+      transition: border-color .2s;
+    }
+    .settings-number-input:focus { border-color: var(--teal); }
+    .settings-save-btn {
+      background: var(--teal); color: #fff; border: none; border-radius: 8px;
+      padding: .55rem 1.25rem; font-family: inherit; font-size: .85rem; font-weight: 600;
+      cursor: pointer; margin-top: .75rem; transition: background .2s;
+    }
+    .settings-save-btn:hover { background: var(--teal2); }
+    .settings-saved-msg { font-size: .8rem; color: var(--teal); margin-top: .5rem; display: none; }
+
+    /* Seeking feedback toggle in note detail */
+    .seeking-feedback-bar {
+      display: flex; align-items: center; justify-content: space-between;
+      background: rgba(14,165,197,0.05); border: 1px solid var(--border);
+      border-radius: 10px; padding: .7rem 1rem; margin-top: 1.25rem; gap: 1rem;
+    }
+    .seeking-feedback-bar-info { flex: 1; }
+    .seeking-feedback-bar-label { font-size: .85rem; font-weight: 500; color: var(--white); }
+    .seeking-feedback-bar-sub { font-size: .75rem; color: var(--muted); margin-top: .15rem; }
+
     /* ── KLINISKE PERLER (COMMENTS) ── */
     #pearls-section { margin-top: 2rem; padding-top: 1.5rem; border-top: 1px solid var(--border); }
     .pearls-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem; }
@@ -1031,9 +1161,18 @@
     <!-- Note-liste visning -->
     <div id="portal-list-view" class="portal-inner">
       <div class="portal-header">
-        <h1 data-t="portal-notes-title">Mine noter</h1>
+        <h1 data-t="portal-notes-title">ClinLog Portal</h1>
         <div id="contributor-badge-area"></div>
       </div>
+      <div class="portal-tabbar">
+        <button class="portal-tab active" data-ptab="noter">📋 Mine noter</button>
+        <button class="portal-tab" data-ptab="grupper">👥 Grupper</button>
+        <button class="portal-tab" data-ptab="indbakke">💬 Indbakke<span id="inbox-badge" class="portal-tab-badge" style="display:none">0</span></button>
+        <button class="portal-tab" data-ptab="indstillinger">⚙️ Indstillinger</button>
+      </div>
+
+      <!-- NOTER -->
+      <div class="portal-section active" id="psec-noter">
       <div class="portal-toolbar">
         <div class="portal-search-wrap">
           <span class="portal-search-icon">🔍</span>
@@ -1052,6 +1191,49 @@
         <p>Du har endnu ingen noter synkroniseret fra appen.<br>Optag din første note i ClinLog-appen for at se den her.</p>
       </div>
       <div id="portal-notes-list" style="display:none"></div>
+      </div><!-- /#psec-noter -->
+
+      <!-- GRUPPER -->
+      <div class="portal-section" id="psec-grupper">
+        <div class="groups-create-form">
+          <div class="groups-create-title">Opret ny gruppe</div>
+          <input class="groups-input" id="group-name-input" type="text" placeholder="Gruppenavn (fx Akutlæger Region Syd)" maxlength="80" />
+          <input class="groups-input" id="group-specialty-input" type="text" placeholder="Speciale (fx Akutmedicin)" maxlength="60" />
+          <button class="groups-create-btn" id="group-create-btn">Opret gruppe</button>
+        </div>
+        <div id="groups-list"></div>
+      </div>
+
+      <!-- INDBAKKE -->
+      <div class="portal-section" id="psec-indbakke">
+        <div id="inbox-list"></div>
+      </div>
+
+      <!-- INDSTILLINGER -->
+      <div class="portal-section" id="psec-indstillinger">
+        <div class="settings-section-title">Beskeder</div>
+        <div class="settings-row">
+          <div class="settings-row-info">
+            <div class="settings-row-label">Tillad at andre sender dig beskeder</div>
+            <div class="settings-row-sub">Andre brugere kan kontakte dig om dine offentlige noter</div>
+          </div>
+          <label class="settings-toggle">
+            <input type="checkbox" id="setting-allow-messages" />
+            <span class="settings-toggle-slider"></span>
+          </label>
+        </div>
+        <div class="settings-section-title">Erfaring</div>
+        <div class="settings-row">
+          <div class="settings-row-info">
+            <div class="settings-row-label">Års klinisk erfaring</div>
+            <div class="settings-row-sub">Bruges til mentor-matching (≥5 år giver adgang til mentor-feed)</div>
+          </div>
+          <input class="settings-number-input" id="setting-years-exp" type="number" min="0" max="50" value="0" />
+        </div>
+        <button class="settings-save-btn" id="settings-save-btn">Gem indstillinger</button>
+        <div class="settings-saved-msg" id="settings-saved-msg">✓ Gemt</div>
+      </div>
+
     </div>
 
     <!-- Note-detalje visning -->
@@ -1069,6 +1251,16 @@
       <div class="detail-panel active" id="panel-notat">
         <div id="panel-notat-original"></div>
         <div id="panel-notat-sections"></div>
+        <div class="seeking-feedback-bar" id="seeking-feedback-bar" style="display:none">
+          <div class="seeking-feedback-bar-info">
+            <div class="seeking-feedback-bar-label">Søger feedback fra erfarne kolleger</div>
+            <div class="seeking-feedback-bar-sub">Gør din case synlig i mentor-feedet</div>
+          </div>
+          <label class="settings-toggle">
+            <input type="checkbox" id="seeking-feedback-toggle" />
+            <span class="settings-toggle-slider"></span>
+          </label>
+        </div>
         <div id="pearls-section" style="display:none">
           <div class="pearls-header">
             <span class="pearls-label">💎 Kliniske perler</span>
@@ -2485,7 +2677,7 @@
     try {
       const token = currentSession?.access_token || SUPABASE_ANON_KEY;
       const res = await fetch(
-        `${SUPABASE_URL}/rest/v1/noter?select=id,title,content,category,created_at,updated_at,structured_content,edited_note&user_id=eq.${encodeURIComponent(userId)}&order=created_at.desc`,
+        `${SUPABASE_URL}/rest/v1/noter?select=id,title,content,category,created_at,updated_at,structured_content,edited_note,seeking_feedback&user_id=eq.${encodeURIComponent(userId)}&order=created_at.desc`,
         { headers: { 'apikey': SUPABASE_ANON_KEY, 'Authorization': `Bearer ${token}` } }
       );
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
@@ -2837,6 +3029,7 @@
     renderNoteSections(note);
     buildInterestTabs(note);
     renderSimilarCases(note);
+    if (window.initSeekingFeedback) window.initSeekingFeedback(note);
 
     // DDx-fane: nulstil så lazy load starter forfra
     const ddxEl = document.getElementById('detail-ddx-content');
@@ -3275,6 +3468,7 @@
     portal.classList.add('open');
     loadNotes(user.id);
     loadBookmarksAndProfile(user.id, currentSession?.access_token || SUPABASE_ANON_KEY);
+    if (window.checkUnreadCount) window.checkUnreadCount();
   }
 
   function showLanding() {
@@ -3580,6 +3774,254 @@
 
     // Eksponer showTldr globalt så renderNoteList kan kalde den
     window.showTldr = showTldr;
+  })();
+
+  // ══ PORTAL TABS ══
+  (function () {
+    document.querySelectorAll('.portal-tab').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.portal-tab').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        const tab = btn.dataset.ptab;
+        document.querySelectorAll('.portal-section').forEach(s => s.classList.remove('active'));
+        document.getElementById('psec-' + tab)?.classList.add('active');
+        if (tab === 'indbakke' && currentUserId && currentSession) loadInbox();
+        if (tab === 'grupper' && currentUserId && currentSession) loadGroups();
+        if (tab === 'indstillinger' && currentUserId && currentSession) loadSettings();
+      });
+    });
+  })();
+
+  // ══ 3A: GRUPPER ══
+  (function () {
+    async function loadGroups() {
+      if (!currentSession?.access_token) return;
+      const listEl = document.getElementById('groups-list');
+      listEl.innerHTML = '<p class="groups-empty">Henter grupper…</p>';
+      try {
+        const res = await fetch(
+          `${SUPABASE_URL}/rest/v1/groups?select=id,name,specialty,created_by,invite_only,group_members(role)&group_members.user_id=eq.${encodeURIComponent(currentUserId)}&order=created_at.desc`,
+          { headers: { 'apikey': SUPABASE_ANON_KEY, 'Authorization': `Bearer ${currentSession.access_token}` } }
+        );
+        if (!res.ok) throw new Error();
+        const groups = await res.json() || [];
+        if (groups.length === 0) {
+          listEl.innerHTML = '<p class="groups-empty">Du er ikke med i nogen grupper endnu.</p>';
+          return;
+        }
+        listEl.innerHTML = groups.map(g => {
+          const role = g.group_members?.[0]?.role || (g.created_by === currentUserId ? 'admin' : 'member');
+          const roleLabel = role === 'admin' ? 'Admin' : 'Medlem';
+          return `<div class="group-card">
+            <div class="group-card-icon">👥</div>
+            <div class="group-card-info">
+              <div class="group-card-name">${escHtml(g.name)}</div>
+              <div class="group-card-meta">${g.specialty ? escHtml(g.specialty) + ' · ' : ''}${g.invite_only ? 'Lukket gruppe' : 'Åben gruppe'}</div>
+            </div>
+            <span class="group-card-role">${roleLabel}</span>
+          </div>`;
+        }).join('');
+      } catch {
+        listEl.innerHTML = '<p class="groups-empty">Kunne ikke hente grupper.</p>';
+      }
+    }
+
+    document.getElementById('group-create-btn').addEventListener('click', async () => {
+      const name = document.getElementById('group-name-input').value.trim();
+      if (!name || !currentSession?.access_token) return;
+      const specialty = document.getElementById('group-specialty-input').value.trim();
+      const btn = document.getElementById('group-create-btn');
+      btn.disabled = true;
+      try {
+        const res = await fetch(`${SUPABASE_URL}/rest/v1/groups`, {
+          method: 'POST',
+          headers: {
+            'apikey': SUPABASE_ANON_KEY, 'Authorization': `Bearer ${currentSession.access_token}`,
+            'Content-Type': 'application/json', 'Prefer': 'return=representation',
+          },
+          body: JSON.stringify({ name, specialty: specialty || null, created_by: currentUserId, invite_only: true }),
+        });
+        if (!res.ok) throw new Error();
+        const [group] = await res.json();
+        // Add creator as admin member
+        await fetch(`${SUPABASE_URL}/rest/v1/group_members`, {
+          method: 'POST',
+          headers: {
+            'apikey': SUPABASE_ANON_KEY, 'Authorization': `Bearer ${currentSession.access_token}`,
+            'Content-Type': 'application/json', 'Prefer': 'return=minimal',
+          },
+          body: JSON.stringify({ group_id: group.id, user_id: currentUserId, role: 'admin' }),
+        });
+        document.getElementById('group-name-input').value = '';
+        document.getElementById('group-specialty-input').value = '';
+        loadGroups();
+      } catch {}
+      btn.disabled = false;
+    });
+
+    window.loadGroups = loadGroups;
+  })();
+
+  // ══ 3B: INDBAKKE ══
+  (function () {
+    let unreadCount = 0;
+
+    async function loadInbox() {
+      if (!currentSession?.access_token) return;
+      const listEl = document.getElementById('inbox-list');
+      listEl.innerHTML = '<p class="inbox-empty">Henter beskeder…</p>';
+      try {
+        const res = await fetch(
+          `${SUPABASE_URL}/rest/v1/messages?recipient_id=eq.${encodeURIComponent(currentUserId)}&order=created_at.desc`,
+          { headers: { 'apikey': SUPABASE_ANON_KEY, 'Authorization': `Bearer ${currentSession.access_token}` } }
+        );
+        if (!res.ok) throw new Error();
+        const messages = await res.json() || [];
+        unreadCount = messages.filter(m => !m.read).length;
+        updateInboxBadge();
+        if (messages.length === 0) {
+          listEl.innerHTML = '<p class="inbox-empty">Din indbakke er tom.</p>';
+          return;
+        }
+        listEl.innerHTML = '';
+        messages.forEach(m => {
+          const date = new Date(m.created_at).toLocaleDateString('da-DK', { day: 'numeric', month: 'short', year: '2-digit' });
+          const div = document.createElement('div');
+          div.className = 'inbox-message' + (m.read ? '' : ' unread');
+          div.dataset.id = m.id;
+          div.innerHTML = `
+            <div class="inbox-message-header">
+              ${!m.read ? '<span class="inbox-unread-dot"></span>' : ''}
+              <span class="inbox-message-date">${date}</span>
+            </div>
+            ${m.note_id ? `<div class="inbox-message-context">📋 Vedr. note</div>` : ''}
+            <div class="inbox-message-text">${escHtml(m.content)}</div>
+            ${!m.read ? `<button class="inbox-mark-read-btn" data-id="${m.id}">Marker som læst</button>` : ''}`;
+          listEl.appendChild(div);
+        });
+        listEl.querySelectorAll('.inbox-mark-read-btn').forEach(btn => {
+          btn.addEventListener('click', async () => {
+            const mid = btn.dataset.id;
+            try {
+              await fetch(`${SUPABASE_URL}/rest/v1/messages?id=eq.${encodeURIComponent(mid)}`, {
+                method: 'PATCH',
+                headers: { 'apikey': SUPABASE_ANON_KEY, 'Authorization': `Bearer ${currentSession.access_token}`, 'Content-Type': 'application/json', 'Prefer': 'return=minimal' },
+                body: JSON.stringify({ read: true }),
+              });
+              btn.closest('.inbox-message').classList.remove('unread');
+              btn.remove();
+              unreadCount = Math.max(0, unreadCount - 1);
+              updateInboxBadge();
+            } catch {}
+          });
+        });
+      } catch {
+        listEl.innerHTML = '<p class="inbox-empty">Kunne ikke hente beskeder.</p>';
+      }
+    }
+
+    function updateInboxBadge() {
+      const badge = document.getElementById('inbox-badge');
+      if (!badge) return;
+      if (unreadCount > 0) { badge.textContent = unreadCount; badge.style.display = ''; }
+      else { badge.style.display = 'none'; }
+    }
+
+    async function checkUnreadCount() {
+      if (!currentSession?.access_token) return;
+      try {
+        const res = await fetch(
+          `${SUPABASE_URL}/rest/v1/messages?recipient_id=eq.${encodeURIComponent(currentUserId)}&read=eq.false&select=id`,
+          { headers: { 'apikey': SUPABASE_ANON_KEY, 'Authorization': `Bearer ${currentSession.access_token}` } }
+        );
+        if (res.ok) {
+          const data = await res.json();
+          unreadCount = (data || []).length;
+          updateInboxBadge();
+        }
+      } catch {}
+    }
+
+    window.loadInbox = loadInbox;
+    window.checkUnreadCount = checkUnreadCount;
+  })();
+
+  // ══ 3B: INDSTILLINGER (allow_messages + years_experience) ══
+  (function () {
+    async function loadSettings() {
+      if (!currentSession?.access_token) return;
+      try {
+        const res = await fetch(
+          `${SUPABASE_URL}/rest/v1/profiles?select=allow_messages,years_experience&id=eq.${encodeURIComponent(currentUserId)}&limit=1`,
+          { headers: { 'apikey': SUPABASE_ANON_KEY, 'Authorization': `Bearer ${currentSession.access_token}` } }
+        );
+        if (!res.ok) return;
+        const [profile] = await res.json();
+        if (profile) {
+          document.getElementById('setting-allow-messages').checked = !!profile.allow_messages;
+          document.getElementById('setting-years-exp').value = profile.years_experience ?? 0;
+        }
+      } catch {}
+    }
+
+    document.getElementById('settings-save-btn').addEventListener('click', async () => {
+      if (!currentSession?.access_token) return;
+      const allow_messages = document.getElementById('setting-allow-messages').checked;
+      const years_experience = parseInt(document.getElementById('setting-years-exp').value) || 0;
+      const msg = document.getElementById('settings-saved-msg');
+      try {
+        await fetch(`${SUPABASE_URL}/rest/v1/profiles?id=eq.${encodeURIComponent(currentUserId)}`, {
+          method: 'PATCH',
+          headers: {
+            'apikey': SUPABASE_ANON_KEY, 'Authorization': `Bearer ${currentSession.access_token}`,
+            'Content-Type': 'application/json', 'Prefer': 'return=minimal',
+          },
+          body: JSON.stringify({ allow_messages, years_experience }),
+        });
+        msg.style.display = '';
+        setTimeout(() => { msg.style.display = 'none'; }, 2500);
+      } catch {}
+    });
+
+    window.loadSettings = loadSettings;
+  })();
+
+  // ══ 3C: SEEKING FEEDBACK TOGGLE ══
+  (function () {
+    const toggle = document.getElementById('seeking-feedback-toggle');
+    const bar    = document.getElementById('seeking-feedback-bar');
+
+    function initSeekingFeedback(note) {
+      if (!note) return;
+      bar.style.display = '';
+      toggle.checked = !!note.seeking_feedback;
+      toggle.dataset.noteId = note.id;
+    }
+
+    toggle.addEventListener('change', async () => {
+      const noteId = toggle.dataset.noteId;
+      if (!noteId || !currentSession?.access_token) return;
+      const value = toggle.checked;
+      // Optimistic: update allNotes
+      const note = allNotes.find(n => n.id === noteId);
+      if (note) note.seeking_feedback = value;
+      try {
+        await fetch(`${SUPABASE_URL}/rest/v1/noter?id=eq.${encodeURIComponent(noteId)}&user_id=eq.${encodeURIComponent(currentUserId)}`, {
+          method: 'PATCH',
+          headers: {
+            'apikey': SUPABASE_ANON_KEY, 'Authorization': `Bearer ${currentSession.access_token}`,
+            'Content-Type': 'application/json', 'Prefer': 'return=minimal',
+          },
+          body: JSON.stringify({ seeking_feedback: value }),
+        });
+      } catch {
+        // Revert on error
+        toggle.checked = !value;
+        if (note) note.seeking_feedback = !value;
+      }
+    });
+
+    window.initSeekingFeedback = initSeekingFeedback;
   })();
 
   // ══ 2A: BOOKMARKS + CONTRIBUTOR BADGE ══
