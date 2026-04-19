@@ -9,6 +9,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&display=swap" rel="stylesheet" />
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js" defer></script>
+  <script src="https://cdn.jsdelivr.net/npm/pptxgenjs@3.12.0/libs/pptxgen.bundle.js" defer></script>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     :root {
@@ -480,6 +481,62 @@
     .maanedens-card-meta { font-size: .8rem; color: var(--muted); margin-bottom: 1rem; }
     .maanedens-card-excerpt { font-size: .9rem; color: var(--white); line-height: 1.75; opacity: .85; }
     .maanedens-empty { color: var(--muted); font-size: .9rem; }
+
+    /* ── TOAST ── */
+    #toast-container { position: fixed; bottom: 1.5rem; left: 50%; transform: translateX(-50%); z-index: 9999; display: flex; flex-direction: column; gap: .5rem; pointer-events: none; }
+    .toast {
+      background: var(--navy2); border: 1px solid var(--border);
+      color: var(--white); font-size: .875rem; padding: .65rem 1.25rem;
+      border-radius: 99px; box-shadow: 0 4px 24px rgba(0,0,0,.4);
+      opacity: 0; transform: translateY(8px);
+      transition: opacity .25s, transform .25s; pointer-events: none; white-space: nowrap;
+    }
+    .toast.show { opacity: 1; transform: translateY(0); }
+
+    /* ── OFFLINE KNAP + EKSPORT KNAP ── */
+    .note-card-offline, .note-card-export {
+      background: none; border: 1px solid var(--border); color: var(--muted);
+      cursor: pointer; font-size: .72rem; font-family: inherit; font-weight: 500;
+      padding: .2rem .5rem; border-radius: 5px; line-height: 1.4; flex-shrink: 0;
+      transition: color .2s, border-color .2s, background .2s; white-space: nowrap;
+    }
+    .note-card-offline:hover { color: #34d399; border-color: #34d399; background: rgba(52,211,153,0.07); }
+    .note-card-offline.saved { color: #34d399; border-color: #34d399; background: rgba(52,211,153,0.1); }
+    .note-card-export:hover { color: var(--teal2); border-color: var(--teal); background: rgba(14,165,197,0.07); }
+    .detail-export-btn {
+      background: none; border: 1px solid var(--border); color: var(--muted);
+      font-size: .78rem; font-family: inherit; cursor: pointer;
+      padding: .3rem .8rem; border-radius: 7px; margin-top: 1rem; align-self: flex-start;
+      transition: color .2s, border-color .2s;
+    }
+    .detail-export-btn:hover { color: var(--teal); border-color: var(--teal); }
+
+    /* ── OFFLINE SECTIONEN ── */
+    .offline-note-card {
+      background: var(--card-bg); border: 1px solid var(--border);
+      border-radius: 12px; padding: 1.1rem 1.25rem; margin-bottom: .75rem;
+      display: flex; flex-direction: column; gap: .3rem;
+    }
+    .offline-note-title { font-weight: 600; font-size: .95rem; color: var(--white); }
+    .offline-note-meta { font-size: .75rem; color: var(--muted); }
+    .offline-note-excerpt { font-size: .855rem; color: var(--muted); line-height: 1.6; margin-top: .25rem; }
+    .offline-remove-btn {
+      background: none; border: none; color: var(--muted); cursor: pointer;
+      font-size: .72rem; align-self: flex-end; margin-top: .25rem;
+      transition: color .2s;
+    }
+    .offline-remove-btn:hover { color: #f87171; }
+    .offline-empty { color: var(--muted); font-size: .9rem; text-align: center; padding: 2rem 0; }
+    .offline-count { font-size: .78rem; color: var(--muted); margin-bottom: 1rem; }
+
+    /* ── SPECIALTY CHIPS ── */
+    .specialty-chips { display: flex; flex-wrap: wrap; gap: .5rem; margin-top: .6rem; }
+    .specialty-chip {
+      background: none; border: 1px solid var(--border); color: var(--muted);
+      font-size: .78rem; font-family: inherit; cursor: pointer;
+      padding: .3rem .8rem; border-radius: 99px; transition: all .2s;
+    }
+    .specialty-chip.selected { border-color: var(--teal); color: var(--teal); background: rgba(14,165,197,0.1); }
 
     /* ── PORTAL TABS (GRUPPER / INDBAKKE / INDSTILLINGER) ── */
     .portal-tabbar {
@@ -1155,6 +1212,9 @@
     </div>
   </div>
 
+  <!-- ══ TOAST ══ -->
+  <div id="toast-container"></div>
+
   <!-- ══ PORTAL ══ -->
   <div id="portal">
 
@@ -1168,6 +1228,7 @@
         <button class="portal-tab active" data-ptab="noter">📋 Mine noter</button>
         <button class="portal-tab" data-ptab="grupper">👥 Grupper</button>
         <button class="portal-tab" data-ptab="indbakke">💬 Indbakke<span id="inbox-badge" class="portal-tab-badge" style="display:none">0</span></button>
+        <button class="portal-tab" data-ptab="offline">📥 Offline</button>
         <button class="portal-tab" data-ptab="indstillinger">⚙️ Indstillinger</button>
       </div>
 
@@ -1209,6 +1270,12 @@
         <div id="inbox-list"></div>
       </div>
 
+      <!-- OFFLINE -->
+      <div class="portal-section" id="psec-offline">
+        <div class="offline-count" id="offline-count"></div>
+        <div id="offline-notes-list"></div>
+      </div>
+
       <!-- INDSTILLINGER -->
       <div class="portal-section" id="psec-indstillinger">
         <div class="settings-section-title">Beskeder</div>
@@ -1230,6 +1297,14 @@
           </div>
           <input class="settings-number-input" id="setting-years-exp" type="number" min="0" max="50" value="0" />
         </div>
+        <div class="settings-section-title">Notifikationer</div>
+        <div class="settings-row" style="flex-direction:column; align-items:flex-start; gap:.75rem">
+          <div class="settings-row-info">
+            <div class="settings-row-label">Abonnér på specialer</div>
+            <div class="settings-row-sub">Vælg de specialer du vil holdes opdateret om (e-mail notifikationer kommer snart)</div>
+          </div>
+          <div class="specialty-chips" id="specialty-chips"></div>
+        </div>
         <button class="settings-save-btn" id="settings-save-btn">Gem indstillinger</button>
         <div class="settings-saved-msg" id="settings-saved-msg">✓ Gemt</div>
       </div>
@@ -1241,6 +1316,7 @@
       <div class="detail-topbar">
         <button class="detail-back" id="detail-back-btn" data-t="portal-back">← Tilbage</button>
         <input class="detail-title-input" id="detail-title" type="text" placeholder="Titel…" />
+        <button class="detail-export-btn" id="detail-export-btn" title="Eksportér til præsentation">📊 Eksportér</button>
         <span class="detail-save-badge" id="detail-save-badge">Gemt ✓</span>
       </div>
       <div class="detail-tabbar" id="detail-tabbar">
@@ -2624,6 +2700,7 @@
           <span class="note-card-title">${escHtml(note.title || 'Uden titel')}</span>
           <div style="display:flex;align-items:center;gap:.5rem;flex-shrink:0">
             <span class="note-card-meta">${date}</span>
+            <button class="note-card-offline${window.isOfflineSaved && isOfflineSaved(note.id) ? ' saved' : ''}" title="Gem til offline">💾</button>
             <button class="note-card-bookmark${myBookmarks.has(note.id) ? ' bookmarked' : ''}" title="${myBookmarks.has(note.id) ? 'Fjern bogmærke' : 'Bogmærk'}">🔖</button>
             <button class="note-card-tldr" title="30-sekunders opsummering">⚡ TL;DR</button>
             <button class="note-card-delete" title="Slet notat">🗑️</button>
@@ -2633,6 +2710,13 @@
         <div class="note-card-content">${escHtml(preview)}${preview.length >= 180 ? '…' : ''}</div>
       `;
       card.addEventListener('click', () => openNote(note.id));
+      card.querySelector('.note-card-offline').addEventListener('click', function (e) {
+        e.stopPropagation();
+        if (!window.saveForOffline) return;
+        saveForOffline(note);
+        this.classList.add('saved');
+        showToast('💾 Gemt til offline adgang');
+      });
       card.querySelector('.note-card-bookmark').addEventListener('click', function (e) {
         e.stopPropagation();
         toggleBookmark(note.id, this);
@@ -3787,7 +3871,8 @@
         document.getElementById('psec-' + tab)?.classList.add('active');
         if (tab === 'indbakke' && currentUserId && currentSession) loadInbox();
         if (tab === 'grupper' && currentUserId && currentSession) loadGroups();
-        if (tab === 'indstillinger' && currentUserId && currentSession) loadSettings();
+        if (tab === 'indstillinger' && currentUserId && currentSession) { loadSettings(); if (window.loadSubscriptions) loadSubscriptions(); }
+        if (tab === 'offline') { if (window.renderOfflineNotes) renderOfflineNotes(); }
       });
     });
   })();
@@ -3978,6 +4063,7 @@
           },
           body: JSON.stringify({ allow_messages, years_experience }),
         });
+        if (window.saveSubscriptions) await saveSubscriptions();
         msg.style.display = '';
         setTimeout(() => { msg.style.display = 'none'; }, 2500);
       } catch {}
@@ -4022,6 +4108,228 @@
     });
 
     window.initSeekingFeedback = initSeekingFeedback;
+  })();
+
+  // ══ TOAST ══
+  function showToast(msg, duration) {
+    const container = document.getElementById('toast-container');
+    if (!container) return;
+    const el = document.createElement('div');
+    el.className = 'toast';
+    el.textContent = msg;
+    container.appendChild(el);
+    requestAnimationFrame(() => { requestAnimationFrame(() => { el.classList.add('show'); }); });
+    setTimeout(() => {
+      el.classList.remove('show');
+      setTimeout(() => el.remove(), 300);
+    }, duration || 2500);
+  }
+
+  // ══ 4A: OFFLINE ══
+  (function () {
+    const OFFLINE_KEY = 'clinlog_offline_notes';
+    const MAX_OFFLINE = 20;
+
+    function getOfflineNotes() {
+      try { return JSON.parse(localStorage.getItem(OFFLINE_KEY) || '[]'); } catch { return []; }
+    }
+    function saveOfflineNotes(notes) {
+      localStorage.setItem(OFFLINE_KEY, JSON.stringify(notes));
+    }
+    function isOfflineSaved(noteId) {
+      return getOfflineNotes().some(n => n.id === noteId);
+    }
+
+    function saveForOffline(note) {
+      const notes = getOfflineNotes().filter(n => n.id !== note.id);
+      const sc = parseStructured(note);
+      const entry = {
+        id: note.id,
+        title: note.title || 'Uden titel',
+        category: note.category || '',
+        created_at: note.created_at,
+        savedAt: new Date().toISOString(),
+        excerpt: (sc?.anonymizedContent || note.content || '').slice(0, 300),
+      };
+      notes.unshift(entry);
+      saveOfflineNotes(notes.slice(0, MAX_OFFLINE));
+    }
+
+    function removeOffline(noteId) {
+      saveOfflineNotes(getOfflineNotes().filter(n => n.id !== noteId));
+    }
+
+    function renderOfflineNotes() {
+      const listEl  = document.getElementById('offline-notes-list');
+      const countEl = document.getElementById('offline-count');
+      if (!listEl) return;
+      const notes = getOfflineNotes();
+      if (countEl) countEl.textContent = notes.length > 0 ? `${notes.length} af ${MAX_OFFLINE} noter gemt offline` : '';
+      if (notes.length === 0) {
+        listEl.innerHTML = '<p class="offline-empty">Ingen noter gemt til offline brug endnu.<br>Brug 💾-knappen på et notekort for at gemme.</p>';
+        return;
+      }
+      listEl.innerHTML = '';
+      notes.forEach(n => {
+        const date = n.created_at ? new Date(n.created_at).toLocaleDateString('da-DK', { day: 'numeric', month: 'short', year: '2-digit' }) : '';
+        const div = document.createElement('div');
+        div.className = 'offline-note-card';
+        div.innerHTML = `
+          <div class="offline-note-title">${escHtml(n.title)}</div>
+          <div class="offline-note-meta">${escHtml(n.category)}${n.category && date ? ' · ' : ''}${date}</div>
+          ${n.excerpt ? `<div class="offline-note-excerpt">${escHtml(n.excerpt)}${n.excerpt.length >= 300 ? '…' : ''}</div>` : ''}
+          <button class="offline-remove-btn" data-id="${n.id}">✕ Fjern fra offline</button>`;
+        listEl.appendChild(div);
+      });
+      listEl.querySelectorAll('.offline-remove-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          removeOffline(btn.dataset.id);
+          renderOfflineNotes();
+        });
+      });
+    }
+
+    window.isOfflineSaved  = isOfflineSaved;
+    window.saveForOffline  = saveForOffline;
+    window.renderOfflineNotes = renderOfflineNotes;
+  })();
+
+  // ══ 4B: EKSPORT TIL PRÆSENTATION ══
+  document.getElementById('detail-export-btn').addEventListener('click', async function () {
+    const note = allNotes.find(n => n.id === openNoteId);
+    if (!note) return;
+    if (typeof PptxGenJS === 'undefined') { showToast('⚠️ PptxGenJS ikke loadet — prøv igen om et øjeblik'); return; }
+
+    const btn = this;
+    btn.textContent = '⏳ Genererer…';
+    btn.disabled = true;
+
+    try {
+      const sc      = parseStructured(note);
+      const title   = note.title || 'Klinisk case';
+      const cat     = note.category || '';
+      const date    = new Date(note.created_at || Date.now()).toLocaleDateString('da-DK', { day: 'numeric', month: 'long', year: 'numeric' });
+      const excerpt = (sc?.anonymizedContent || note.content || '').slice(0, 600).trim();
+
+      // TL;DR bullets fra cache hvis tilgængelige
+      let bullets = [];
+      try { bullets = JSON.parse(localStorage.getItem('tldr_' + note.id) || '[]'); } catch {}
+
+      const pptx = new PptxGenJS();
+      pptx.layout = 'LAYOUT_WIDE'; // 13.33 x 7.5 in
+
+      const NAVY  = '0b1120';
+      const TEAL  = '0ea5c5';
+      const WHITE = 'f8fafc';
+      const MUTED = '8a9ab5';
+
+      const slide = pptx.addSlide();
+      slide.background = { color: NAVY };
+
+      // Top bar accent
+      slide.addShape(pptx.ShapeType.rect, { x: 0, y: 0, w: 13.33, h: 0.06, fill: { color: TEAL }, line: { color: TEAL } });
+
+      // Logo / brand (top left)
+      slide.addText('ClinLog', { x: 0.4, y: 0.18, w: 2, h: 0.35, fontSize: 14, bold: true, color: WHITE, fontFace: 'Arial' });
+
+      // "Anonymiseret klinisk case" badge (top right)
+      slide.addText('Anonymiseret klinisk case', { x: 9.5, y: 0.18, w: 3.5, h: 0.35, fontSize: 9, color: TEAL, align: 'right', fontFace: 'Arial' });
+
+      // Category + date pill
+      const metaText = [cat, date].filter(Boolean).join(' · ');
+      slide.addText(metaText, { x: 0.5, y: 0.75, w: 8, h: 0.28, fontSize: 10, color: MUTED, fontFace: 'Arial' });
+
+      // Title
+      slide.addText(title, { x: 0.5, y: 1.1, w: 12.3, h: 0.9, fontSize: 28, bold: true, color: WHITE, fontFace: 'Arial', wrap: true });
+
+      // Divider
+      slide.addShape(pptx.ShapeType.rect, { x: 0.5, y: 2.1, w: 12.3, h: 0.02, fill: { color: '1e3a4a' }, line: { color: '1e3a4a' } });
+
+      if (bullets.length > 0) {
+        // TL;DR bullets
+        slide.addText('TL;DR', { x: 0.5, y: 2.25, w: 3, h: 0.3, fontSize: 9, bold: true, color: TEAL, fontFace: 'Arial' });
+        const bulletItems = bullets.map(b => ({ text: b, options: { bullet: { type: 'number' }, color: WHITE, fontSize: 13, fontFace: 'Arial', paraSpaceAfter: 6 } }));
+        slide.addText(bulletItems, { x: 0.5, y: 2.6, w: 12.3, h: 2.5, fontFace: 'Arial', wrap: true });
+      } else if (excerpt) {
+        // Fallback: raw excerpt
+        slide.addText(excerpt, { x: 0.5, y: 2.25, w: 12.3, h: 4, fontSize: 12, color: WHITE, fontFace: 'Arial', wrap: true, valign: 'top' });
+      }
+
+      // Footer
+      slide.addText('Genereret med ClinLog · clinlog.dk · Alle data er anonymiserede', {
+        x: 0, y: 7.2, w: 13.33, h: 0.3, fontSize: 8, color: MUTED, align: 'center', fontFace: 'Arial'
+      });
+
+      const filename = (title.replace(/[^a-zA-Z0-9æøåÆØÅ\s]/g, '').trim().slice(0, 40) || 'case') + '.pptx';
+      await pptx.writeFile({ fileName: filename });
+      showToast('📊 Præsentation downloadet');
+    } catch (err) {
+      showToast('⚠️ Eksport fejlede — prøv igen');
+    }
+    btn.textContent = '📊 Eksportér';
+    btn.disabled = false;
+  });
+
+  // ══ 4C: SPECIALTY SUBSCRIPTIONS ══
+  (function () {
+    const SPECIALTIES = ['Anæstesi', 'Intensiv', 'Akutmedicin', 'Kardiologi', 'Neurologi', 'Ortopædi', 'Pædiatri', 'Psykiatri', 'Onkologi', 'Gynækologi', 'Medicin', 'Kirurgi', 'Andet'];
+    let mySubscriptions = new Set();
+
+    function renderSpecialtyChips() {
+      const container = document.getElementById('specialty-chips');
+      if (!container) return;
+      container.innerHTML = '';
+      SPECIALTIES.forEach(s => {
+        const btn = document.createElement('button');
+        btn.className = 'specialty-chip' + (mySubscriptions.has(s) ? ' selected' : '');
+        btn.textContent = s;
+        btn.dataset.specialty = s;
+        btn.addEventListener('click', () => {
+          if (mySubscriptions.has(s)) mySubscriptions.delete(s);
+          else mySubscriptions.add(s);
+          btn.classList.toggle('selected', mySubscriptions.has(s));
+        });
+        container.appendChild(btn);
+      });
+    }
+
+    async function loadSubscriptions() {
+      if (!currentSession?.access_token) return;
+      try {
+        const res = await fetch(
+          `${SUPABASE_URL}/rest/v1/subscriptions?user_id=eq.${encodeURIComponent(currentUserId)}&select=specialty`,
+          { headers: { 'apikey': SUPABASE_ANON_KEY, 'Authorization': `Bearer ${currentSession.access_token}` } }
+        );
+        if (res.ok) {
+          const data = await res.json();
+          mySubscriptions = new Set((data || []).map(s => s.specialty));
+        }
+      } catch {}
+      renderSpecialtyChips();
+    }
+
+    async function saveSubscriptions() {
+      if (!currentSession?.access_token) return;
+      const token = currentSession.access_token;
+      // Delete all existing, then insert selected
+      try {
+        await fetch(`${SUPABASE_URL}/rest/v1/subscriptions?user_id=eq.${encodeURIComponent(currentUserId)}`, {
+          method: 'DELETE',
+          headers: { 'apikey': SUPABASE_ANON_KEY, 'Authorization': `Bearer ${token}`, 'Prefer': 'return=minimal' },
+        });
+        if (mySubscriptions.size > 0) {
+          const rows = [...mySubscriptions].map(specialty => ({ user_id: currentUserId, specialty }));
+          await fetch(`${SUPABASE_URL}/rest/v1/subscriptions`, {
+            method: 'POST',
+            headers: { 'apikey': SUPABASE_ANON_KEY, 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json', 'Prefer': 'return=minimal' },
+            body: JSON.stringify(rows),
+          });
+        }
+      } catch {}
+    }
+
+    window.loadSubscriptions  = loadSubscriptions;
+    window.saveSubscriptions  = saveSubscriptions;
   })();
 
   // ══ 2A: BOOKMARKS + CONTRIBUTOR BADGE ══
