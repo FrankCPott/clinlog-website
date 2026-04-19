@@ -82,8 +82,8 @@
     }
     .logo-wordmark { font-family: 'DM Serif Display', serif; font-size: 1.45rem; color: var(--white); letter-spacing: -0.02em; line-height: 1; }
     .logo-wordmark span { color: var(--teal); }
-    .nav-links { display: flex; list-style: none; gap: 1.4rem; align-items: center; }
-    .nav-links a { color: var(--muted); text-decoration: none; font-size: .82rem; transition: color .2s; white-space: nowrap; }
+    .nav-links { display: flex; list-style: none; gap: 2rem; align-items: center; }
+    .nav-links a { color: var(--muted); text-decoration: none; font-size: .9rem; transition: color .2s; }
     .nav-links a:hover { color: var(--white); }
     .nav-cta { background: var(--teal) !important; color: #fff !important; padding: .5rem 1.2rem; border-radius: 6px; font-weight: 500; transition: background .2s !important; }
     .nav-cta:hover { background: var(--teal2) !important; }
@@ -428,63 +428,6 @@
     .note-card { cursor: pointer; }
     .note-card-delete { background: none; border: none; color: var(--muted); cursor: pointer; font-size: 1rem; padding: .25rem .4rem; border-radius: 4px; line-height: 1; flex-shrink: 0; transition: color .2s, background .2s; }
     .note-card-delete:hover { color: #f87171; background: rgba(248,113,113,0.1); }
-    .note-card-tldr {
-      background: none; border: 1px solid var(--border); color: var(--muted);
-      cursor: pointer; font-size: .72rem; font-family: inherit; font-weight: 500;
-      padding: .2rem .55rem; border-radius: 5px; line-height: 1.4; flex-shrink: 0;
-      transition: color .2s, border-color .2s, background .2s; white-space: nowrap;
-    }
-    .note-card-tldr:hover { color: var(--teal2); border-color: var(--teal); background: rgba(14,165,197,0.07); }
-
-    /* ── TL;DR MODAL ── */
-    #tldr-overlay {
-      display: none; position: fixed; inset: 0; z-index: 2100;
-      background: rgba(7,12,24,0.88); backdrop-filter: blur(8px);
-      align-items: center; justify-content: center; padding: 1.5rem;
-    }
-    #tldr-overlay.open { display: flex; }
-    .tldr-modal {
-      background: var(--navy2); border: 1px solid var(--border);
-      border-radius: 18px; padding: 2rem 2rem 1.75rem; width: 100%; max-width: 480px;
-      box-shadow: 0 24px 80px rgba(0,0,0,0.6); position: relative;
-    }
-    .tldr-modal-header {
-      display: flex; align-items: center; justify-content: space-between;
-      margin-bottom: 1.25rem; gap: 1rem;
-    }
-    .tldr-modal-title { font-family: 'DM Serif Display', serif; font-size: 1.25rem; }
-    .tldr-ai-badge {
-      font-size: .68rem; font-weight: 600; letter-spacing: .04em; text-transform: uppercase;
-      color: var(--teal); border: 1px solid rgba(14,165,197,0.35); border-radius: 4px;
-      padding: .15rem .45rem; flex-shrink: 0;
-    }
-    .tldr-close {
-      position: absolute; top: 1rem; right: 1rem;
-      background: rgba(255,255,255,0.06); border: 1px solid var(--border);
-      color: var(--muted); border-radius: 7px; width: 30px; height: 30px;
-      cursor: pointer; font-size: .9rem; display: flex; align-items: center; justify-content: center;
-      transition: color .2s, background .2s;
-    }
-    .tldr-close:hover { color: var(--white); background: rgba(255,255,255,0.1); }
-    .tldr-spinner { text-align: center; padding: 2rem 0; color: var(--muted); font-size: .9rem; }
-    .tldr-spinner::before { content: '⏳'; display: block; font-size: 1.8rem; margin-bottom: .75rem; animation: tldr-spin 1.2s linear infinite; }
-    @keyframes tldr-spin { to { transform: rotate(360deg); } }
-    .tldr-bullets { list-style: none; margin: 0 0 1.25rem; padding: 0; display: flex; flex-direction: column; gap: .75rem; }
-    .tldr-bullet {
-      display: flex; gap: .65rem; align-items: flex-start;
-      font-size: .925rem; color: var(--white); line-height: 1.6;
-    }
-    .tldr-bullet::before { content: '▸'; color: var(--teal); flex-shrink: 0; margin-top: .1rem; }
-    .tldr-note-title { font-size: .8rem; color: var(--muted); margin-bottom: 1rem; font-style: italic; }
-    .tldr-footer { display: flex; justify-content: flex-end; gap: .75rem; padding-top: .75rem; border-top: 1px solid var(--border); }
-    .tldr-copy-btn {
-      background: var(--teal); color: #fff; border: none; border-radius: 8px;
-      padding: .5rem 1.1rem; font-family: inherit; font-size: .875rem; font-weight: 500;
-      cursor: pointer; transition: background .2s;
-    }
-    .tldr-copy-btn:hover { background: var(--teal2); }
-    .tldr-copy-btn.copied { background: var(--success); }
-    .tldr-error { color: #f87171; font-size: .875rem; padding: 1rem 0; }
 
     /* ── PORTAL SØGNING + FILTER ── */
     .portal-toolbar {
@@ -843,22 +786,6 @@
     </div>
   </div>
 
-  <!-- ══ TL;DR MODAL ══ -->
-  <div id="tldr-overlay" role="dialog" aria-modal="true" aria-label="30-sekunders opsummering">
-    <div class="tldr-modal">
-      <button class="tldr-close" id="tldr-close-btn" aria-label="Luk">✕</button>
-      <div class="tldr-modal-header">
-        <span class="tldr-modal-title">⚡ 30-sekunders opsummering</span>
-        <span class="tldr-ai-badge">AI</span>
-      </div>
-      <div id="tldr-note-title" class="tldr-note-title"></div>
-      <div id="tldr-body"></div>
-      <div class="tldr-footer" id="tldr-footer" style="display:none">
-        <button class="tldr-copy-btn" id="tldr-copy-btn">📋 Kopiér</button>
-      </div>
-    </div>
-  </div>
-
   <!-- ══ PORTAL ══ -->
   <div id="portal">
 
@@ -939,7 +866,7 @@
       <li><a href="#about" data-t="nav-about">Om Clinlog</a></li>
       <li><a href="#contact" data-t="nav-contact">Kontakt</a></li>
       <li><a href="#waitlist" class="nav-cta" data-t="nav-waitlist">Tilmeld venteliste</a></li>
-      <li id="nav-login-item" style="display:none"><button class="nav-login" id="nav-login-btn" data-t="nav-login">Log ind</button></li>
+      <li id="nav-login-item" style="display:none"><button class="nav-login" id="nav-login-btn">Log ind</button></li>
       <li id="nav-user-item" style="display:none">
         <div class="portal-nav-user">
           <button class="nav-login" id="nav-mine-noter-btn" data-t="nav-mine-noter">Mine noter</button>
@@ -1006,7 +933,7 @@
           <rect y="10" width="22" height="5" fill="#FFCE00"/>
         </svg>
       </button>
-      <button class="nav-login" id="nav-login-btn-mobile" data-t="nav-login" style="font-size:.8rem; padding:.4rem .85rem; display:none">Log ind</button>
+      <button class="nav-login" id="nav-login-btn-mobile" style="font-size:.8rem; padding:.4rem .85rem; display:none">Log ind</button>
       <div id="nav-user-item-mobile" style="display:none; align-items:center; gap:.4rem;">
         <button class="nav-login" id="nav-mine-noter-btn-mobile" style="font-size:.8rem; padding:.4rem .85rem;" data-t="nav-mine-noter">Mine noter</button>
         <button class="portal-logout" id="nav-logout-btn-mobile" style="font-size:.78rem; padding:.35rem .7rem;" data-t="nav-logout">Log ud</button>
@@ -1507,7 +1434,6 @@
       'nav-about': 'Om Clinlog',
       'nav-contact': 'Kontakt',
       'nav-waitlist': 'Tilmeld venteliste',
-      'nav-login': 'Log ind',
       'nav-mine-noter': 'Mine noter',
       'nav-logout': 'Log ud',
       'hero-badge': 'Kommer snart · Beta 2026',
@@ -1636,7 +1562,6 @@
       'nav-about': 'About',
       'nav-contact': 'Contact',
       'nav-waitlist': 'Join waitlist',
-      'nav-login': 'Log in',
       'nav-mine-noter': 'My notes',
       'nav-logout': 'Log out',
       'hero-badge': 'Coming soon · Beta 2026',
@@ -1761,11 +1686,10 @@
     },
     de: {
       'nav-features': 'Funktionen',
-      'nav-how': 'Funktionsweise',
+      'nav-how': 'So funktioniert es',
       'nav-about': 'Über uns',
       'nav-contact': 'Kontakt',
-      'nav-waitlist': 'Warteliste',
-      'nav-login': 'Anmelden',
+      'nav-waitlist': 'Warteliste beitreten',
       'nav-mine-noter': 'Meine Notizen',
       'nav-logout': 'Abmelden',
       'hero-badge': 'Demnächst · Beta 2026',
@@ -2229,7 +2153,6 @@
           <span class="note-card-title">${escHtml(note.title || 'Uden titel')}</span>
           <div style="display:flex;align-items:center;gap:.5rem;flex-shrink:0">
             <span class="note-card-meta">${date}</span>
-            <button class="note-card-tldr" title="30-sekunders opsummering">⚡ TL;DR</button>
             <button class="note-card-delete" title="Slet notat">🗑️</button>
           </div>
         </div>
@@ -2237,10 +2160,6 @@
         <div class="note-card-content">${escHtml(preview)}${preview.length >= 180 ? '…' : ''}</div>
       `;
       card.addEventListener('click', () => openNote(note.id));
-      card.querySelector('.note-card-tldr').addEventListener('click', function (e) {
-        e.stopPropagation();
-        showTldr(note);
-      });
       card.querySelector('.note-card-delete').addEventListener('click', function (e) {
         e.stopPropagation();
         deleteNote(note.id, note.title);
@@ -2820,7 +2739,7 @@
 
   async function pubmedSearch(query) {
     const res = await fetch(
-      `https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?db=pubmed&term=${encodeURIComponent(query)}&retmax=5&sort=relevance&retmode=json&api_key=4d0f6b5fcb7cd1d08248a0b0fa5787aaf909&tool=clinlog&email=pott.clinlog%40gmail.com`
+      `https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?db=pubmed&term=${encodeURIComponent(query)}&retmax=5&sort=relevance&retmode=json`
     );
     if (!res.ok) throw new Error('PubMed esearch fejlede');
     const json = await res.json();
@@ -2903,7 +2822,7 @@
       }
 
       const summaryRes = await fetch(
-        `https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esummary.fcgi?db=pubmed&id=${ids.join(',')}&retmode=json&api_key=4d0f6b5fcb7cd1d08248a0b0fa5787aaf909&tool=clinlog&email=pott.clinlog%40gmail.com`
+        `https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esummary.fcgi?db=pubmed&id=${ids.join(',')}&retmode=json`
       );
       const summaryJson = await summaryRes.json();
       const result = summaryJson.result;
@@ -3010,12 +2929,10 @@
   supabase.auth.onAuthStateChange((_event, session) => {
     if (session) {
       currentSession = session;
-      window.__clinlogSession = session;
       showPortal(session.user);
       hideLogin();
     } else {
       currentSession = null;
-      window.__clinlogSession = null;
       showLanding();
     }
   });
@@ -3163,139 +3080,6 @@
 
   } // end if (supabase)
   }); // end window.load
-
-  // ── TL;DR ──────────────────────────────────────────────────────────────────
-
-  (function () {
-    const overlay   = document.getElementById('tldr-overlay');
-    const body      = document.getElementById('tldr-body');
-    const footer    = document.getElementById('tldr-footer');
-    const copyBtn   = document.getElementById('tldr-copy-btn');
-    const titleEl   = document.getElementById('tldr-note-title');
-    const closeBtn  = document.getElementById('tldr-close-btn');
-    const CACHE_KEY = id => 'tldr_' + id;
-
-    function closeTldr() {
-      overlay.classList.remove('open');
-    }
-    closeBtn.addEventListener('click', closeTldr);
-    overlay.addEventListener('click', function (e) {
-      if (e.target === overlay) closeTldr();
-    });
-    document.addEventListener('keydown', function (e) {
-      if (e.key === 'Escape') closeTldr();
-    });
-
-    function buildCaseText(note) {
-      // Anonymiseret indhold: brug structured_content hvis tilgængeligt
-      try {
-        const sc = note.structured_content
-          ? (typeof note.structured_content === 'string' ? JSON.parse(note.structured_content) : note.structured_content)
-          : null;
-        if (!sc) return note.content || '';
-        const parts = [];
-        if (sc.patientCase)        parts.push('Patientcase: ' + sc.patientCase);
-        if (sc.kliniskForlob)      parts.push('Klinisk forløb: ' + sc.kliniskForlob);
-        if (sc.fagligLaering)      parts.push('Faglig læring: ' + sc.fagligLaering);
-        if (sc.outcome_structured) parts.push('Outcome: ' + sc.outcome_structured);
-        return parts.join('\n\n') || note.content || '';
-      } catch { return note.content || ''; }
-    }
-
-    function renderBullets(bullets) {
-      const ul = document.createElement('ul');
-      ul.className = 'tldr-bullets';
-      bullets.forEach(txt => {
-        const li = document.createElement('li');
-        li.className = 'tldr-bullet';
-        li.textContent = txt.replace(/^[-–•▸]\s*/, '').trim();
-        ul.appendChild(li);
-      });
-      return ul;
-    }
-
-    async function showTldr(note) {
-      // Reset og åbn
-      body.innerHTML = '<div class="tldr-spinner"></div>';
-      footer.style.display = 'none';
-      titleEl.textContent = note.title || '';
-      overlay.classList.add('open');
-
-      // Tjek cache
-      const cached = localStorage.getItem(CACHE_KEY(note.id));
-      if (cached) {
-        try {
-          const bullets = JSON.parse(cached);
-          body.innerHTML = '';
-          body.appendChild(renderBullets(bullets));
-          setupCopy(bullets);
-          footer.style.display = '';
-          return;
-        } catch { /* cache korrupt — hent igen */ }
-      }
-
-      // Hent fra Claude
-      const caseText = buildCaseText(note);
-      if (!caseText.trim()) {
-        body.innerHTML = '<p class="tldr-error">Ingen indhold at opsummere.</p>';
-        return;
-      }
-
-      const session = window.__clinlogSession;
-      if (!session?.access_token) {
-        body.innerHTML = '<p class="tldr-error">Log ind for at bruge denne funktion.</p>';
-        return;
-      }
-
-      try {
-        const res = await fetch('/.netlify/functions/claude', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': 'Bearer ' + session.access_token,
-          },
-          body: JSON.stringify({
-            model: 'claude-haiku-4-5-20251001',
-            max_tokens: 350,
-            messages: [{
-              role: 'user',
-              content: 'Opsummer denne kliniske case i præcis 3 korte bulletpoints til en travl kliniker. Vær præcis og klinisk. Svar KUN med 3 linjer — ingen intro, ingen forklaring, ingen nummerering.\n\n' + caseText,
-            }]
-          })
-        });
-        if (!res.ok) throw new Error('HTTP ' + res.status);
-        const data = await res.json();
-        const text = data?.content?.[0]?.text || '';
-        const bullets = text.split('\n').map(l => l.trim()).filter(l => l.length > 4).slice(0, 3);
-        if (bullets.length === 0) throw new Error('Tomt svar');
-
-        localStorage.setItem(CACHE_KEY(note.id), JSON.stringify(bullets));
-        body.innerHTML = '';
-        body.appendChild(renderBullets(bullets));
-        setupCopy(bullets);
-        footer.style.display = '';
-      } catch (err) {
-        body.innerHTML = '<p class="tldr-error">Kunne ikke generere opsummering. Prøv igen.</p>';
-      }
-    }
-
-    function setupCopy(bullets) {
-      copyBtn.classList.remove('copied');
-      copyBtn.onclick = function () {
-        navigator.clipboard.writeText(bullets.join('\n')).then(() => {
-          copyBtn.textContent = '✓ Kopieret';
-          copyBtn.classList.add('copied');
-          setTimeout(() => {
-            copyBtn.textContent = '📋 Kopiér';
-            copyBtn.classList.remove('copied');
-          }, 2000);
-        });
-      };
-    }
-
-    // Eksponer showTldr globalt så renderNoteList kan kalde den
-    window.showTldr = showTldr;
-  })();
 
   </script>
 </body>
