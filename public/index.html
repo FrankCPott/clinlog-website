@@ -522,6 +522,38 @@
       margin-top: auto; padding-top: .3rem;
     }
 
+    /* ── DIFFERENTIALDIAGNOSE PANEL ── */
+    #panel-ddx { gap: 0; }
+    .ddx-loading { color: var(--muted); font-size: .9rem; padding: 1.5rem 0; text-align: center; }
+    .ddx-loading::before { content: '🧠'; display: block; font-size: 1.8rem; margin-bottom: .6rem; animation: tldr-spin 1.2s linear infinite; }
+    .ddx-error { color: #f87171; font-size: .875rem; padding: 1rem 0; }
+    .ddx-cards { display: flex; flex-direction: column; gap: 1rem; margin-top: .25rem; }
+    .ddx-card {
+      background: rgba(14,165,197,0.05); border: 1px solid var(--border);
+      border-radius: 12px; padding: 1rem 1.1rem; display: flex; flex-direction: column; gap: .4rem;
+    }
+    .ddx-card-rank {
+      font-size: .68rem; font-weight: 700; letter-spacing: .1em; text-transform: uppercase;
+      color: var(--teal); margin-bottom: .1rem;
+    }
+    .ddx-card-name { font-size: 1rem; font-weight: 700; color: var(--white); }
+    .ddx-card-rationale { font-size: .875rem; color: var(--muted); line-height: 1.65; }
+    .ddx-card-pubmed {
+      display: inline-flex; align-items: center; gap: .35rem;
+      font-size: .75rem; color: var(--teal); text-decoration: none;
+      border: 1px solid var(--border); border-radius: 6px;
+      padding: .25rem .6rem; margin-top: .3rem; width: fit-content;
+      transition: border-color .2s, background .2s;
+    }
+    .ddx-card-pubmed:hover { border-color: var(--teal); background: rgba(14,165,197,0.1); }
+    .ddx-refresh {
+      align-self: flex-end; margin-top: .75rem;
+      background: transparent; border: 1px solid var(--border);
+      color: var(--muted); border-radius: 6px; padding: .3rem .75rem;
+      font-size: .75rem; cursor: pointer; transition: border-color .2s, color .2s;
+    }
+    .ddx-refresh:hover { border-color: var(--teal); color: var(--teal); }
+
     /* ── PORTAL SØGNING + FILTER ── */
     .portal-toolbar {
       display: flex; flex-direction: column; gap: .75rem; margin-bottom: 1.5rem;
@@ -932,6 +964,7 @@
       </div>
       <div class="detail-tabbar" id="detail-tabbar">
         <button class="detail-tab active" data-tab="notat" data-t="tab-notat">Notat</button>
+        <button class="detail-tab" data-tab="ddx">🧠 DDx</button>
         <button class="detail-tab" data-tab="referencer" data-t="tab-referencer">📖 Referencer</button>
       </div>
       <div class="detail-panel active" id="panel-notat">
@@ -944,6 +977,9 @@
           </div>
           <div class="similar-cases-strip" id="similar-cases-strip"></div>
         </div>
+      </div>
+      <div class="detail-panel" id="panel-ddx">
+        <div id="detail-ddx-content"></div>
       </div>
       <div class="detail-panel" id="panel-referencer">
         <div id="detail-refs-content"><p class="refs-loading">Henter referencer…</p></div>
@@ -2661,6 +2697,7 @@
     const note = allNotes.find(n => n.id === id);
     if (!note) return;
     openNoteId = id;
+    window.__openNoteId = id;
     const badge = document.getElementById('detail-save-badge');
     badge.textContent = '';
     badge.className = 'detail-save-badge';
@@ -2671,6 +2708,10 @@
     renderNoteSections(note);
     buildInterestTabs(note);
     renderSimilarCases(note);
+
+    // DDx-fane: nulstil så lazy load starter forfra
+    const ddxEl = document.getElementById('detail-ddx-content');
+    if (ddxEl) ddxEl.innerHTML = '';
 
     // Referencer-fane: loading state
     document.getElementById('detail-refs-content').innerHTML =
@@ -3402,6 +3443,128 @@
 
     // Eksponer showTldr globalt så renderNoteList kan kalde den
     window.showTldr = showTldr;
+  })();
+
+  // ══ DIFFERENTIALDIAGNOSE ASSISTENT ══
+  (function () {
+    const DDX_CACHE_KEY = id => 'ddx_' + id;
+
+    function buildCaseTextForDdx(note) {
+      const sc = parseStructured(note);
+      if (sc?.anonymizedContent) return sc.anonymizedContent;
+      if (sc?.patientCase || sc?.kliniskForlob) {
+        return [sc.patientCase, sc.kliniskForlob, sc.fagligLaering]
+          .filter(Boolean).join('\n\n');
+      }
+      return note.edited_note || note.content || '';
+    }
+
+    function renderDdxCards(diagnoses, noteId, container) {
+      const RANKS = ['1. Mest sandsynlig', '2. Alternativ', '3. Udeluk ikke'];
+      container.innerHTML = '';
+      const cards = document.createElement('div');
+      cards.className = 'ddx-cards';
+      diagnoses.forEach((d, i) => {
+        const pubmedUrl = 'https://pubmed.ncbi.nlm.nih.gov/?term=' +
+          encodeURIComponent(d.pubmedTerm || d.diagnosis);
+        const card = document.createElement('div');
+        card.className = 'ddx-card';
+        card.innerHTML = `
+          <div class="ddx-card-rank">${RANKS[i] || (i + 1) + '.'}</div>
+          <div class="ddx-card-name">${escHtml(d.diagnosis)}</div>
+          <div class="ddx-card-rationale">${escHtml(d.rationale)}</div>
+          <a class="ddx-card-pubmed" href="${pubmedUrl}" target="_blank" rel="noopener">
+            📖 Søg på PubMed
+          </a>`;
+        cards.appendChild(card);
+      });
+      container.appendChild(cards);
+
+      // Genindlæs-knap (ryd cache + fetch igen)
+      const refreshBtn = document.createElement('button');
+      refreshBtn.className = 'ddx-refresh';
+      refreshBtn.textContent = '↺ Generer igen';
+      refreshBtn.addEventListener('click', () => {
+        localStorage.removeItem(DDX_CACHE_KEY(noteId));
+        fetchDdx(noteId, true);
+      });
+      container.appendChild(refreshBtn);
+    }
+
+    async function fetchDdx(noteId, forceRefresh) {
+      const note = allNotes.find(n => n.id === noteId);
+      const container = document.getElementById('detail-ddx-content');
+      if (!note || !container) return;
+
+      // Cache check
+      if (!forceRefresh) {
+        const cached = localStorage.getItem(DDX_CACHE_KEY(noteId));
+        if (cached) {
+          try {
+            renderDdxCards(JSON.parse(cached), noteId, container);
+            return;
+          } catch { /* korrupt cache — fortsæt */ }
+        }
+      }
+
+      container.innerHTML = '<div class="ddx-loading"></div>';
+
+      const caseText = buildCaseTextForDdx(note);
+      if (!caseText.trim()) {
+        container.innerHTML = '<p class="ddx-error">Ingen indhold at analysere. Strukturér noten i appen først.</p>';
+        return;
+      }
+
+      const session = window.__clinlogSession;
+      if (!session?.access_token) {
+        container.innerHTML = '<p class="ddx-error">Log ind for at bruge denne funktion.</p>';
+        return;
+      }
+
+      const prompt = `Du er en erfaren klinisk underviser. Analyser denne kliniske case og returner PRÆCIS 3 differentialdiagnoser som et JSON-array.
+
+Format:
+[{"diagnosis":"Diagnose navn","rationale":"1-2 sætninger klinisk begrundelse","pubmedTerm":"3-5 engelske søgeord til PubMed"},...]
+
+Svar KUN med JSON-arrayet — ingen tekst udenfor arrayet.
+
+Case:
+${caseText}`;
+
+      try {
+        const res = await fetch('/.netlify/functions/claude', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + session.access_token,
+          },
+          body: JSON.stringify({
+            model: 'claude-haiku-4-5-20251001',
+            max_tokens: 600,
+            messages: [{ role: 'user', content: prompt }]
+          })
+        });
+        if (!res.ok) throw new Error('HTTP ' + res.status);
+        const data = await res.json();
+        const text = (data?.content?.[0]?.text || '').trim();
+        // Strip any markdown code fences
+        const json = text.replace(/^```(?:json)?\n?/, '').replace(/\n?```$/, '').trim();
+        const diagnoses = JSON.parse(json);
+        if (!Array.isArray(diagnoses) || diagnoses.length === 0) throw new Error('Tomt svar');
+        localStorage.setItem(DDX_CACHE_KEY(noteId), JSON.stringify(diagnoses.slice(0, 3)));
+        renderDdxCards(diagnoses.slice(0, 3), noteId, container);
+      } catch (err) {
+        container.innerHTML = '<p class="ddx-error">Kunne ikke generere differentialdiagnoser. Prøv igen.</p>';
+      }
+    }
+
+    // Lazy load: kun når brugeren klikker på DDx-fanen
+    document.querySelector('[data-tab="ddx"]').addEventListener('click', () => {
+      const id = window.__openNoteId;
+      if (id) fetchDdx(id);
+    });
+
+    window.fetchDdx = fetchDdx;
   })();
 
   </script>
