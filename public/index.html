@@ -2742,7 +2742,7 @@
 
   async function pubmedSearch(query) {
     const res = await fetch(
-      `https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?db=pubmed&term=${encodeURIComponent(query)}&retmax=5&sort=relevance&retmode=json`
+      `https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?db=pubmed&term=${encodeURIComponent(query)}&retmax=5&sort=relevance&retmode=json&api_key=4d0f6b5fcb7cd1d08248a0b0fa5787aaf909`
     );
     if (!res.ok) throw new Error('PubMed esearch fejlede');
     const json = await res.json();
@@ -2825,7 +2825,7 @@
       }
 
       const summaryRes = await fetch(
-        `https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esummary.fcgi?db=pubmed&id=${ids.join(',')}&retmode=json`
+        `https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esummary.fcgi?db=pubmed&id=${ids.join(',')}&retmode=json&api_key=4d0f6b5fcb7cd1d08248a0b0fa5787aaf909`
       );
       const summaryJson = await summaryRes.json();
       const result = summaryJson.result;
