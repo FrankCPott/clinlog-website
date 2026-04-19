@@ -486,6 +486,42 @@
     .tldr-copy-btn.copied { background: var(--success); }
     .tldr-error { color: #f87171; font-size: .875rem; padding: 1rem 0; }
 
+    /* ── LIGNENDE CASES ── */
+    #similar-cases-section { margin-top: 1.75rem; }
+    .similar-cases-header {
+      display: flex; align-items: center; gap: .5rem; margin-bottom: .75rem;
+    }
+    .similar-cases-icon { font-size: 1rem; }
+    .similar-cases-label {
+      font-size: .7rem; font-weight: 700; letter-spacing: .12em;
+      text-transform: uppercase; color: var(--teal);
+    }
+    .similar-cases-strip {
+      display: flex; gap: .75rem; overflow-x: auto; padding-bottom: .5rem;
+      scrollbar-width: thin; scrollbar-color: var(--border) transparent;
+    }
+    .similar-cases-strip::-webkit-scrollbar { height: 4px; }
+    .similar-cases-strip::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+    .similar-card {
+      flex: 0 0 160px; background: rgba(14,165,197,0.06);
+      border: 1px solid var(--border); border-radius: 10px;
+      padding: .75rem; cursor: pointer; transition: border-color .2s, background .2s;
+      display: flex; flex-direction: column; gap: .3rem;
+    }
+    .similar-card:hover { border-color: var(--teal); background: rgba(14,165,197,0.12); }
+    .similar-card-title {
+      font-size: .82rem; font-weight: 600; color: var(--white);
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+    .similar-card-meta {
+      font-size: .72rem; color: var(--muted); white-space: nowrap;
+      overflow: hidden; text-overflow: ellipsis;
+    }
+    .similar-card-score {
+      font-size: .68rem; color: var(--teal);
+      margin-top: auto; padding-top: .3rem;
+    }
+
     /* ── PORTAL SØGNING + FILTER ── */
     .portal-toolbar {
       display: flex; flex-direction: column; gap: .75rem; margin-bottom: 1.5rem;
@@ -901,6 +937,13 @@
       <div class="detail-panel active" id="panel-notat">
         <div id="panel-notat-original"></div>
         <div id="panel-notat-sections"></div>
+        <div id="similar-cases-section" style="display:none">
+          <div class="similar-cases-header">
+            <span class="similar-cases-icon">🔍</span>
+            <span class="similar-cases-label">Lignende cases</span>
+          </div>
+          <div class="similar-cases-strip" id="similar-cases-strip"></div>
+        </div>
       </div>
       <div class="detail-panel" id="panel-referencer">
         <div id="detail-refs-content"><p class="refs-loading">Henter referencer…</p></div>
@@ -2498,6 +2541,69 @@
     el.innerHTML = html;
   }
 
+  function renderSimilarCases(currentNote) {
+    const section = document.getElementById('similar-cases-section');
+    const strip   = document.getElementById('similar-cases-strip');
+    if (!section || !strip) return;
+
+    // Extract tags from structured content
+    function getNoteTags(note) {
+      const sc = parseStructured(note);
+      const tags = [];
+      if (note.category) tags.push(note.category.toLowerCase());
+      if (sc?.tags) {
+        (Array.isArray(sc.tags) ? sc.tags : [sc.tags]).forEach(t => {
+          if (t) tags.push(String(t).toLowerCase());
+        });
+      }
+      // Also extract from section keys as implicit tags
+      if (sc) {
+        ['diagnose', 'diagnosis', 'behandling', 'treatment', 'specialty', 'specialty'].forEach(k => {
+          if (sc[k]) tags.push(String(sc[k]).toLowerCase().slice(0, 30));
+        });
+      }
+      return tags;
+    }
+
+    const currentTags = getNoteTags(currentNote);
+    if (currentTags.length === 0) { section.style.display = 'none'; return; }
+
+    // Score all other notes by tag overlap
+    const scored = allNotes
+      .filter(n => n.id !== currentNote.id)
+      .map(n => {
+        const nTags = getNoteTags(n);
+        const overlap = currentTags.filter(t => nTags.includes(t)).length;
+        return { note: n, overlap };
+      })
+      .filter(x => x.overlap > 0)
+      .sort((a, b) => b.overlap - a.overlap)
+      .slice(0, 5);
+
+    if (scored.length === 0) { section.style.display = 'none'; return; }
+
+    strip.innerHTML = scored.map(({ note: n, overlap }) => {
+      const title = escHtml(n.title || 'Uden titel');
+      const date  = n.created_at
+        ? new Date(n.created_at).toLocaleDateString('da-DK', { day: 'numeric', month: 'short', year: '2-digit' })
+        : '';
+      const cat   = escHtml(n.category || '');
+      const label = overlap === 1 ? '1 fælles tag' : `${overlap} fælles tags`;
+      return `<div class="similar-card" data-id="${n.id}">
+        <div class="similar-card-title">${title}</div>
+        <div class="similar-card-meta">${cat}${cat && date ? ' · ' : ''}${date}</div>
+        <div class="similar-card-score">🔗 ${label}</div>
+      </div>`;
+    }).join('');
+
+    // Click to open
+    strip.querySelectorAll('.similar-card').forEach(card => {
+      card.addEventListener('click', () => openNote(card.dataset.id));
+    });
+
+    section.style.display = '';
+  }
+
   function buildInterestTabs(note) {
     const sc = parseStructured(note);
     const tabbar = document.getElementById('detail-tabbar');
@@ -2564,6 +2670,7 @@
     renderOriginalNote(note);
     renderNoteSections(note);
     buildInterestTabs(note);
+    renderSimilarCases(note);
 
     // Referencer-fane: loading state
     document.getElementById('detail-refs-content').innerHTML =
