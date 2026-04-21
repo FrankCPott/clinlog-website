@@ -515,13 +515,6 @@
       transition: color .2s, border-color .2s;
     }
     .detail-export-btn:hover { color: var(--teal); border-color: var(--teal); }
-    .detail-anon-btn {
-      background: none; border: 1px solid var(--border); color: var(--muted);
-      font-size: .78rem; font-family: inherit; cursor: pointer;
-      padding: .35rem .75rem; border-radius: 6px; white-space: nowrap;
-      transition: color .2s, border-color .2s;
-    }
-    .detail-anon-btn:hover { color: #f87171; border-color: #f87171; }
     .detail-view-count { font-size: .75rem; color: var(--muted); white-space: nowrap; padding: 0 .4rem; }
 
     /* ── ANONYMISERINGS MODAL ── */
@@ -791,6 +784,7 @@
       background: var(--navy2); border: 1px solid var(--border);
       border-radius: 18px; padding: 2rem 2rem 1.75rem; width: 100%; max-width: 480px;
       box-shadow: 0 24px 80px rgba(0,0,0,0.6); position: relative;
+      max-height: 90vh; overflow-y: auto;
     }
     .tldr-modal-header {
       display: flex; align-items: center; justify-content: space-between;
@@ -969,7 +963,7 @@
     .struct-section { margin-bottom: 1.25rem; }
     .detail-tabbar {
       display: flex; border-bottom: 1px solid var(--border);
-      background: var(--navy2); flex-shrink: 0; overflow-x: auto;
+      background: var(--navy2); flex-shrink: 0; flex-wrap: wrap;
     }
     .detail-tab {
       padding: .65rem 1.25rem; font-size: .82rem; font-weight: 500;
@@ -1060,6 +1054,18 @@
       .detail-panel { padding: 1rem; }
       .detail-tab { padding: .55rem .85rem; font-size: .78rem; }
     }
+    @media (max-width: 600px) {
+      /* Topbar: titel på sin egen linje */
+      .detail-topbar { flex-wrap: wrap; gap: .4rem; padding: .5rem .75rem; }
+      .detail-back { order: 1; flex-shrink: 0; }
+      .detail-view-count { order: 2; margin-left: auto; }
+      .detail-export-btn { order: 3; margin-top: 0; padding: .25rem .55rem; font-size: .72rem; align-self: center; }
+      .detail-save-badge { order: 4; align-self: center; }
+      .detail-title-input { order: 10; flex: 1 1 100%; font-size: 1rem; }
+      /* TL;DR modal: kompakt på mobil */
+      .tldr-modal { padding: 1.25rem 1.1rem 1rem; border-radius: 14px; }
+      .tldr-modal-title { font-size: 1.05rem; }
+    }
 
     /* ── MOBIL NAV HØJRE ── */
     .nav-mobile-right {
@@ -1074,6 +1080,12 @@
       white-space: nowrap;
     }
 
+    @media (max-width: 480px) {
+      /* Skjul sprogflag i nav på meget små skærme for at give plads til login/logout */
+      .nav-mobile-right .lang-switch { display: none; }
+      .nav-mobile-right .nav-login { font-size: .72rem; padding: .3rem .6rem; }
+      .nav-mobile-right .portal-logout { font-size: .72rem; padding: .3rem .6rem; }
+    }
     @media (max-width: 768px) {
       nav { padding: 1rem 1.25rem; }
       .nav-links { display: none; }
@@ -1420,7 +1432,6 @@
         <button class="detail-back" id="detail-back-btn" data-t="portal-back">← Tilbage</button>
         <input class="detail-title-input" id="detail-title" type="text" placeholder="Titel…" />
         <span class="detail-view-count" id="detail-view-count" style="display:none"></span>
-        <button class="detail-anon-btn" id="detail-anon-btn" title="Tjek for personhenførbare oplysninger (PII)">🔒 Anonymiseringstjek</button>
         <button class="detail-export-btn" id="detail-export-btn" title="Eksportér til præsentation">📊 Eksportér</button>
         <span class="detail-save-badge" id="detail-save-badge">Gemt ✓</span>
       </div>
@@ -2559,6 +2570,34 @@
   let currentSession = null;
   let currentUserId = null;
   let openNoteId = null;
+  let anonCheckPending = false; // sættes true første gang bruger redigerer; checker PII ved næste gem
+
+  // ── Hjælpefunktioner der bruges BÅDE inde i og udenfor window.load ──
+  const STRUCT_SECTIONS = [
+    { key: 'patientCase',        label: 'PATIENTCASE' },
+    { key: 'kliniskForlob',      label: 'KLINISK FORLØB' },
+    { key: 'fagligLaering',      label: 'FAGLIG LÆRING' },
+    { key: 'outcome_structured', label: 'OUTCOME' },
+    { key: 'emotioneltEtisk',    label: 'EMOTIONELT / ETISK' },
+  ];
+
+  function parseStructured(note) {
+    if (!note.structured_content) return null;
+    try { return typeof note.structured_content === 'string' ? JSON.parse(note.structured_content) : note.structured_content; } catch { return null; }
+  }
+
+  function buildCombinedText(note) {
+    if (note.edited_note) return note.edited_note;
+    const sc = parseStructured(note);
+    const parts = [];
+    if (note.content) parts.push(note.content.trim());
+    if (sc) {
+      STRUCT_SECTIONS.forEach(s => {
+        if (sc[s.key]) parts.push('\n' + s.label + '\n' + sc[s.key].trim());
+      });
+    }
+    return parts.join('\n\n');
+  }
 
   document.getElementById('waitlist-btn').addEventListener('click', async function () {
     const input = document.getElementById('waitlist-email');
@@ -2905,33 +2944,6 @@
   let saveTimer = null;
   openNoteId = null;
 
-  const STRUCT_SECTIONS = [
-    { key: 'patientCase',        label: 'PATIENTCASE' },
-    { key: 'kliniskForlob',      label: 'KLINISK FORLØB' },
-    { key: 'fagligLaering',      label: 'FAGLIG LÆRING' },
-    { key: 'outcome_structured', label: 'OUTCOME' },
-    { key: 'emotioneltEtisk',    label: 'EMOTIONELT / ETISK' },
-  ];
-
-  function parseStructured(note) {
-    if (!note.structured_content) return null;
-    try { return typeof note.structured_content === 'string' ? JSON.parse(note.structured_content) : note.structured_content; } catch { return null; }
-  }
-
-  function buildCombinedText(note) {
-    // Brug edited_note hvis den findes
-    if (note.edited_note) return note.edited_note;
-    const sc = parseStructured(note);
-    const parts = [];
-    if (note.content) parts.push(note.content.trim());
-    if (sc) {
-      STRUCT_SECTIONS.forEach(s => {
-        if (sc[s.key]) parts.push('\n' + s.label + '\n' + sc[s.key].trim());
-      });
-    }
-    return parts.join('\n\n');
-  }
-
   function autoResizeTextarea(ta) {
     ta.style.height = 'auto';
     ta.style.height = ta.scrollHeight + 'px';
@@ -3109,24 +3121,22 @@
 
     function scorePair(n) {
       let score = 0;
-      // Kategori-match: stærkeste signal
-      if (currentNote.category && n.category === currentNote.category) score += 4;
-      // Tag-overlap
+      // Tag-overlap (kliniske symptom-tags er stærkt signal)
       const cSc = parseStructured(currentNote);
       const nSc = parseStructured(n);
       const cTags = new Set((cSc?.tags || []).map(t => String(t).toLowerCase()));
       (nSc?.tags || []).forEach(t => { if (cTags.has(String(t).toLowerCase())) score += 2; });
-      // Nøgleord-overlap (unikke)
+      // Nøgleord-overlap i klinisk tekst (sygdomsbillede, symptomer, fund)
       const cKW = new Set(noteKeywords(currentNote));
       const shared = new Set(noteKeywords(n).filter(w => cKW.has(w)));
-      score += shared.size * 0.25;
+      score += shared.size * 0.3;
       return score;
     }
 
     const scored = allNotes
       .filter(n => n.id !== currentNote.id)
       .map(n => ({ note: n, score: scorePair(n) }))
-      .filter(x => x.score >= 2)
+      .filter(x => x.score >= 1.5)
       .sort((a, b) => b.score - a.score)
       .slice(0, 6);
 
@@ -3135,8 +3145,7 @@
     strip.innerHTML = scored.map(({ note: n, score }) => {
       const title   = escHtml(n.title || 'Uden titel');
       const cat     = escHtml(n.category || '');
-      const sameCat = n.category && n.category === currentNote.category;
-      const label   = sameCat ? '🎯 Samme speciale' : `🔗 Score ${Math.round(score * 10) / 10}`;
+      const label   = `🔗 Lighed: ${Math.round(score * 10) / 10}`;
       return `<div class="similar-card" data-id="${n.id}">
         <div class="similar-card-title">${title}</div>
         <div class="similar-card-meta">${cat}</div>
@@ -3209,6 +3218,7 @@
     if (!note) return;
     openNoteId = id;
     window.__openNoteId = id;
+    anonCheckPending = false; // nulstil pr. note-åbning
 
     // 5b: Log view (fire-and-forget) + load count
     if (currentUserId && currentSession?.access_token) {
@@ -3288,6 +3298,7 @@
   document.getElementById('detail-back-btn').addEventListener('click', closeDetail);
 
   function scheduleAutoSave() {
+    anonCheckPending = true; // bruger har ændret indholdet
     clearTimeout(saveTimer);
     saveTimer = setTimeout(saveNote, 1500);
   }
@@ -3305,6 +3316,14 @@
         .eq('id', openNoteId).eq('user_id', currentUserId);
       badge.textContent = T[lang]['portal-saved'] || 'Ændringer gemt ✓';
       badge.className = 'detail-save-badge persistent';
+      // PII-tjek én gang pr. redigering (fire-and-forget — blokerer ikke gem)
+      if (anonCheckPending && window.runAnonCheckSilent) {
+        anonCheckPending = false;
+        const session = window.__clinlogSession;
+        if (session?.access_token) {
+          window.runAnonCheckSilent({ ...note, title, edited_note: editedNote }, session);
+        }
+      }
     } catch (e) {
       badge.textContent = T[lang]['portal-save-err'] || 'Fejl ved gemning';
       badge.className = 'detail-save-badge persistent';
@@ -4709,29 +4728,14 @@
     document.getElementById('anon-proceed-btn').addEventListener('click', closeAnon);
     overlay.addEventListener('click', e => { if (e.target === overlay) closeAnon(); });
 
-    function localParseStructured(note) {
-      if (!note.structured_content) return null;
-      try { return typeof note.structured_content === 'string' ? JSON.parse(note.structured_content) : note.structured_content; } catch { return null; }
-    }
+    // Eksporteret funktion: kaldes fra saveNote() efter brugerredigering
+    window.runAnonCheckSilent = async function (note, session) {
+      if (!note || !session?.access_token) return;
 
-    document.getElementById('detail-anon-btn').addEventListener('click', async function () {
-      const note = allNotes.find(n => n.id === openNoteId);
-      if (!note) return;
-      const session = window.__clinlogSession;
-      if (!session?.access_token) { showToast('Log ind for at bruge denne funktion'); return; }
-
-      overlay.classList.add('open');
-      bodyEl.innerHTML = '<div class="anon-loading"></div>';
-      footer.style.display = 'none';
-
-      const sc = localParseStructured(note);
+      const sc = parseStructured(note);
       const text = [note.title, sc?.patientCase, sc?.kliniskForlob, sc?.fagligLaering, sc?.anonymizedContent, note.edited_note, note.content]
         .filter(Boolean).join('\n\n').slice(0, 2500);
-
-      if (!text.trim()) {
-        bodyEl.innerHTML = '<p class="anon-ok">Ingen tekst at analysere.</p>';
-        return;
-      }
+      if (!text.trim()) return;
 
       const prompt = `Du tjekker kliniske noter for personhenførbare oplysninger (PII) inden deling.
 
@@ -4749,33 +4753,35 @@ ${text}`;
           headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + session.access_token },
           body: JSON.stringify({ model: 'claude-haiku-4-5-20251001', max_tokens: 900, messages: [{ role: 'user', content: prompt }] }),
         });
-        if (!res.ok) throw new Error('HTTP ' + res.status);
+        if (!res.ok) return; // stille fejl
         const data = await res.json();
         const raw  = (data?.content?.[0]?.text || '').trim().replace(/^```(?:json)?\n?/, '').replace(/\n?```$/, '').trim();
         const findings = JSON.parse(raw);
 
-        if (!Array.isArray(findings) || findings.length === 0) {
-          bodyEl.innerHTML = '<div class="anon-ok">Ingen personhenførbare oplysninger fundet.</div>';
-          footer.style.display = 'none';
-        } else {
-          const wrap = document.createElement('div');
-          wrap.className = 'anon-findings';
-          findings.forEach(f => {
-            const el = document.createElement('div');
-            el.className = 'anon-finding' + (f.severity === 'lav' ? ' sev-lav' : '');
-            el.innerHTML = `<div class="anon-finding-type">${escHtml(f.type || '')}</div>
-              <div class="anon-finding-fragment">"${escHtml(f.fragment || '')}"</div>
-              ${f.note ? `<div class="anon-finding-note">${escHtml(f.note)}</div>` : ''}`;
-            wrap.appendChild(el);
-          });
-          bodyEl.innerHTML = '';
-          bodyEl.appendChild(wrap);
-          footer.style.display = '';
-        }
-      } catch {
-        bodyEl.innerHTML = '<p style="color:#f87171;font-size:.875rem;padding:1rem 0">Tjekket fejlede — prøv igen.</p>';
-      }
-    });
+        if (!Array.isArray(findings) || findings.length === 0) return; // ingen PII — stille ok
+
+        // PII fundet: vis modal med fund
+        overlay.classList.add('open');
+        const wrap = document.createElement('div');
+        wrap.className = 'anon-findings';
+        findings.forEach(f => {
+          const el = document.createElement('div');
+          el.className = 'anon-finding' + (f.severity === 'lav' ? ' sev-lav' : '');
+          el.innerHTML = `<div class="anon-finding-type">${escHtml(f.type || '')}</div>
+            <div class="anon-finding-fragment">"${escHtml(f.fragment || '')}"</div>
+            ${f.note ? `<div class="anon-finding-note">${escHtml(f.note)}</div>` : ''}`;
+          wrap.appendChild(el);
+        });
+        bodyEl.innerHTML = '';
+        bodyEl.appendChild(wrap);
+        footer.style.display = '';
+        // Opdater knaptekst til kontekst (noten er allerede gemt)
+        const proceedBtn = document.getElementById('anon-proceed-btn');
+        if (proceedBtn) proceedBtn.textContent = 'Forstået';
+        const backBtn = document.getElementById('anon-back-btn');
+        if (backBtn) backBtn.textContent = '← Ret noten';
+      } catch { /* stille fejl */ }
+    };
   })();
 
   // ══ DIFFERENTIALDIAGNOSE ASSISTENT ══
