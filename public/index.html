@@ -423,8 +423,13 @@
       display: inline-block; background: rgba(14,165,197,0.1);
       border: 1px solid var(--border); color: var(--teal2);
       font-size: .72rem; font-weight: 500; padding: .2rem .7rem;
-      border-radius: 99px; margin-bottom: .75rem;
+      border-radius: 99px; flex-shrink: 0;
     }
+    .note-card-footer {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: .75rem; gap: .5rem; flex-wrap: nowrap;
+    }
+    .note-card-actions { display: flex; gap: .25rem; align-items: center; flex-shrink: 0; }
     .note-card-content { font-size: .875rem; color: var(--muted); line-height: 1.65; }
     .note-card { cursor: pointer; }
     .note-card-delete { background: none; border: none; color: var(--muted); cursor: pointer; font-size: 1rem; padding: .25rem .4rem; border-radius: 4px; line-height: 1; flex-shrink: 0; transition: color .2s, background .2s; }
@@ -510,6 +515,50 @@
       transition: color .2s, border-color .2s;
     }
     .detail-export-btn:hover { color: var(--teal); border-color: var(--teal); }
+    .detail-anon-btn {
+      background: none; border: 1px solid var(--border); color: var(--muted);
+      font-size: .78rem; font-family: inherit; cursor: pointer;
+      padding: .35rem .75rem; border-radius: 6px; white-space: nowrap;
+      transition: color .2s, border-color .2s;
+    }
+    .detail-anon-btn:hover { color: #f87171; border-color: #f87171; }
+    .detail-view-count { font-size: .75rem; color: var(--muted); white-space: nowrap; padding: 0 .4rem; }
+
+    /* ── ANONYMISERINGS MODAL ── */
+    #anon-overlay {
+      display: none; position: fixed; inset: 0; z-index: 2200;
+      background: rgba(7,12,24,0.9); backdrop-filter: blur(8px);
+      align-items: center; justify-content: center; padding: 1.5rem;
+    }
+    #anon-overlay.open { display: flex; }
+    .anon-modal {
+      background: var(--navy2); border: 1px solid var(--border);
+      border-radius: 18px; padding: 2rem; width: 100%; max-width: 520px;
+      max-height: 80vh; overflow-y: auto; position: relative;
+      box-shadow: 0 24px 80px rgba(0,0,0,0.6);
+    }
+    .anon-modal-title { font-family: 'DM Serif Display', serif; font-size: 1.2rem; margin-bottom: 1.25rem; }
+    .anon-loading { color: var(--muted); font-size: .9rem; text-align: center; padding: 2.5rem 0; }
+    .anon-loading::before { content: '🔒'; display: block; font-size: 1.8rem; margin-bottom: .6rem; animation: tldr-spin 1.4s linear infinite; }
+    .anon-ok { color: #22c55e; font-size: .95rem; text-align: center; padding: 2rem 0; }
+    .anon-ok::before { content: '✅'; display: block; font-size: 1.8rem; margin-bottom: .5rem; }
+    .anon-findings { display: flex; flex-direction: column; gap: .6rem; margin-bottom: 1.25rem; }
+    .anon-finding {
+      background: rgba(239,68,68,0.07); border: 1px solid rgba(239,68,68,0.3);
+      border-radius: 10px; padding: .75rem 1rem;
+    }
+    .anon-finding.sev-lav { background: rgba(251,191,36,0.07); border-color: rgba(251,191,36,0.3); }
+    .anon-finding-type { font-size: .68rem; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: #f87171; margin-bottom: .2rem; }
+    .anon-finding.sev-lav .anon-finding-type { color: #fbbf24; }
+    .anon-finding-fragment { font-size: .875rem; color: var(--white); font-style: italic; }
+    .anon-finding-note { font-size: .78rem; color: var(--muted); margin-top: .25rem; }
+    .anon-footer { display: flex; justify-content: flex-end; gap: .75rem; padding-top: 1rem; border-top: 1px solid var(--border); margin-top: .75rem; }
+    .anon-back-btn { background: none; border: 1px solid var(--border); color: var(--muted); border-radius: 8px; padding: .5rem 1.1rem; font-family: inherit; font-size: .875rem; cursor: pointer; transition: all .2s; }
+    .anon-back-btn:hover { color: var(--white); border-color: var(--white); }
+    .anon-proceed-btn { background: #ef4444; color: #fff; border: none; border-radius: 8px; padding: .5rem 1.1rem; font-family: inherit; font-size: .875rem; font-weight: 500; cursor: pointer; transition: background .2s; }
+    .anon-proceed-btn:hover { background: #dc2626; }
+    .anon-close { position: absolute; top: 1rem; right: 1rem; background: rgba(255,255,255,0.06); border: 1px solid var(--border); color: var(--muted); border-radius: 7px; width: 30px; height: 30px; cursor: pointer; font-size: .9rem; display: flex; align-items: center; justify-content: center; transition: all .2s; }
+    .anon-close:hover { color: var(--white); background: rgba(255,255,255,0.1); }
 
     /* ── OFFLINE SECTIONEN ── */
     .offline-note-card {
@@ -657,6 +706,16 @@
     }
     .settings-save-btn:hover { background: var(--teal2); }
     .settings-saved-msg { font-size: .8rem; color: var(--teal); margin-top: .5rem; display: none; }
+    .notif-freq-group { display: flex; flex-wrap: wrap; gap: .45rem; margin-top: .3rem; }
+    .notif-freq-label {
+      display: inline-flex; align-items: center; gap: .35rem; cursor: pointer;
+      border: 1px solid var(--border); border-radius: 99px;
+      padding: .3rem .8rem; font-size: .78rem; color: var(--muted);
+      transition: all .2s; user-select: none;
+    }
+    .notif-freq-label input[type="radio"] { display: none; }
+    .notif-freq-label:hover { border-color: var(--teal); color: var(--teal); }
+    .notif-freq-label.selected { border-color: var(--teal); color: var(--teal); background: rgba(14,165,197,0.1); }
 
     /* Seeking feedback toggle in note detail */
     .seeking-feedback-bar {
@@ -1196,6 +1255,19 @@
     </div>
   </div>
 
+  <!-- ══ ANONYMISERINGS MODAL ══ -->
+  <div id="anon-overlay" role="dialog" aria-modal="true">
+    <div class="anon-modal">
+      <button class="anon-close" id="anon-close-btn">✕</button>
+      <div class="anon-modal-title">🔒 Anonymiseringstjek</div>
+      <div id="anon-body"></div>
+      <div class="anon-footer" id="anon-footer" style="display:none">
+        <button class="anon-back-btn" id="anon-back-btn">← Gå tilbage og ret</button>
+        <button class="anon-proceed-btn" id="anon-proceed-btn">Fortsæt alligevel</button>
+      </div>
+    </div>
+  </div>
+
   <!-- ══ TL;DR MODAL ══ -->
   <div id="tldr-overlay" role="dialog" aria-modal="true" aria-label="30-sekunders opsummering">
     <div class="tldr-modal">
@@ -1259,7 +1331,26 @@
         <div class="groups-create-form">
           <div class="groups-create-title">Opret ny gruppe</div>
           <input class="groups-input" id="group-name-input" type="text" placeholder="Gruppenavn (fx Akutlæger Region Syd)" maxlength="80" />
-          <input class="groups-input" id="group-specialty-input" type="text" placeholder="Speciale (fx Akutmedicin)" maxlength="60" />
+          <select class="groups-input" id="group-specialty-input">
+            <option value="">Vælg speciale…</option>
+            <option>Almen medicin</option><option>Akutmedicin</option>
+            <option>Anæstesiologi og intensiv medicin</option>
+            <option>Intern medicin</option><option>Kardiologi</option>
+            <option>Karkirurgi</option><option>Lungemedicin</option>
+            <option>Gastroenterologi</option><option>Nefrologi</option>
+            <option>Neurologi</option><option>Neurokirurgi</option>
+            <option>Psykiatri</option><option>Pædiatri</option>
+            <option>Gynækologi og obstetrik</option>
+            <option>Abdominal kirurgi</option><option>Ortopædkirurgi</option>
+            <option>Urologi</option><option>Thoraxkirurgi</option>
+            <option>Plastikkirurgi</option><option>Øjenlæge</option>
+            <option>ØNH</option><option>Dermatologi</option>
+            <option>Onkologi</option><option>Hæmatologi</option>
+            <option>Infektionsmedicin</option><option>Radiologi</option>
+            <option>Klinisk farmakologi</option>
+            <option>Præhospital medicin</option>
+            <option>Ikke-klinisk / forskning</option><option>Andet</option>
+          </select>
           <button class="groups-create-btn" id="group-create-btn">Opret gruppe</button>
         </div>
         <div id="groups-list"></div>
@@ -1301,9 +1392,21 @@
         <div class="settings-row" style="flex-direction:column; align-items:flex-start; gap:.75rem">
           <div class="settings-row-info">
             <div class="settings-row-label">Abonnér på specialer</div>
-            <div class="settings-row-sub">Vælg de specialer du vil holdes opdateret om (e-mail notifikationer kommer snart)</div>
+            <div class="settings-row-sub">Modtag e-mail om nye cases i dine valgte specialer</div>
           </div>
           <div class="specialty-chips" id="specialty-chips"></div>
+        </div>
+        <div class="settings-row" style="flex-direction:column; align-items:flex-start; gap:.75rem">
+          <div class="settings-row-info">
+            <div class="settings-row-label">Notifikationsfrekvens</div>
+            <div class="settings-row-sub">Vælg hvor ofte du vil modtage e-mail om nye cases</div>
+          </div>
+          <div class="notif-freq-group" id="notif-freq-group">
+            <label class="notif-freq-label selected" data-val="none"><input type="radio" name="notif-freq" value="none" checked> Ingen</label>
+            <label class="notif-freq-label" data-val="daily"><input type="radio" name="notif-freq" value="daily"> Daglig</label>
+            <label class="notif-freq-label" data-val="weekly"><input type="radio" name="notif-freq" value="weekly"> Ugentlig (fredag)</label>
+            <label class="notif-freq-label" data-val="monthly"><input type="radio" name="notif-freq" value="monthly"> Månedlig (sidst i mnd.)</label>
+          </div>
         </div>
         <button class="settings-save-btn" id="settings-save-btn">Gem indstillinger</button>
         <div class="settings-saved-msg" id="settings-saved-msg">✓ Gemt</div>
@@ -1316,6 +1419,8 @@
       <div class="detail-topbar">
         <button class="detail-back" id="detail-back-btn" data-t="portal-back">← Tilbage</button>
         <input class="detail-title-input" id="detail-title" type="text" placeholder="Titel…" />
+        <span class="detail-view-count" id="detail-view-count" style="display:none"></span>
+        <button class="detail-anon-btn" id="detail-anon-btn" title="Tjek for personhenførbare oplysninger (PII)">🔒 Anonymiseringstjek</button>
         <button class="detail-export-btn" id="detail-export-btn" title="Eksportér til præsentation">📊 Eksportér</button>
         <span class="detail-save-badge" id="detail-save-badge">Gemt ✓</span>
       </div>
@@ -2449,6 +2554,12 @@
   const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJjcndxeWN0cGpsdG5vZnhzc215Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ4ODQzODgsImV4cCI6MjA5MDQ2MDM4OH0.qP_fUOe3ucAojfCoHuis8-Mc91rqG6zPocyEbfLaY54';
   const CLAUDE_PROXY = '/.netlify/functions/claude';
 
+  // ── Delt state — tilgængeligt for IIFEs uden for window.load-handler ──
+  let allNotes = [];
+  let currentSession = null;
+  let currentUserId = null;
+  let openNoteId = null;
+
   document.getElementById('waitlist-btn').addEventListener('click', async function () {
     const input = document.getElementById('waitlist-email');
     const msgEl = document.getElementById('waitlist-msg');
@@ -2661,11 +2772,11 @@
   }
 
   // ── NOTE DATA + FILTRERING ──
-  let allNotes = [];
-  let currentSession = null;
+  allNotes = [];
+  currentSession = null;
+  currentUserId = null;
   let activeCategory = '';
   let searchQuery = '';
-  let currentUserId = null;
   function filteredNotes() {
     return allNotes.filter(n => {
       const matchCat = !activeCategory || n.category === activeCategory;
@@ -2690,7 +2801,6 @@
     list.style.display = '';
     list.innerHTML = '';
     notes.forEach(note => {
-      const date = new Date(note.created_at).toLocaleDateString('da-DK', { day:'numeric', month:'short', year:'numeric' });
       const preview = (note.content || '').slice(0, 180).trim();
       const card = document.createElement('div');
       card.className = 'note-card';
@@ -2698,15 +2808,16 @@
       card.innerHTML = `
         <div class="note-card-header">
           <span class="note-card-title">${escHtml(note.title || 'Uden titel')}</span>
-          <div style="display:flex;align-items:center;gap:.5rem;flex-shrink:0">
-            <span class="note-card-meta">${date}</span>
-            <button class="note-card-offline${window.isOfflineSaved && isOfflineSaved(note.id) ? ' saved' : ''}" title="Gem til offline">💾</button>
-            <button class="note-card-bookmark${myBookmarks.has(note.id) ? ' bookmarked' : ''}" title="${myBookmarks.has(note.id) ? 'Fjern bogmærke' : 'Bogmærk'}">🔖</button>
-            <button class="note-card-tldr" title="30-sekunders opsummering">⚡ TL;DR</button>
-            <button class="note-card-delete" title="Slet notat">🗑️</button>
+        </div>
+        <div class="note-card-footer">
+          ${note.category ? `<span class="note-card-category">${escHtml(note.category)}</span>` : '<span></span>'}
+          <div class="note-card-actions">
+            <button class="note-card-offline${window.isOfflineSaved && isOfflineSaved(note.id) ? ' saved' : ''}" title="Gem note til offline-adgang">💾</button>
+            <button class="note-card-bookmark${myBookmarks.has(note.id) ? ' bookmarked' : ''}" title="${myBookmarks.has(note.id) ? 'Fjern bogmærke' : 'Tilføj bogmærke'}">🔖</button>
+            <button class="note-card-tldr" title="Generér AI-opsummering (30 sek.)">⚡</button>
+            <button class="note-card-delete" title="Slet notat permanent">🗑️</button>
           </div>
         </div>
-        ${note.category ? `<span class="note-card-category">${escHtml(note.category)}</span>` : ''}
         <div class="note-card-content">${escHtml(preview)}${preview.length >= 180 ? '…' : ''}</div>
       `;
       card.addEventListener('click', () => openNote(note.id));
@@ -2792,7 +2903,7 @@
 
   // ── NOTE DETAIL ──
   let saveTimer = null;
-  let openNoteId = null;
+  openNoteId = null;
 
   const STRUCT_SECTIONS = [
     { key: 'patientCase',        label: 'PATIENTCASE' },
@@ -2987,57 +3098,52 @@
     const strip   = document.getElementById('similar-cases-strip');
     if (!section || !strip) return;
 
-    // Extract tags from structured content
-    function getNoteTags(note) {
+    const DA_STOP = new Set(['med','og','er','til','den','det','for','ikke','han','hun','fra','har','som','var','ved','over','også','efter','men','der','ville','kunne','skulle','under','ingen','eller','disse','dette','have','hvad','alle','sig','når','blev','bare','meget','her','mine','hans','hendes','deres','ingen','igen','noget','nogle','denne','sige','sagde','mere','som','ved','men','her','da','om','hos','ved','der','dog','kan']);
+
+    function noteKeywords(note) {
       const sc = parseStructured(note);
-      const tags = [];
-      if (note.category) tags.push(note.category.toLowerCase());
-      if (sc?.tags) {
-        (Array.isArray(sc.tags) ? sc.tags : [sc.tags]).forEach(t => {
-          if (t) tags.push(String(t).toLowerCase());
-        });
-      }
-      // Also extract from section keys as implicit tags
-      if (sc) {
-        ['diagnose', 'diagnosis', 'behandling', 'treatment', 'specialty', 'specialty'].forEach(k => {
-          if (sc[k]) tags.push(String(sc[k]).toLowerCase().slice(0, 30));
-        });
-      }
-      return tags;
+      const text = [note.title, sc?.patientCase, sc?.kliniskForlob, sc?.fagligLaering, note.content, note.edited_note]
+        .filter(Boolean).join(' ').toLowerCase();
+      return text.split(/[\s\W]+/).filter(w => w.length >= 4 && !DA_STOP.has(w) && !/^\d+$/.test(w));
     }
 
-    const currentTags = getNoteTags(currentNote);
-    if (currentTags.length === 0) { section.style.display = 'none'; return; }
+    function scorePair(n) {
+      let score = 0;
+      // Kategori-match: stærkeste signal
+      if (currentNote.category && n.category === currentNote.category) score += 4;
+      // Tag-overlap
+      const cSc = parseStructured(currentNote);
+      const nSc = parseStructured(n);
+      const cTags = new Set((cSc?.tags || []).map(t => String(t).toLowerCase()));
+      (nSc?.tags || []).forEach(t => { if (cTags.has(String(t).toLowerCase())) score += 2; });
+      // Nøgleord-overlap (unikke)
+      const cKW = new Set(noteKeywords(currentNote));
+      const shared = new Set(noteKeywords(n).filter(w => cKW.has(w)));
+      score += shared.size * 0.25;
+      return score;
+    }
 
-    // Score all other notes by tag overlap
     const scored = allNotes
       .filter(n => n.id !== currentNote.id)
-      .map(n => {
-        const nTags = getNoteTags(n);
-        const overlap = currentTags.filter(t => nTags.includes(t)).length;
-        return { note: n, overlap };
-      })
-      .filter(x => x.overlap > 0)
-      .sort((a, b) => b.overlap - a.overlap)
-      .slice(0, 5);
+      .map(n => ({ note: n, score: scorePair(n) }))
+      .filter(x => x.score >= 2)
+      .sort((a, b) => b.score - a.score)
+      .slice(0, 6);
 
     if (scored.length === 0) { section.style.display = 'none'; return; }
 
-    strip.innerHTML = scored.map(({ note: n, overlap }) => {
-      const title = escHtml(n.title || 'Uden titel');
-      const date  = n.created_at
-        ? new Date(n.created_at).toLocaleDateString('da-DK', { day: 'numeric', month: 'short', year: '2-digit' })
-        : '';
-      const cat   = escHtml(n.category || '');
-      const label = overlap === 1 ? '1 fælles tag' : `${overlap} fælles tags`;
+    strip.innerHTML = scored.map(({ note: n, score }) => {
+      const title   = escHtml(n.title || 'Uden titel');
+      const cat     = escHtml(n.category || '');
+      const sameCat = n.category && n.category === currentNote.category;
+      const label   = sameCat ? '🎯 Samme speciale' : `🔗 Score ${Math.round(score * 10) / 10}`;
       return `<div class="similar-card" data-id="${n.id}">
         <div class="similar-card-title">${title}</div>
-        <div class="similar-card-meta">${cat}${cat && date ? ' · ' : ''}${date}</div>
-        <div class="similar-card-score">🔗 ${label}</div>
+        <div class="similar-card-meta">${cat}</div>
+        <div class="similar-card-score">${label}</div>
       </div>`;
     }).join('');
 
-    // Click to open
     strip.querySelectorAll('.similar-card').forEach(card => {
       card.addEventListener('click', () => openNote(card.dataset.id));
     });
@@ -3103,6 +3209,22 @@
     if (!note) return;
     openNoteId = id;
     window.__openNoteId = id;
+
+    // 5b: Log view (fire-and-forget) + load count
+    if (currentUserId && currentSession?.access_token) {
+      fetch(`${SUPABASE_URL}/rest/v1/case_views`, {
+        method: 'POST',
+        headers: {
+          'apikey': SUPABASE_ANON_KEY,
+          'Authorization': `Bearer ${currentSession.access_token}`,
+          'Content-Type': 'application/json',
+          'Prefer': 'return=minimal',
+        },
+        body: JSON.stringify({ note_id: id, viewer_id: currentUserId }),
+      }).catch(() => {});
+    }
+    loadNoteViewCount(id);
+
     const badge = document.getElementById('detail-save-badge');
     badge.textContent = '';
     badge.className = 'detail-save-badge';
@@ -3142,7 +3264,25 @@
     document.getElementById('portal-detail').classList.remove('open');
     document.getElementById('portal-list-view').style.display = '';
     openNoteId = null;
+    const vc = document.getElementById('detail-view-count');
+    if (vc) vc.style.display = 'none';
     clearTimeout(saveTimer);
+  }
+
+  async function loadNoteViewCount(noteId) {
+    const badge = document.getElementById('detail-view-count');
+    if (!badge || !currentSession?.access_token) return;
+    try {
+      const res = await fetch(
+        `${SUPABASE_URL}/rest/v1/case_views?note_id=eq.${encodeURIComponent(noteId)}&select=id`,
+        { headers: { 'apikey': SUPABASE_ANON_KEY, 'Authorization': `Bearer ${currentSession.access_token}` } }
+      );
+      if (res.ok) {
+        const data = await res.json();
+        badge.textContent = `👁 ${data.length} visninger`;
+        badge.style.display = '';
+      }
+    } catch {}
   }
 
   document.getElementById('detail-back-btn').addEventListener('click', closeDetail);
@@ -4037,7 +4177,7 @@
       if (!currentSession?.access_token) return;
       try {
         const res = await fetch(
-          `${SUPABASE_URL}/rest/v1/profiles?select=allow_messages,years_experience&id=eq.${encodeURIComponent(currentUserId)}&limit=1`,
+          `${SUPABASE_URL}/rest/v1/profiles?select=allow_messages,years_experience,notification_frequency&id=eq.${encodeURIComponent(currentUserId)}&limit=1`,
           { headers: { 'apikey': SUPABASE_ANON_KEY, 'Authorization': `Bearer ${currentSession.access_token}` } }
         );
         if (!res.ok) return;
@@ -4045,14 +4185,29 @@
         if (profile) {
           document.getElementById('setting-allow-messages').checked = !!profile.allow_messages;
           document.getElementById('setting-years-exp').value = profile.years_experience ?? 0;
+          const freq = profile.notification_frequency || 'none';
+          document.querySelectorAll('.notif-freq-label').forEach(lbl => {
+            const sel = lbl.dataset.val === freq;
+            lbl.classList.toggle('selected', sel);
+            if (sel) lbl.querySelector('input').checked = true;
+          });
         }
       } catch {}
     }
+
+    document.getElementById('notif-freq-group').addEventListener('click', function (e) {
+      const lbl = e.target.closest('.notif-freq-label');
+      if (!lbl) return;
+      document.querySelectorAll('.notif-freq-label').forEach(l => l.classList.remove('selected'));
+      lbl.classList.add('selected');
+      lbl.querySelector('input').checked = true;
+    });
 
     document.getElementById('settings-save-btn').addEventListener('click', async () => {
       if (!currentSession?.access_token) return;
       const allow_messages = document.getElementById('setting-allow-messages').checked;
       const years_experience = parseInt(document.getElementById('setting-years-exp').value) || 0;
+      const notification_frequency = document.querySelector('input[name="notif-freq"]:checked')?.value || 'none';
       const msg = document.getElementById('settings-saved-msg');
       try {
         await fetch(`${SUPABASE_URL}/rest/v1/profiles?id=eq.${encodeURIComponent(currentUserId)}`, {
@@ -4061,7 +4216,7 @@
             'apikey': SUPABASE_ANON_KEY, 'Authorization': `Bearer ${currentSession.access_token}`,
             'Content-Type': 'application/json', 'Prefer': 'return=minimal',
           },
-          body: JSON.stringify({ allow_messages, years_experience }),
+          body: JSON.stringify({ allow_messages, years_experience, notification_frequency }),
         });
         if (window.saveSubscriptions) await saveSubscriptions();
         msg.style.display = '';
@@ -4272,7 +4427,7 @@
 
   // ══ 4C: SPECIALTY SUBSCRIPTIONS ══
   (function () {
-    const SPECIALTIES = ['Anæstesi', 'Intensiv', 'Akutmedicin', 'Kardiologi', 'Neurologi', 'Ortopædi', 'Pædiatri', 'Psykiatri', 'Onkologi', 'Gynækologi', 'Medicin', 'Kirurgi', 'Andet'];
+    const SPECIALTIES = ['Almen medicin','Akutmedicin','Anæstesiologi og intensiv medicin','Intern medicin','Kardiologi','Karkirurgi','Lungemedicin','Gastroenterologi','Nefrologi','Neurologi','Neurokirurgi','Psykiatri','Pædiatri','Gynækologi og obstetrik','Abdominal kirurgi','Ortopædkirurgi','Urologi','Thoraxkirurgi','Plastikkirurgi','Øjenlæge','ØNH','Dermatologi','Onkologi','Hæmatologi','Infektionsmedicin','Radiologi','Klinisk farmakologi','Præhospital medicin','Ikke-klinisk / forskning','Andet'];
     let mySubscriptions = new Set();
 
     function renderSpecialtyChips() {
@@ -4541,6 +4696,88 @@
     window.fetchPearls = fetchPearls;
   })();
 
+  // ══ 5A: ANONYMISERINGSTJEK ══
+  (function () {
+    const overlay   = document.getElementById('anon-overlay');
+    const bodyEl    = document.getElementById('anon-body');
+    const footer    = document.getElementById('anon-footer');
+    if (!overlay) return;
+
+    function closeAnon() { overlay.classList.remove('open'); }
+    document.getElementById('anon-close-btn').addEventListener('click', closeAnon);
+    document.getElementById('anon-back-btn').addEventListener('click', closeAnon);
+    document.getElementById('anon-proceed-btn').addEventListener('click', closeAnon);
+    overlay.addEventListener('click', e => { if (e.target === overlay) closeAnon(); });
+
+    function localParseStructured(note) {
+      if (!note.structured_content) return null;
+      try { return typeof note.structured_content === 'string' ? JSON.parse(note.structured_content) : note.structured_content; } catch { return null; }
+    }
+
+    document.getElementById('detail-anon-btn').addEventListener('click', async function () {
+      const note = allNotes.find(n => n.id === openNoteId);
+      if (!note) return;
+      const session = window.__clinlogSession;
+      if (!session?.access_token) { showToast('Log ind for at bruge denne funktion'); return; }
+
+      overlay.classList.add('open');
+      bodyEl.innerHTML = '<div class="anon-loading"></div>';
+      footer.style.display = 'none';
+
+      const sc = localParseStructured(note);
+      const text = [note.title, sc?.patientCase, sc?.kliniskForlob, sc?.fagligLaering, sc?.anonymizedContent, note.edited_note, note.content]
+        .filter(Boolean).join('\n\n').slice(0, 2500);
+
+      if (!text.trim()) {
+        bodyEl.innerHTML = '<p class="anon-ok">Ingen tekst at analysere.</p>';
+        return;
+      }
+
+      const prompt = `Du tjekker kliniske noter for personhenførbare oplysninger (PII) inden deling.
+
+Analyser teksten og returner et JSON-array med fundne PII-elementer.
+Hvert element: {"type":"navn|CPR|fødselsdato|adresse|telefon|afdelingsnavn|hospital|andet","fragment":"tekst (maks 60 tegn)","severity":"høj|medium|lav","note":"1 sætning forklaring"}
+
+Returner KUN JSON-arrayet. Ingen PII fundet = []
+
+Tekst:
+${text}`;
+
+      try {
+        const res = await fetch('/.netlify/functions/claude', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + session.access_token },
+          body: JSON.stringify({ model: 'claude-haiku-4-5-20251001', max_tokens: 900, messages: [{ role: 'user', content: prompt }] }),
+        });
+        if (!res.ok) throw new Error('HTTP ' + res.status);
+        const data = await res.json();
+        const raw  = (data?.content?.[0]?.text || '').trim().replace(/^```(?:json)?\n?/, '').replace(/\n?```$/, '').trim();
+        const findings = JSON.parse(raw);
+
+        if (!Array.isArray(findings) || findings.length === 0) {
+          bodyEl.innerHTML = '<div class="anon-ok">Ingen personhenførbare oplysninger fundet.</div>';
+          footer.style.display = 'none';
+        } else {
+          const wrap = document.createElement('div');
+          wrap.className = 'anon-findings';
+          findings.forEach(f => {
+            const el = document.createElement('div');
+            el.className = 'anon-finding' + (f.severity === 'lav' ? ' sev-lav' : '');
+            el.innerHTML = `<div class="anon-finding-type">${escHtml(f.type || '')}</div>
+              <div class="anon-finding-fragment">"${escHtml(f.fragment || '')}"</div>
+              ${f.note ? `<div class="anon-finding-note">${escHtml(f.note)}</div>` : ''}`;
+            wrap.appendChild(el);
+          });
+          bodyEl.innerHTML = '';
+          bodyEl.appendChild(wrap);
+          footer.style.display = '';
+        }
+      } catch {
+        bodyEl.innerHTML = '<p style="color:#f87171;font-size:.875rem;padding:1rem 0">Tjekket fejlede — prøv igen.</p>';
+      }
+    });
+  })();
+
   // ══ DIFFERENTIALDIAGNOSE ASSISTENT ══
   (function () {
     const DDX_CACHE_KEY = id => 'ddx_' + id;
@@ -4549,10 +4786,11 @@
       const sc = parseStructured(note);
       if (sc?.anonymizedContent) return sc.anonymizedContent;
       if (sc?.patientCase || sc?.kliniskForlob) {
-        return [sc.patientCase, sc.kliniskForlob, sc.fagligLaering]
+        return [sc.patientCase, sc.kliniskForlob, sc.fagligLaering, sc.outcome_structured]
           .filter(Boolean).join('\n\n');
       }
-      return note.edited_note || note.content || '';
+      // Fallback: brug al tilgængelig tekst inkl. titel
+      return [note.edited_note, note.content, note.title].filter(Boolean).join('\n\n');
     }
 
     function renderDdxCards(diagnoses, noteId, container) {
