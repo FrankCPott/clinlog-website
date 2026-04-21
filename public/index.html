@@ -377,6 +377,10 @@
       font-family: inherit; font-size: inherit; text-decoration: underline;
     }
     .login-divider { height: 1px; background: var(--border); margin: 1.5rem 0; }
+    .capslock-warn {
+      font-size: .78rem; color: var(--gold); margin-top: .3rem;
+      display: flex; align-items: center; gap: .3rem;
+    }
 
     /* ── PORTAL ── */
     #portal {
@@ -417,7 +421,7 @@
     }
     .note-card:hover { border-color: var(--teal); }
     .note-card-header { display: flex; align-items: flex-start; justify-content: space-between; gap: 1rem; margin-bottom: .75rem; }
-    .note-card-title { font-weight: 600; font-size: 1rem; }
+    .note-card-title { font-weight: 600; font-size: 1.08rem; }
     .note-card-meta { font-size: .78rem; color: var(--muted); white-space: nowrap; }
     .note-card-category {
       display: inline-block; background: rgba(14,165,197,0.1);
@@ -516,6 +520,44 @@
     }
     .detail-export-btn:hover { color: var(--teal); border-color: var(--teal); }
     .detail-view-count { font-size: .75rem; color: var(--muted); white-space: nowrap; padding: 0 .4rem; }
+    .detail-tts-btn {
+      background: rgba(14,165,197,0.08); border: 1px solid rgba(14,165,197,0.2);
+      color: var(--teal2); border-radius: 7px; padding: .3rem .7rem;
+      font-family: inherit; font-size: .82rem; cursor: pointer; white-space: nowrap;
+      transition: background .2s, border-color .2s, color .2s;
+    }
+    .detail-tts-btn:hover { background: rgba(14,165,197,0.18); border-color: var(--teal); }
+    .detail-tts-btn.speaking { background: rgba(239,68,68,0.1); border-color: rgba(239,68,68,0.35); color: #f87171; }
+    /* ── KORT-BEKRÆFTELSESDIALOG ── */
+    #card-confirm-overlay {
+      display: none; position: fixed; inset: 0; z-index: 3200;
+      background: rgba(7,12,24,0.72); backdrop-filter: blur(5px);
+      align-items: center; justify-content: center; padding: 1.25rem;
+    }
+    #card-confirm-overlay.open { display: flex; }
+    .card-confirm-modal {
+      background: var(--navy2); border: 1px solid var(--border);
+      border-radius: 14px; padding: 1.5rem 1.75rem;
+      max-width: 380px; width: 100%;
+      box-shadow: 0 16px 50px rgba(0,0,0,0.55);
+    }
+    .card-confirm-title { font-weight: 600; font-size: 1rem; color: var(--white); margin-bottom: .45rem; }
+    .card-confirm-desc { font-size: .875rem; color: var(--muted); line-height: 1.6; margin-bottom: 1.25rem; }
+    .card-confirm-actions { display: flex; gap: .6rem; justify-content: flex-end; }
+    .card-confirm-ok {
+      background: var(--teal); color: #fff; border: none; border-radius: 7px;
+      padding: .5rem 1.2rem; cursor: pointer; font-family: inherit;
+      font-size: .875rem; font-weight: 600; transition: background .2s;
+    }
+    .card-confirm-ok:hover { background: var(--teal2); }
+    .card-confirm-ok.danger { background: var(--error); }
+    .card-confirm-ok.danger:hover { background: #dc2626; }
+    .card-confirm-cancel {
+      background: none; border: 1px solid var(--border); color: var(--muted);
+      border-radius: 7px; padding: .5rem 1.2rem; cursor: pointer;
+      font-family: inherit; font-size: .875rem; transition: color .2s, border-color .2s;
+    }
+    .card-confirm-cancel:hover { color: var(--white); border-color: var(--muted); }
 
     /* ── ANONYMISERINGS MODAL ── */
     #anon-overlay {
@@ -1262,6 +1304,7 @@
       <div class="login-field">
         <label for="login-password">Adgangskode</label>
         <input type="password" id="login-password" placeholder="••••••••" autocomplete="current-password" />
+        <p id="capslock-warn" class="capslock-warn" style="display:none">⚠️ CAPS LOCK er slået til</p>
       </div>
       <button class="login-btn" id="login-submit-btn">Log ind</button>
       <p class="login-msg" id="login-msg"></p>
@@ -1303,6 +1346,18 @@
 
   <!-- ══ TOAST ══ -->
   <div id="toast-container"></div>
+
+  <!-- ══ KORTHANDLING-BEKRÆFTELSE ══ -->
+  <div id="card-confirm-overlay" role="dialog" aria-modal="true">
+    <div class="card-confirm-modal">
+      <div class="card-confirm-title" id="card-confirm-title"></div>
+      <div class="card-confirm-desc" id="card-confirm-desc"></div>
+      <div class="card-confirm-actions">
+        <button class="card-confirm-cancel" id="card-confirm-cancel">Annuller</button>
+        <button class="card-confirm-ok" id="card-confirm-ok">OK</button>
+      </div>
+    </div>
+  </div>
 
   <!-- ══ PORTAL ══ -->
   <div id="portal">
@@ -1437,6 +1492,7 @@
         <button class="detail-back" id="detail-back-btn" data-t="portal-back">← Tilbage</button>
         <input class="detail-title-input" id="detail-title" type="text" placeholder="Titel…" />
         <span class="detail-view-count" id="detail-view-count" style="display:none"></span>
+        <button class="detail-tts-btn" id="detail-tts-btn" title="Oplæs notat højt">🔊</button>
         <button class="detail-export-btn" id="detail-export-btn" title="Eksportér til præsentation">📊 Eksportér</button>
         <span class="detail-save-badge" id="detail-save-badge">Gemt ✓</span>
       </div>
@@ -2760,6 +2816,18 @@
   const loginPassword  = document.getElementById('login-password');
   const loginSubmitBtn = document.getElementById('login-submit-btn');
   const loginMsg       = document.getElementById('login-msg');
+
+  // ── CAPS LOCK ADVARSEL ──
+  (function () {
+    const warn = document.getElementById('capslock-warn');
+    if (!loginPassword || !warn) return;
+    loginPassword.addEventListener('keyup', function (e) {
+      warn.style.display = e.getModifierState('CapsLock') ? '' : 'none';
+    });
+    loginPassword.addEventListener('blur', function () {
+      warn.style.display = 'none';
+    });
+  })();
   const loginTitle     = document.getElementById('login-modal-title');
   const loginSub       = document.getElementById('login-modal-sub');
   const loginToggleBtn = document.getElementById('login-toggle-btn');
@@ -2824,6 +2892,31 @@
     });
   }
 
+  // ── BEKRÆFTELSESDIALOG TIL KORTKNAPPER ──
+  function showConfirm(title, desc, onConfirm, danger) {
+    const overlay   = document.getElementById('card-confirm-overlay');
+    const titleEl   = document.getElementById('card-confirm-title');
+    const descEl    = document.getElementById('card-confirm-desc');
+    const okBtn     = document.getElementById('card-confirm-ok');
+    const cancelBtn = document.getElementById('card-confirm-cancel');
+    titleEl.textContent = title;
+    descEl.textContent  = desc;
+    okBtn.className = 'card-confirm-ok' + (danger ? ' danger' : '');
+    overlay.classList.add('open');
+    function close() { overlay.classList.remove('open'); cleanup(); }
+    function cleanup() {
+      okBtn.removeEventListener('click', handleOk);
+      cancelBtn.removeEventListener('click', handleCancel);
+      overlay.removeEventListener('click', handleOverlay);
+    }
+    function handleOk()      { close(); onConfirm(); }
+    function handleCancel()  { close(); }
+    function handleOverlay(e){ if (e.target === overlay) close(); }
+    okBtn.addEventListener('click', handleOk);
+    cancelBtn.addEventListener('click', handleCancel);
+    overlay.addEventListener('click', handleOverlay);
+  }
+
   function renderNoteList() {
     const loading = document.getElementById('portal-notes-loading');
     const empty   = document.getElementById('portal-notes-empty');
@@ -2861,22 +2954,46 @@
       card.addEventListener('click', () => openNote(note.id));
       card.querySelector('.note-card-offline').addEventListener('click', function (e) {
         e.stopPropagation();
-        if (!window.saveForOffline) return;
-        saveForOffline(note);
-        this.classList.add('saved');
-        showToast('💾 Gemt til offline adgang');
+        const btn = this;
+        showConfirm(
+          '💾 Gem til offline',
+          'Noten gemmes lokalt i din browser og er tilgængelig uden internetforbindelse. Brugbart til klinikken.',
+          () => {
+            if (!window.saveForOffline) return;
+            saveForOffline(note);
+            btn.classList.add('saved');
+            showToast('💾 Gemt til offline adgang');
+          }
+        );
       });
       card.querySelector('.note-card-bookmark').addEventListener('click', function (e) {
         e.stopPropagation();
-        toggleBookmark(note.id, this);
+        const btn = this;
+        const isBookmarked = myBookmarks.has(note.id);
+        showConfirm(
+          isBookmarked ? '🔖 Fjern bogmærke' : '🔖 Tilføj bogmærke',
+          isBookmarked
+            ? 'Fjerner noten fra dine bogmærkede noter i portalen.'
+            : 'Bogmærkede noter vises øverst og er let tilgængelige i din portal.',
+          () => toggleBookmark(note.id, btn)
+        );
       });
       card.querySelector('.note-card-tldr').addEventListener('click', function (e) {
         e.stopPropagation();
-        showTldr(note);
+        showConfirm(
+          '⚡ 30-sekunders opsummering',
+          'Claude AI (Haiku) læser noten og genererer 3-5 korte bullets med de vigtigste kliniske pointer. Resultatet caches lokalt.',
+          () => showTldr(note)
+        );
       });
       card.querySelector('.note-card-delete').addEventListener('click', function (e) {
         e.stopPropagation();
-        deleteNote(note.id, note.title);
+        showConfirm(
+          '🗑️ Slet notat',
+          `"${note.title || 'Uden titel'}" slettes permanent fra din konto. Dette kan ikke fortrydes.`,
+          () => deleteNote(note.id, note.title),
+          true /* danger */
+        );
       });
       list.appendChild(card);
     });
@@ -3276,6 +3393,10 @@
     const vc = document.getElementById('detail-view-count');
     if (vc) vc.style.display = 'none';
     clearTimeout(saveTimer);
+    // Stop oplæsning hvis aktiv
+    if (window.speechSynthesis) window.speechSynthesis.cancel();
+    const ttsBtn = document.getElementById('detail-tts-btn');
+    if (ttsBtn) { ttsBtn.textContent = '🔊'; ttsBtn.classList.remove('speaking'); }
   }
 
   async function loadNoteViewCount(noteId) {
@@ -4912,6 +5033,63 @@ ${caseText}`;
     });
 
     window.fetchDdx = fetchDdx;
+  })();
+
+  // ══ TEKST-TIL-TALE (TTS) ══
+  (function () {
+    const btn = document.getElementById('detail-tts-btn');
+    if (!btn || !window.speechSynthesis) {
+      if (btn) btn.style.display = 'none'; // skjul hvis TTS ikke understøttes
+      return;
+    }
+
+    let utterance = null;
+
+    function stopReading() {
+      window.speechSynthesis.cancel();
+      btn.textContent = '🔊';
+      btn.classList.remove('speaking');
+      utterance = null;
+    }
+
+    function startReading() {
+      const noteId = window.__openNoteId;
+      if (!noteId) return;
+      const note = allNotes.find(n => n.id === noteId);
+      if (!note) return;
+
+      const text = buildCombinedText(note) || note.title || '';
+      if (!text.trim()) { showToast('Ingen tekst at oplæse'); return; }
+
+      utterance = new SpeechSynthesisUtterance(text);
+      utterance.lang = 'da-DK';
+      utterance.rate = 0.95;
+
+      // Brug dansk stemme hvis tilgængelig
+      function pickVoice() {
+        const voices = window.speechSynthesis.getVoices();
+        const da = voices.find(v => v.lang.startsWith('da'));
+        if (da) utterance.voice = da;
+      }
+      pickVoice();
+      if (window.speechSynthesis.onvoiceschanged !== undefined) {
+        window.speechSynthesis.onvoiceschanged = pickVoice;
+      }
+
+      utterance.onend = utterance.onerror = stopReading;
+
+      btn.textContent = '⏹';
+      btn.classList.add('speaking');
+      window.speechSynthesis.speak(utterance);
+    }
+
+    btn.addEventListener('click', function () {
+      if (window.speechSynthesis.speaking) {
+        stopReading();
+      } else {
+        startReading();
+      }
+    });
   })();
 
   </script>
