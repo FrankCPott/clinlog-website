@@ -1,0 +1,49 @@
+/*
+ * tokens.css — ClinLog design system
+ * Deles mellem clinlog.dk og ClinLog-appen (identiske farveværdier)
+ * Version: 1.0 · 22. april 2026
+ */
+
+:root {
+  /* ── Baggrunde ─────────────────────────────────────────────────────────── */
+  --bg-canvas:        #F5F7FA;       /* lys side-baggrund */
+  --bg-surface:       #FFFFFF;       /* kortoverflader */
+  --bg-bars:          #0E1C2E;       /* header, hero, footer — matcher appens bars */
+  --bg-subtle:        #EEF2F7;       /* svagt indrykket */
+  --bg-brand-subtle:  #E3F0F6;       /* brand-farvet baggrund */
+
+  /* ── Tekst ─────────────────────────────────────────────────────────────── */
+  --text-primary:     #0E1C2E;       /* primær tekst på lys baggrund */
+  --text-secondary:   #4A5A70;       /* sekundær */
+  --text-tertiary:    #6B7A8F;       /* placeholder, dæmpet */
+  --text-on-dark:     #FFFFFF;       /* tekst på mørk bar */
+  --text-on-dark-muted: #A8B5C8;     /* dæmpet tekst på mørk bar */
+
+  /* ── Brand ─────────────────────────────────────────────────────────────── */
+  --brand-primary:    #2B7A9E;       /* primær accent — lys baggrund */
+  --brand-hover:      #1F5F7F;       /* hover-tilstand */
+  --brand-glow:       #4DA3C7;       /* accent på mørk baggrund / glow */
+
+  /* ── Semantik ──────────────────────────────────────────────────────────── */
+  --success-on-light: #1F7A4C;       /* success på lys baggrund */
+  --success-on-dark:  #22C55E;       /* success på mørk baggrund */
+  --danger-on-light:  #B42318;       /* fejl på lys baggrund */
+  --danger-on-dark:   #EF4444;       /* fejl på mørk baggrund */
+
+  /* ── Kanter ────────────────────────────────────────────────────────────── */
+  --border-default:   #D7DEE8;
+  --border-strong:    #B8C3D1;
+  --border-focus:     #2B7A9E;
+  --border-on-dark:   rgba(77,163,199,0.22);  /* kanter på mørk baggrund */
+
+  /* ── Skygger ───────────────────────────────────────────────────────────── */
+  --shadow-sm:  0 1px 2px  rgba(14,28,46,0.05);
+  --shadow-md:  0 2px 8px  rgba(14,28,46,0.08);
+  --shadow-lg:  0 8px 24px rgba(14,28,46,0.12);
+  --shadow-xl:  0 20px 50px rgba(14,28,46,0.18);
+
+  /* ── Fonte ─────────────────────────────────────────────────────────────── */
+  --font-serif: 'Source Serif 4', Georgia, serif;
+  --font-sans:  'Geist', system-ui, -apple-system, sans-serif;
+  --font-mono:  'Geist Mono', 'SF Mono', monospace;
+}

@@ -10,29 +10,32 @@
   <meta name="description" content="Clinlog hjælper læger, sygeplejersker, studerende og andre sundhedspersoner med at dokumentere og lære fra kliniske oplevelser — struktureret af AI, specialitetsspecifik og GDPR-sikker." />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,opsz,wght@0,8..60,300..900;1,8..60,300..900&family=Geist:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="tokens.css" />
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js" defer></script>
   <script src="https://cdn.jsdelivr.net/npm/pptxgenjs@3.12.0/dist/pptxgen.bundled.js" defer></script>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     :root {
-      --navy:    #0b1120;
-      --navy2:   #111827;
-      --navy3:   #1a2740;
-      --teal:    #0ea5c5;
-      --teal2:   #38bdf8;
+      /* ── Backwards-compat aliasser (bruges af eksisterende CSS) ──────── */
+      /* Mappes til nye tokens fra tokens.css                               */
+      --navy:    var(--bg-bars);           /* #0E1C2E */
+      --navy2:   #131E2E;
+      --navy3:   #1A2F46;
+      --teal:    var(--brand-glow);        /* #4DA3C7 */
+      --teal2:   #7FC4E0;
       --gold:    #f0c060;
-      --white:   #f0f4f8;
-      --muted:   #8a9ab5;
-      --card-bg: #131e30;
-      --border:  rgba(14,165,197,0.18);
-      --success: #22c55e;
-      --error:   #ef4444;
+      --white:   var(--text-on-dark);      /* #FFFFFF */
+      --muted:   var(--text-on-dark-muted); /* #A8B5C8 */
+      --card-bg: #0D1B2A;
+      --border:  var(--border-on-dark);    /* rgba(77,163,199,0.22) */
+      --success: var(--success-on-dark);   /* #22C55E — beholdes lys til toast/badge */
+      --error:   var(--danger-on-dark);    /* #EF4444 */
     }
     html { scroll-behavior: smooth; overflow-x: hidden; }
     body {
       background: var(--navy); color: var(--white);
-      font-family: 'DM Sans', sans-serif; font-weight: 400;
+      font-family: var(--font-sans); font-weight: 400;
       line-height: 1.65; overflow-x: hidden; max-width: 100%;
     }
     body::before {
@@ -84,7 +87,7 @@
       display: flex; align-items: center; justify-content: center; flex-shrink: 0;
       box-shadow: 0 0 12px rgba(14,165,197,0.45);
     }
-    .logo-wordmark { font-family: 'DM Serif Display', serif; font-size: 1.45rem; color: var(--white); letter-spacing: -0.02em; line-height: 1; }
+    .logo-wordmark { font-family: 'Source Serif 4', Georgia, serif; font-size: 1.45rem; color: var(--white); letter-spacing: -0.02em; line-height: 1; }
     .logo-wordmark span { color: var(--teal); }
     .nav-links { display: flex; list-style: none; gap: 1.4rem; align-items: center; }
     .nav-links a { color: var(--muted); text-decoration: none; font-size: .82rem; transition: color .2s; white-space: nowrap; }
@@ -147,7 +150,7 @@
     }
     @keyframes pulse-dot { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.5;transform:scale(1.4)} }
     .hero h1 {
-      font-family: 'DM Serif Display', serif;
+      font-family: 'Source Serif 4', Georgia, serif;
       font-size: clamp(2.4rem, 6vw, 4.2rem);
       line-height: 1.12; letter-spacing: -0.02em;
       max-width: 760px; margin-bottom: 1.5rem;
@@ -184,9 +187,9 @@
     .phone-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem; padding-bottom: .75rem; border-bottom: 1px solid var(--border); }
     .phone-header-logo { display: inline-flex; align-items: center; gap: 7px; }
     .phone-logo-icon { width: 22px; height: 22px; background: var(--teal); border-radius: 5px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
-    .phone-logo-text { font-family: 'DM Serif Display', serif; font-size: .9rem; color: var(--white); letter-spacing: -0.02em; }
+    .phone-logo-text { font-family: 'Source Serif 4', Georgia, serif; font-size: .9rem; color: var(--white); letter-spacing: -0.02em; }
     .phone-logo-text span { color: var(--teal); }
-    .phone-tag { background: rgba(14,165,197,0.15); color: var(--teal2); font-family: 'DM Sans', sans-serif; font-size: .68rem; font-weight: 600; letter-spacing: .05em; padding: .2rem .6rem; border-radius: 99px; }
+    .phone-tag { background: rgba(14,165,197,0.15); color: var(--teal2); font-family: var(--font-sans); font-size: .68rem; font-weight: 600; letter-spacing: .05em; padding: .2rem .6rem; border-radius: 99px; }
     .phone-note { background: rgba(255,255,255,0.03); border: 1px solid var(--border); border-radius: 10px; padding: .75rem; font-size: .75rem; color: var(--muted); margin-bottom: .6rem; line-height: 1.55; }
     .phone-note strong { color: var(--white); font-size: .7rem; text-transform: uppercase; letter-spacing: .05em; display: block; margin-bottom: .3rem; }
     .phone-score { display: flex; align-items: center; justify-content: space-between; background: rgba(240,192,96,0.07); border: 1px solid rgba(240,192,96,0.2); border-radius: 10px; padding: .65rem .75rem; font-size: .72rem; }
@@ -197,7 +200,7 @@
     section { position: relative; }
     .section-inner { max-width: 1100px; margin: 0 auto; padding: 6rem 2rem; }
     .section-label { font-size: .72rem; font-weight: 600; letter-spacing: .12em; text-transform: uppercase; color: var(--teal); margin-bottom: 1rem; display: block; }
-    .section-title { font-family: 'DM Serif Display', serif; font-size: clamp(1.8rem, 4vw, 2.8rem); letter-spacing: -0.02em; line-height: 1.15; margin-bottom: 1rem; }
+    .section-title { font-family: 'Source Serif 4', Georgia, serif; font-size: clamp(1.8rem, 4vw, 2.8rem); letter-spacing: -0.02em; line-height: 1.15; margin-bottom: 1rem; }
     .section-sub { color: var(--muted); max-width: 560px; font-size: 1.05rem; margin-bottom: 3.5rem; }
 
     /* ── FEATURES ── */
@@ -212,7 +215,7 @@
     /* ── HOW ── */
     .steps { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px,1fr)); gap: 2rem; }
     .step { text-align: center; }
-    .step-num { width: 52px; height: 52px; border-radius: 50%; background: rgba(14,165,197,0.1); border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; font-family: 'DM Serif Display', serif; font-size: 1.4rem; color: var(--teal2); margin: 0 auto 1.25rem; }
+    .step-num { width: 52px; height: 52px; border-radius: 50%; background: rgba(14,165,197,0.1); border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; font-family: 'Source Serif 4', Georgia, serif; font-size: 1.4rem; color: var(--teal2); margin: 0 auto 1.25rem; }
     .step h3 { font-size: 1rem; font-weight: 600; margin-bottom: .5rem; }
     .step p { font-size: .875rem; color: var(--muted); }
 
@@ -228,9 +231,9 @@
     /* ── ABOUT ── */
     #about { background: linear-gradient(135deg, var(--navy3) 0%, var(--navy) 100%); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); }
     .about-inner { max-width: 900px; margin: 0 auto; padding: 6rem 2rem; display: grid; grid-template-columns: auto 1fr; gap: 4rem; align-items: center; }
-    .about-avatar { width: 120px; height: 120px; border-radius: 50%; background: linear-gradient(135deg, var(--teal) 0%, var(--navy3) 100%); border: 2px solid var(--border); display: flex; align-items: center; justify-content: center; font-family: 'DM Serif Display', serif; font-size: 2.8rem; color: #fff; flex-shrink: 0; box-shadow: 0 0 40px rgba(14,165,197,0.2); }
+    .about-avatar { width: 120px; height: 120px; border-radius: 50%; background: linear-gradient(135deg, var(--teal) 0%, var(--navy3) 100%); border: 2px solid var(--border); display: flex; align-items: center; justify-content: center; font-family: 'Source Serif 4', Georgia, serif; font-size: 2.8rem; color: #fff; flex-shrink: 0; box-shadow: 0 0 40px rgba(14,165,197,0.2); }
     .about-content .section-label { margin-bottom: .75rem; }
-    .about-content h2 { font-family: 'DM Serif Display', serif; font-size: clamp(1.5rem, 3vw, 2.2rem); letter-spacing: -0.02em; margin-bottom: 1rem; }
+    .about-content h2 { font-family: 'Source Serif 4', Georgia, serif; font-size: clamp(1.5rem, 3vw, 2.2rem); letter-spacing: -0.02em; margin-bottom: 1rem; }
     .about-content p { color: var(--muted); font-size: .975rem; line-height: 1.75; margin-bottom: .75rem; }
     .about-content p strong { color: var(--white); }
     .credentials { display: flex; flex-wrap: wrap; gap: .5rem; margin-top: 1.25rem; }
@@ -251,7 +254,7 @@
     .community-card p { font-size: .875rem; color: var(--muted); line-height: 1.65; }
     .community-visual { background: var(--card-bg); border: 1px solid rgba(240,192,96,0.2); border-radius: 20px; padding: 2rem; position: sticky; top: 6rem; }
     .cv-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.5rem; padding-bottom: 1rem; border-bottom: 1px solid var(--border); }
-    .cv-title { font-family: 'DM Serif Display', serif; font-size: 1rem; }
+    .cv-title { font-family: 'Source Serif 4', Georgia, serif; font-size: 1rem; }
     .cv-badge { background: rgba(240,192,96,0.12); color: var(--gold); font-size: .68rem; font-weight: 600; letter-spacing: .05em; padding: .25rem .7rem; border-radius: 99px; }
     .cv-result { background: rgba(255,255,255,0.03); border: 1px solid var(--border); border-radius: 12px; padding: 1rem 1.1rem; margin-bottom: .75rem; transition: border-color .2s; }
     .cv-result:hover { border-color: rgba(240,192,96,0.25); }
@@ -308,7 +311,7 @@
     /* ── FOOTER ── */
     footer { background: var(--navy2); border-top: 1px solid var(--border); padding: 2.5rem 2rem; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem; max-width: 100%; }
     .footer-logo { display: inline-flex; align-items: center; gap: 10px; text-decoration: none; }
-    .footer-logo-wordmark { font-family: 'DM Serif Display', serif; font-size: 1.25rem; color: var(--white); letter-spacing: -0.02em; }
+    .footer-logo-wordmark { font-family: 'Source Serif 4', Georgia, serif; font-size: 1.25rem; color: var(--white); letter-spacing: -0.02em; }
     .footer-logo-wordmark span { color: var(--teal); }
     .footer-links { display: flex; gap: 1rem; flex-wrap: wrap; }
     .footer-links a { color: var(--muted); font-size: .82rem; text-decoration: none; transition: color .2s; white-space: nowrap; }
@@ -343,7 +346,7 @@
       position: relative;
     }
     .login-modal h2 {
-      font-family: 'DM Serif Display', serif; font-size: 1.7rem;
+      font-family: 'Source Serif 4', Georgia, serif; font-size: 1.7rem;
       letter-spacing: -0.02em; margin-bottom: .4rem;
     }
     .login-modal .login-sub { font-size: .875rem; color: var(--muted); margin-bottom: 1.75rem; }
@@ -407,7 +410,7 @@
     .portal-inner { max-width: 900px; margin: 0 auto; padding: 3rem 2rem; }
     .portal-header { margin-bottom: 2.5rem; }
     .portal-header h1 {
-      font-family: 'DM Serif Display', serif;
+      font-family: 'Source Serif 4', Georgia, serif;
       font-size: clamp(1.8rem, 4vw, 2.6rem); letter-spacing: -0.02em; margin-bottom: .4rem;
     }
     .portal-header p { color: var(--muted); font-size: .975rem; }
@@ -489,7 +492,7 @@
       font-size: .7rem; font-weight: 700; letter-spacing: .12em; text-transform: uppercase;
       color: #fbbf24; margin-bottom: .6rem;
     }
-    .maanedens-card-title { font-family: 'DM Serif Display', serif; font-size: 1.4rem; color: var(--white); margin-bottom: .5rem; }
+    .maanedens-card-title { font-family: 'Source Serif 4', Georgia, serif; font-size: 1.4rem; color: var(--white); margin-bottom: .5rem; }
     .maanedens-card-meta { font-size: .8rem; color: var(--muted); margin-bottom: 1rem; }
     .maanedens-card-excerpt { font-size: .9rem; color: var(--white); line-height: 1.75; opacity: .85; }
     .maanedens-empty { color: var(--muted); font-size: .9rem; }
@@ -575,7 +578,7 @@
       max-height: 80vh; overflow-y: auto; position: relative;
       box-shadow: 0 24px 80px rgba(0,0,0,0.6);
     }
-    .anon-modal-title { font-family: 'DM Serif Display', serif; font-size: 1.2rem; margin-bottom: 1.25rem; }
+    .anon-modal-title { font-family: 'Source Serif 4', Georgia, serif; font-size: 1.2rem; margin-bottom: 1.25rem; }
     .anon-loading { color: var(--muted); font-size: .9rem; text-align: center; padding: 2.5rem 0; }
     .anon-loading::before { content: '🔒'; display: block; font-size: 1.8rem; margin-bottom: .6rem; animation: tldr-spin 1.4s linear infinite; }
     .anon-ok { color: #22c55e; font-size: .95rem; text-align: center; padding: 2rem 0; }
@@ -835,7 +838,7 @@
       display: flex; align-items: center; justify-content: space-between;
       margin-bottom: 1.25rem; gap: 1rem;
     }
-    .tldr-modal-title { font-family: 'DM Serif Display', serif; font-size: 1.25rem; }
+    .tldr-modal-title { font-family: 'Source Serif 4', Georgia, serif; font-size: 1.25rem; }
     .tldr-ai-badge {
       font-size: .68rem; font-weight: 600; letter-spacing: .04em; text-transform: uppercase;
       color: var(--teal); border: 1px solid rgba(14,165,197,0.35); border-radius: 4px;
@@ -982,7 +985,7 @@
     .detail-back:hover { color: var(--white); border-color: var(--muted); }
     .detail-title-input {
       flex: 1; background: transparent; border: none; color: var(--white);
-      font-family: 'DM Serif Display', serif; font-size: 1.2rem;
+      font-family: 'Source Serif 4', Georgia, serif; font-size: 1.2rem;
       outline: none; min-width: 0;
     }
     .detail-save-badge {
@@ -1228,7 +1231,7 @@
     .demo-dot { width: 10px; height: 10px; border-radius: 50%; background: rgba(255,255,255,0.12); }
     .demo-title-area { flex: 1; }
     .demo-note-title {
-      font-family: 'DM Serif Display', serif;
+      font-family: 'Source Serif 4', Georgia, serif;
       font-size: 1.15rem; color: var(--white);
       letter-spacing: -0.01em;
     }
