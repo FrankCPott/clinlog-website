@@ -6,8 +6,31 @@
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
   <meta http-equiv="Pragma" content="no-cache" />
   <meta http-equiv="Expires" content="0" />
-  <title>Clinlog – Klinisk læringsdagbog for sundhedsprofessionelle</title>
-  <meta name="description" content="Clinlog hjælper læger, sygeplejersker, studerende og andre sundhedspersoner med at dokumentere og lære fra kliniske oplevelser — struktureret af AI, specialitetsspecifik og GDPR-sikker." />
+  <title>ClinLog – Klinisk læringsdagbog for sundhedsprofessionelle</title>
+  <meta name="description" content="ClinLog hjælper læger, sygeplejersker, studerende og andre sundhedspersoner med at dokumentere og lære fra kliniske oplevelser — struktureret af AI, specialitetsspecifik og GDPR-sikker." />
+  <!-- Open Graph -->
+  <meta property="og:type"        content="website" />
+  <meta property="og:url"         content="https://clinlog.dk/" />
+  <meta property="og:title"       content="ClinLog – Klinisk læringsdagbog" />
+  <meta property="og:description" content="Dokumentér, reflektér og lær fra kliniske oplevelser. AI-struktureret, GDPR-sikker, alle specialer." />
+  <meta property="og:image"       content="https://clinlog.dk/og-image.png" />
+  <meta name="twitter:card"       content="summary_large_image" />
+  <!-- Canonical -->
+  <link rel="canonical" href="https://clinlog.dk/" />
+  <!-- JSON-LD -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    "name": "ClinLog",
+    "description": "Klinisk læringsdagbog for sundhedsprofessionelle — AI-struktureret, GDPR-sikker.",
+    "applicationCategory": "MedicalApplication",
+    "operatingSystem": "Android, iOS",
+    "offers": { "@type": "Offer", "price": "0", "priceCurrency": "DKK" },
+    "url": "https://clinlog.dk",
+    "inLanguage": ["da", "en"]
+  }
+  </script>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,opsz,wght@0,8..60,300..900;1,8..60,300..900&family=Geist:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
@@ -78,7 +101,7 @@
       position: fixed; top: 0; left: 0; right: 0; z-index: 100;
       display: flex; align-items: center; justify-content: space-between;
       padding: 1rem 2.5rem; max-width: 100%; overflow: hidden;
-      background: rgba(11,17,32,0.88); backdrop-filter: blur(16px);
+      background: rgba(14,28,46,0.95); backdrop-filter: blur(16px);
       border-bottom: 1px solid var(--border);
     }
     .nav-logo { display: inline-flex; align-items: center; gap: 10px; text-decoration: none; }
@@ -321,6 +344,53 @@
     .divider { width: 100%; height: 1px; background: linear-gradient(90deg, transparent, var(--border), transparent); }
     .reveal { opacity: 0; transform: translateY(28px); transition: opacity .7s ease, transform .7s ease; }
     .reveal.visible { opacity: 1; transform: none; }
+
+    /* ── LETTE SEKTIONER (canvas-baggrund, mørk tekst) ─────────────────── */
+    .section-light { background: var(--bg-canvas) !important; }
+    .section-light .section-title  { color: var(--text-primary); }
+    .section-light .section-sub    { color: var(--text-secondary); }
+    .section-light .section-label  { color: var(--brand-primary); }
+
+    /* Feature-kort på lys baggrund */
+    .section-light .feature-card   { background: var(--bg-surface); border-color: var(--border-default); box-shadow: var(--shadow-sm); }
+    .section-light .feature-card:hover { border-color: var(--brand-primary); box-shadow: var(--shadow-md); }
+    .section-light .feature-card h3 { color: var(--text-primary); }
+    .section-light .feature-card p  { color: var(--text-secondary); }
+    .section-light .feature-icon   { background: var(--bg-brand-subtle); }
+
+    /* Audience-kort */
+    .section-light .audience-card  { background: var(--bg-surface); border-color: var(--border-default); }
+    .section-light .audience-card h4 { color: var(--text-primary); }
+    .section-light .audience-card p { color: var(--text-secondary); }
+
+    /* Trin (how it works) */
+    .section-light .step h3  { color: var(--text-primary); }
+    .section-light .step p   { color: var(--text-secondary); }
+    .section-light .step-num { background: var(--bg-brand-subtle); border-color: var(--border-focus); color: var(--brand-primary); }
+
+    /* Waitlist-formular */
+    .section-light .waitlist-form input    { background: var(--bg-surface); border-color: var(--border-default); color: var(--text-primary); }
+    .section-light .waitlist-form input::placeholder { color: var(--text-tertiary); }
+    .section-light .waitlist-form input:focus { border-color: var(--brand-primary); }
+    .section-light .waitlist-form button   { background: var(--brand-primary); }
+    .section-light .waitlist-form button:hover { background: var(--brand-hover); }
+    .section-light .store-badge  { background: var(--bg-surface); border-color: var(--border-default); color: var(--text-primary); }
+    .section-light .store-badge:hover { border-color: var(--brand-primary); }
+    .section-light .store-badge-text small { color: var(--text-tertiary); }
+    .section-light .store-coming { color: var(--text-tertiary); }
+    .section-light .waitlist-note { color: var(--text-tertiary); }
+
+    /* Kontakt-link */
+    .section-light .contact-link { color: var(--brand-primary); border-bottom-color: rgba(43,122,158,0.35); }
+    .section-light .contact-link:hover { color: var(--brand-hover); border-bottom-color: var(--brand-primary); }
+    .section-light .contact-inner p { color: var(--text-secondary); }
+
+    /* Om-sektionen */
+    .section-light.about-section { background: var(--bg-subtle) !important; border-color: var(--border-default); }
+    .section-light .about-content h2 { color: var(--text-primary); }
+    .section-light .about-content p  { color: var(--text-secondary); }
+    .section-light .about-content p strong { color: var(--text-primary); }
+    .section-light .credential { background: var(--bg-brand-subtle); border-color: var(--border-focus); color: var(--brand-primary); }
 
     /* ── LOGIN KNAP I NAV ── */
     .nav-login {
@@ -1701,7 +1771,7 @@
   </section>
 
   <!-- ══ FEATURES ══ -->
-  <section id="features">
+  <section id="features" class="section-light">
     <div class="section-inner">
       <span class="section-label reveal" data-t="feat-label">Funktioner</span>
       <h2 class="section-title reveal" data-t="feat-h2">Alt hvad du har brug for<br>til klinisk refleksion</h2>
@@ -1819,7 +1889,7 @@
   <div class="divider"></div>
 
   <!-- ══ HOW IT WORKS ══ -->
-  <section id="how">
+  <section id="how" class="section-light">
     <div class="section-inner">
       <span class="section-label reveal" data-t="how-label">Sådan virker det</span>
       <h2 class="section-title reveal" data-t="how-h2">Fra vagt til læring<br>på få minutter</h2>
@@ -1834,7 +1904,7 @@
   </section>
 
   <!-- ══ AUDIENCE ══ -->
-  <section id="audience">
+  <section id="audience" class="section-light">
     <div class="section-inner">
       <span class="section-label reveal" data-t="aud-label">Til hvem</span>
       <h2 class="section-title reveal" data-t="aud-h2">Bygget til alle<br>sundhedsprofessionelle</h2>
@@ -2045,7 +2115,7 @@
   <div class="divider"></div>
 
   <!-- ══ WAITLIST ══ -->
-  <section id="waitlist">
+  <section id="waitlist" class="section-light">
     <div class="waitlist-inner">
       <span class="section-label reveal" data-t="wl-label">Bliv beta-tester</span>
       <h2 class="section-title reveal" data-t="wl-h2">Vær med fra starten</h2>
@@ -2079,7 +2149,7 @@
   </section>
 
   <!-- ══ CONTACT ══ -->
-  <section id="contact">
+  <section id="contact" class="section-light">
     <div class="contact-inner">
       <span class="section-label reveal" data-t="contact-label">Kontakt</span>
       <h2 class="section-title reveal" data-t="contact-h2">Spørgsmål eller feedback?</h2>
