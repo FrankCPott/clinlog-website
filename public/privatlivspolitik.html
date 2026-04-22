@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Privatlivspolitik — ClinLog</title>
+  <meta name="description" content="ClinLogs privatlivspolitik — hvordan vi indsamler, opbevarer og beskytter dine data i overensstemmelse med GDPR." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,opsz,wght@0,8..60,300..900;1,8..60,300..900&family=Geist:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="tokens.css" />
+  <link rel="stylesheet" href="page.css" />
+  <link rel="icon" href="favicon.ico" sizes="any" />
+</head>
+<body>
+  <a href="#main" class="skip-link">Spring til indhold</a>
+
+  <!-- Nav -->
+  <nav class="page-nav" aria-label="Primær navigation">
+    <a href="/" class="page-nav-logo" aria-label="ClinLog forside">
+      <div class="page-nav-logo-icon">
+        <svg width="20" height="20" viewBox="0 0 22 22" fill="none" aria-hidden="true">
+          <polyline points="1,11 5,11 7,11 8.5,5 10.5,17 12.5,9 14,11 17,11 21,11"
+            stroke="#ffffff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+      <span class="page-nav-wordmark">Clin<span>Log</span></span>
+    </a>
+    <ul class="page-nav-links" role="list">
+      <li><a href="/#features">Funktioner</a></li>
+      <li><a href="/#about">Om ClinLog</a></li>
+      <li><a href="kontakt.html">Kontakt</a></li>
+      <li><a href="/#waitlist" class="nav-cta">Tilmeld venteliste</a></li>
+    </ul>
+  </nav>
+
+  <!-- Hero -->
+  <div class="page-hero" role="banner">
+    <h1>Privatlivspolitik</h1>
+    <p class="page-meta">Sidst opdateret: 22. april 2026</p>
+  </div>
+
+  <!-- Indhold -->
+  <main id="main">
+    <div class="prose">
+
+      <div class="callout">
+        <p><strong>Kort version:</strong> ClinLog indsamler kun de data der er nødvendige for at drive tjenesten. Patientdata anonymiseres på din enhed, inden det sendes. Du har til enhver tid ret til indsigt, sletning og portabilitet af dine data.</p>
+      </div>
+
+      <h2>1. Dataansvarlig</h2>
+      <p>
+        ClinLog er udviklet og drives af Frank Pott (privat person, CVR ikke krævet for GDPR-registrering på dette stadie).<br>
+        Kontakt vedrørende databeskyttelse: <a href="mailto:frank.pott@gmail.com">frank.pott@gmail.com</a>
+      </p>
+
+      <h2>2. Hvilke data indsamles</h2>
+      <p>Vi indsamler følgende kategorier af data:</p>
+      <ul>
+        <li><strong>Kontooplysninger:</strong> E-mailadresse og navn ved oprettelse. Bruges udelukkende til autentificering.</li>
+        <li><strong>Kliniske noter:</strong> Tekst du selv skriver eller dikterer. <em>Du bestemmer selv</em> om en note deles med fællesskabet — som standard er alle noter private.</li>
+        <li><strong>Anonymiserede cases (valgfrit):</strong> Hvis du aktivt vælger at dele en note, fjernes alle personhenførbare oplysninger på din enhed, inden data sendes til serveren.</li>
+        <li><strong>Brugsdata:</strong> Tidspunkt for oprettelse/redigering af noter. Ingen adfærdsanalyse, ingen reklame-tracking.</li>
+      </ul>
+      <p>Vi indsamler <strong>ikke</strong> patientidentifikation, CPR-numre, billeder med genkendelige ansigter eller andre særlige kategorier af personoplysninger (GDPR art. 9) — og advarer aktivt brugere herimod.</p>
+
+      <h2>3. Anonymisering</h2>
+      <p>
+        ClinLog anvender automatisk tekstanalyse til at identificere og erstatte potentielt personhenførbare oplysninger (navne, datoer, sygehusnavne m.m.) <em>inden</em> nogen data forlader din enhed. Anonymiseringen sker lokalt.
+      </p>
+      <p>
+        For billedmateriale: ClinLog advarer eksplicit om at billeder ikke må indeholde genkendelige ansigter eller andre identificerende detaljer.
+      </p>
+
+      <h2>4. Opbevaring og sikkerhed</h2>
+      <ul>
+        <li><strong>Database:</strong> Supabase (PostgreSQL), hostet på AWS Frankfurt (eu-central-1) — inden for EU/EØS.</li>
+        <li><strong>Kryptering:</strong> Al datatransport sker via TLS 1.3. Data at rest er krypteret.</li>
+        <li><strong>Adgangskontrol:</strong> Row Level Security (RLS) i Supabase sikrer at brugere kun kan tilgå egne data.</li>
+        <li><strong>Opbevaringsperiode:</strong> Data bevares så længe din konto er aktiv. Ved kontosletning slettes alle dine data inden for 30 dage.</li>
+      </ul>
+
+      <h2>5. Datadeling</h2>
+      <p>Vi deler <strong>aldrig</strong> dine data med tredjeparter til kommercielle formål.</p>
+      <p>Vi anvender følgende underdatabehandlere:</p>
+      <ul>
+        <li><strong>Supabase Inc.</strong> (database og autentificering) — DPA indgået, EU Standard Contractual Clauses.</li>
+        <li><strong>OpenAI / Anthropic</strong> (AI-strukturering af noter) — kun anonymiserede noter sendes. Zero Data Retention-aftale.</li>
+      </ul>
+      <p>Cases du aktivt deler med ClinLog-fællesskabet er synlige for andre registrerede brugere — men altid anonymiserede.</p>
+
+      <h2>6. Dine rettigheder (GDPR)</h2>
+      <p>Du har ret til at:</p>
+      <ul>
+        <li><strong>Indsigt:</strong> Modtage en kopi af alle data vi opbevarer om dig.</li>
+        <li><strong>Berigtigelse:</strong> Rette fejlagtige oplysninger.</li>
+        <li><strong>Sletning ("retten til at blive glemt"):</strong> Anmode om sletning af din konto og alle tilknyttede data.</li>
+        <li><strong>Portabilitet:</strong> Eksportere dine noter som JSON eller PDF.</li>
+        <li><strong>Indsigelse:</strong> Gøre indsigelse mod behandling af dine data.</li>
+      </ul>
+      <p>
+        Send din anmodning til: <a href="mailto:frank.pott@gmail.com">frank.pott@gmail.com</a><br>
+        Vi svarer inden 30 dage. Du kan også klage til <a href="https://www.datatilsynet.dk" target="_blank" rel="noopener">Datatilsynet</a>.
+      </p>
+
+      <h2>7. Cookies</h2>
+      <p>ClinLog bruger kun funktionelt nødvendige cookies (session-token til autentificering). Vi bruger <strong>ikke</strong> tracking-cookies, analytics-cookies eller markedsføringscookies.</p>
+
+      <h2>8. Ændringer til denne politik</h2>
+      <p>
+        Væsentlige ændringer annonceres i appen og pr. e-mail mindst 14 dage inden de træder i kraft.
+        Du finder altid den seneste version på <a href="https://clinlog.dk/privatlivspolitik.html">clinlog.dk/privatlivspolitik.html</a>.
+      </p>
+
+      <h2>9. Kontakt</h2>
+      <p>
+        Spørgsmål om datasikkerhed eller persondata:<br>
+        <a href="mailto:frank.pott@gmail.com">frank.pott@gmail.com</a>
+      </p>
+
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer class="page-footer">
+    <ul class="page-footer-links" role="list">
+      <li><a href="/">Forside</a></li>
+      <li><a href="privatlivspolitik.html" aria-current="page">Privatlivspolitik</a></li>
+      <li><a href="vilkar.html">Vilkår</a></li>
+      <li><a href="kontakt.html">Kontakt</a></li>
+    </ul>
+    <p>© <script>document.write(new Date().getFullYear())</script> ClinLog · clinlog.dk · Bygget i Danmark</p>
+  </footer>
+
+</body>
+</html>
