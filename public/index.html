@@ -1157,6 +1157,7 @@
     }
     .ref-title:hover { color: var(--teal2); }
     .ref-meta { font-size: .75rem; color: var(--muted); }
+    .ref-why { font-size: .72rem; color: var(--teal2); margin-top: .25rem; font-style: italic; }
     .refs-loading { color: var(--muted); font-size: .875rem; }
     .ai-analysis { font-size: .875rem; color: var(--white); line-height: 1.7; }
     .ai-analysis strong { color: var(--teal2); }
@@ -3234,19 +3235,21 @@
   }
 
   const SECTION_ICONS = {
-    patientCase:        '👤',
-    kliniskForlob:      '📋',
-    fagligLaering:      '🎓',
-    outcome_structured: '🎯',
-    emotioneltEtisk:    '💭',
+    patientCase:            '👤',
+    kliniskForlob:          '📋',
+    fagligLaering:          '🎓',
+    differentialDiagnoses:  '🔀',
+    outcome_structured:     '🎯',
+    emotioneltEtisk:        '💭',
   };
 
   const SECTION_LABELS = {
-    patientCase:        { da: 'Patientcase', en: 'Patient case', de: 'Patientenfall' },
-    kliniskForlob:      { da: 'Klinisk forløb', en: 'Clinical course', de: 'Klinischer Verlauf' },
-    fagligLaering:      { da: 'Faglig læring', en: 'Clinical learning', de: 'Fachliches Lernen' },
-    outcome_structured: { da: 'Outcome', en: 'Outcome', de: 'Ergebnis' },
-    emotioneltEtisk:    { da: 'Emotionelt / etisk', en: 'Emotional / ethical', de: 'Emotional / ethisch' },
+    patientCase:            { da: 'Patientcase', en: 'Patient case', de: 'Patientenfall' },
+    kliniskForlob:          { da: 'Klinisk forløb', en: 'Clinical course', de: 'Klinischer Verlauf' },
+    fagligLaering:          { da: 'Faglig læring', en: 'Clinical learning', de: 'Fachliches Lernen' },
+    differentialDiagnoses:  { da: 'Differentialdiagnoser', en: 'Differential diagnoses', de: 'Differentialdiagnosen' },
+    outcome_structured:     { da: 'Outcome', en: 'Outcome', de: 'Ergebnis' },
+    emotioneltEtisk:        { da: 'Emotionelt / etisk', en: 'Emotional / ethical', de: 'Emotional / ethisch' },
   };
 
   function renderOriginalNote(note) {
@@ -3277,12 +3280,13 @@
     const sc = parseStructured(note);
     if (!sc) { el.innerHTML = ''; return; }
 
-    const KEYS = ['patientCase','kliniskForlob','fagligLaering','outcome_structured','emotioneltEtisk'];
+    const KEYS = ['patientCase','kliniskForlob','fagligLaering','differentialDiagnoses','outcome_structured','emotioneltEtisk'];
     let html = '';
     let first = true;
     KEYS.forEach(key => {
       const text = sc[key];
       if (!text || !text.trim()) return;
+      if (text.trim() === 'Ikke relevant') return;
       const icon = SECTION_ICONS[key] || '📄';
       const label = (SECTION_LABELS[key]?.[lang] || SECTION_LABELS[key]?.da || key);
       if (!first) html += '<hr class="note-section-divider">';
@@ -3772,88 +3776,36 @@
     }
   }
 
-  async function fetchRefs(note) {
+  function fetchRefs(note) {
     const refsEl = document.getElementById('detail-refs-content');
-    refsEl.innerHTML = `<p class="refs-loading">${T[lang]['portal-refs-loading'] || 'Søger i PubMed…'}</p>`;
 
-    try {
-      let ids = [];
+    // Brug referencer gemt af app-algoritmen — ingen live PubMed-søgning
+    const refs = Array.isArray(note.references) ? note.references : [];
 
-      // Trin 0: AI ekstrahere præcise engelske søgetermer fra tags + noteindhold
-      if (true) {
-        const aiTerms = await fetchAISearchTerms(note);
-        if (aiTerms && aiTerms.length > 0) {
-          const q = buildTermClause(aiTerms) + ' AND ' + DATE_FILTER;
-          ids = await pubmedSearch(q);
-          // Udvid søgning hvis for få resultater — fjern datofilter
-          if (ids.length === 0) {
-            ids = await pubmedSearch(buildTermClause(aiTerms));
-          }
-        }
-      }
-
-      // Trin 1: ordbog + MeSH + artikeltype + dato
-      if (ids.length === 0) {
-        ids = await pubmedSearch(buildPubmedQuery(note));
-      }
-
-      // Trin 2 fallback: fjern artikeltype-filter
-      if (ids.length === 0) {
-        ids = await pubmedSearch(buildPubmedQuery(note, { noArticleFilter: true }));
-      }
-
-      // Trin 3 fallback: kun termer, ingen MeSH eller filter
-      if (ids.length === 0) {
-        const terms = getTagTerms(note).length ? getTagTerms(note) : extractMedicalTerms(note);
-        ids = await pubmedSearch(buildTermClause(terms) || 'clinical case');
-      }
-
-      // Trin 4 fallback (sidste udvej): MeSH-term alene eller 'clinical case'
-      if (ids.length === 0) {
-        const mesh = PUBMED_CAT_MESH[note.category];
-        ids = await pubmedSearch(mesh ? `${mesh}[MeSH Terms]` : 'clinical case');
-      }
-
-      if (ids.length === 0) {
-        refsEl.innerHTML = `<p class="refs-loading">${T[lang]['portal-refs-none'] || 'Ingen relevante referencer fundet.'}</p>`;
-        return;
-      }
-
-      const summaryRes = await fetch(
-        `https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esummary.fcgi?db=pubmed&id=${ids.join(',')}&retmode=json&api_key=4d0f6b5fcb7cd1d08248a0b0fa5787aaf909&tool=clinlog&email=pott.clinlog%40gmail.com`
-      );
-      const summaryJson = await summaryRes.json();
-      const result = summaryJson.result;
-
-      refsEl.innerHTML = '';
-      ids.slice(0, 3).forEach((id, i) => {
-        const art = result[id];
-        if (!art) return;
-        const title   = art.title || 'Uden titel';
-        const authors = (art.authors || []).map(a => a.name).slice(0, 2).join(', ');
-        const journal = art.source || '';
-        const year    = (art.pubdate || '').slice(0, 4);
-        const pmcId   = (art.articleids || []).find(a => a.idtype === 'pmc')?.value;
-        const href    = pmcId
-          ? `https://www.ncbi.nlm.nih.gov/pmc/articles/${pmcId}/`
-          : `https://pubmed.ncbi.nlm.nih.gov/${id}/`;
-        const label   = pmcId ? '📄 Full text' : '🔗 PubMed';
-        refsEl.innerHTML += `
-          <div class="ref-item">
-            <div class="ref-num">${i + 1}</div>
-            <div class="ref-body">
-              <a class="ref-title" href="${href}" target="_blank" rel="noopener">${escHtml(title)}</a>
-              <div class="ref-meta">${escHtml(authors)}${authors ? ' · ' : ''}${escHtml(journal)}${year ? ' ' + year : ''} · <span style="color:var(--teal2)">${label} ↗</span></div>
-            </div>
-          </div>`;
-      });
-
-      // Tilføj studieanbefalinger nederst
-      fetchStudyRecommendations(note, refsEl);
-
-    } catch (e) {
-      refsEl.innerHTML = `<p class="refs-loading">Kunne ikke hente referencer.<br><small style="color:var(--muted)">${escHtml(e.message)}</small></p>`;
+    if (refs.length === 0) {
+      refsEl.innerHTML = `<p class="refs-loading">${T[lang]['portal-refs-none'] || 'Ingen relevante referencer fundet.'}</p>`;
+      return;
     }
+
+    refsEl.innerHTML = '';
+    refs.forEach((ref, i) => {
+      const title   = ref.title   || 'Uden titel';
+      const authors = Array.isArray(ref.authors) ? ref.authors.slice(0, 2).join(', ') : '';
+      const journal = ref.journal || '';
+      const year    = ref.pubYear ? String(ref.pubYear) : '';
+      const href    = ref.pubmedUrl || `https://pubmed.ncbi.nlm.nih.gov/${ref.pmid}/`;
+      const why     = ref.whyMatched || '';
+
+      refsEl.innerHTML += `
+        <div class="ref-item">
+          <div class="ref-num">${i + 1}</div>
+          <div class="ref-body">
+            <a class="ref-title" href="${escHtml(href)}" target="_blank" rel="noopener">${escHtml(title)}</a>
+            <div class="ref-meta">${escHtml(authors)}${authors ? ' · ' : ''}${escHtml(journal)}${year ? ' ' + year : ''} · <span style="color:var(--teal2)">🔗 PubMed ↗</span></div>
+            ${why ? `<div class="ref-why">${escHtml(why)}</div>` : ''}
+          </div>
+        </div>`;
+    });
   }
 
   async function fetchStudyRecommendations(note, refsEl) {
