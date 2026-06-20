@@ -1,0 +1,66 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --brand: #1a56db;
+}
+
+body {
+  background: #f5f7fa;
+  color: #111827;
+}
+
+/* ── Tiptap rich-text editor ─────────────────────────────────────────────── */
+
+/* Remove outline — focus ring comes from the wrapper box */
+.tiptap:focus {
+  outline: none;
+}
+
+/* Basic content spacing */
+.tiptap > p,
+.tiptap > ul,
+.tiptap > ol {
+  margin-bottom: 0.35em;
+}
+.tiptap > p:last-child,
+.tiptap > ul:last-child,
+.tiptap > ol:last-child {
+  margin-bottom: 0;
+}
+
+/* Lists */
+.tiptap ul {
+  list-style-type: disc;
+  padding-left: 1.4em;
+}
+.tiptap ol {
+  list-style-type: decimal;
+  padding-left: 1.4em;
+}
+.tiptap li + li {
+  margin-top: 0.15em;
+}
+
+/* Inline formatting */
+.tiptap strong { font-weight: 600; }
+.tiptap em     { font-style: italic; }
+.tiptap u      { text-decoration: underline; }
+
+/* Section headings inside the combined editor:
+   <p><strong>HEADING</strong></p>  → styled bold in a darker colour */
+.tiptap p:has(> strong:only-child) {
+  font-weight: 600;
+  color: #1e293b;
+  margin-top: 1em;
+}
+.tiptap p:has(> strong:only-child):first-child {
+  margin-top: 0;
+}
+
+/* The EditorContent wrapper div needs min-height to
+   match its parent so the placeholder overlay aligns. */
+.tiptap-wrap .ProseMirror {
+  height: 100%;
+}
