@@ -1,0 +1,21 @@
+[build]
+  command   = "npm run build"
+  publish   = "out"
+
+# SPA-fallback: let Next.js static export handle all routes
+[[redirects]]
+  from   = "/*"
+  to     = "/index.html"
+  status = 200
+
+# Never cache HTML
+[[headers]]
+  for = "/*.html"
+  [headers.values]
+    Cache-Control = "no-cache, no-store, must-revalidate"
+
+# Cache JS/CSS aggressively (content-hashed filenames)
+[[headers]]
+  for = "/_next/static/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
