@@ -1,0 +1,100 @@
+/* ── /demo side ─────────────────────────────────────────────────────────── */
+
+.page {
+  min-height: 100vh;
+  background: #F7F5F0;
+  font-family: var(--font-sans), -apple-system, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Header */
+.header {
+  background: #0B1929;
+  padding: 18px 32px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.logo {
+  font-family: var(--font-serif), Georgia, serif;
+  font-size: 20px;
+  font-weight: 600;
+  color: #F7F5F0;
+  text-decoration: none;
+}
+.accent { color: #5B9BC0; font-style: italic; font-weight: 500; }
+.badge {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  background: rgba(91, 155, 192, 0.2);
+  color: #5B9BC0;
+  padding: 3px 9px;
+  border-radius: 3px;
+  border: 1px solid rgba(91, 155, 192, 0.35);
+}
+
+/* Intro */
+.intro {
+  background: #0B1929;
+  padding: 64px 32px 72px;
+  text-align: center;
+  color: #F7F5F0;
+}
+.introInner { max-width: 600px; margin: 0 auto; }
+.eyebrow {
+  font-family: var(--font-mono), monospace;
+  font-size: 12px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #8B9A8C;
+  margin-bottom: 18px;
+}
+.headline {
+  font-family: var(--font-serif), Georgia, serif;
+  font-size: clamp(28px, 5vw, 48px);
+  font-weight: 600;
+  line-height: 1.15;
+  margin-bottom: 20px;
+}
+.sub {
+  font-size: 17px;
+  color: rgba(247, 245, 240, 0.7);
+  line-height: 1.6;
+  margin: 0;
+}
+.sub strong { color: rgba(247, 245, 240, 0.9); }
+
+/* Demo section */
+.demoSection {
+  flex: 1;
+  background: #F7F5F0;
+  padding: 0 20px 48px;
+  display: flex;
+  justify-content: center;
+}
+.demoSection > * { width: 100%; max-width: 680px; }
+
+/* Footer */
+.footer {
+  border-top: 1px solid rgba(22, 36, 58, 0.1);
+  padding: 28px 32px;
+  max-width: 680px;
+  margin: 0 auto;
+  width: 100%;
+  font-size: 13.5px;
+  color: #4A5568;
+  line-height: 1.7;
+}
+.footer p { margin: 0 0 8px; }
+.footer p:last-child { margin-bottom: 0; }
+.footer a { color: #3B7A9E; text-decoration: none; }
+.footer a:hover { text-decoration: underline; }
+
+@media (max-width: 600px) {
+  .intro { padding: 48px 20px 56px; }
+  .header { padding: 16px 20px; }
+}
