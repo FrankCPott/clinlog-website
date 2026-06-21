@@ -2,6 +2,12 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ── Pipeline demo animation (brugt af PulseDots i PipelineDemo.tsx) ──────── */
+@keyframes clinlog-pulse {
+  0%, 100% { transform: scale(0.6); opacity: 0.4; }
+  50%       { transform: scale(1);   opacity: 1;   }
+}
+
 :root {
   --brand: #1a56db;
 }
