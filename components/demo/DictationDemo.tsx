@@ -129,9 +129,10 @@ export default function DictationDemo() {
   const [result,      setResult]      = useState<DemoResult | null>(null);
   const [errorMsg,    setErrorMsg]    = useState("");
   const [transcript,  setTranscript]  = useState("");
-  const [browser,     setBrowser]     = useState<BrowserType>("other");
-  const [os,          setOs]          = useState<OSType>("other");
-  const [copied,      setCopied]      = useState(false);
+  const [browser,          setBrowser]          = useState<BrowserType>("other");
+  const [os,               setOs]               = useState<OSType>("other");
+  const [copied,           setCopied]           = useState(false);
+  const [permissionErrDetail, setPermissionErrDetail] = useState("");
 
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const chunksRef        = useRef<Blob[]>([]);
@@ -161,20 +162,38 @@ export default function DictationDemo() {
     try {
       stream = await navigator.mediaDevices.getUserMedia({ audio: true });
     } catch (err) {
-      const msg = String(err);
-      if (
-        msg.includes("NotAllowed")   ||
-        msg.includes("Permission")   ||
-        msg.includes("denied")       ||
-        msg.includes("NotFound")     ||
-        msg.includes("NotReadable")     // Windows OS-niveau blokering: "Could not start audio source"
-      ) {
-        // ── State B: adgang afvist → vis browser-specifik vejledning ──────────
+      // Brug err.name (DOMException) til kategorisering — mere pålidelig end string-matching
+      const domErr = err as DOMException;
+      const name   = domErr?.name    ?? "";
+      const msg    = domErr?.message ?? String(err);
+      const detail = name ? `${name}: ${msg}` : String(err);
+
+      if (name === "NotAllowedError" || name === "SecurityError") {
+        // ── State B: sand tilladelsesafvisning ────────────────────────────────
         setBrowser(detectBrowser());
         setOs(detectOS());
+        setPermissionErrDetail(detail);
         setDemoState("permission-denied");
+
+      } else if (name === "NotReadableError") {
+        // Hardware/driver-fejl — IKKE en tilladelsesprobl​em
+        setErrorMsg(
+          `Mikrofonen kan ikke åbnes (${detail}).\n\n` +
+          `En anden app bruger sandsynligvis mikrofonen eksklusivt — luk Teams, Zoom, Discord ` +
+          `og andre lydapps helt, og prøv igen. Hvis fejlen fortsætter, genstart computeren.`,
+        );
+        setDemoState("error");
+
+      } else if (name === "NotFoundError") {
+        // Ingen mikrofon fundet
+        setErrorMsg(
+          `Ingen mikrofon fundet (${detail}).\n\n` +
+          `Sørg for at mikrofonen er tilsluttet og genkendes af Windows (Enhedshåndtering).`,
+        );
+        setDemoState("error");
+
       } else {
-        setErrorMsg(msg);
+        setErrorMsg(detail);
         setDemoState("error");
       }
       return;
@@ -284,6 +303,7 @@ export default function DictationDemo() {
     setResult(null);
     setTranscript("");
     setErrorMsg("");
+    setPermissionErrDetail("");
     setSecondsLeft(60);
     setCopied(false);
   }, []);
@@ -494,9 +514,20 @@ export default function DictationDemo() {
                 </div>
               )}
 
+              {/* Raw error — hjælper med at diagnosticere hvad Chrome faktisk smider */}
+              {permissionErrDetail && (
+                <div className={s.permissionErrDetail}>
+                  <span className={s.permissionErrLabel}>Fejlkode: </span>
+                  <code>{permissionErrDetail}</code>
+                </div>
+              )}
+
               <div className={s.deniedActions}>
                 <button className={s.retryBtn} onClick={startRecording}>
                   Prøv igen
+                </button>
+                <button className={s.reloadBtn} onClick={() => window.location.reload()}>
+                  Genindlæs siden
                 </button>
                 <button className={s.resetBtn} onClick={reset}>
                   Tilbage
