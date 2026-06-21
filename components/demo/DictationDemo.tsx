@@ -40,21 +40,30 @@ type DemoState =
   | "rate_limited";
 
 type BrowserType = "chrome" | "edge" | "safari" | "firefox" | "other";
+type OSType      = "windows" | "mac" | "other";
 
 interface DemoResult {
   transcript: string;
   sections:   Record<string, string>;
 }
 
-// ── Browser-detektering ───────────────────────────────────────────────────────
+// ── Browser- og OS-detektering ────────────────────────────────────────────────
 
 function detectBrowser(): BrowserType {
   if (typeof navigator === "undefined") return "other";
   const ua = navigator.userAgent;
-  if (/Edg\//.test(ua))                           return "edge";
-  if (/Chrome\//.test(ua) && !/Edg\//.test(ua))  return "chrome";
+  if (/Edg\//.test(ua))                             return "edge";
+  if (/Chrome\//.test(ua) && !/Edg\//.test(ua))    return "chrome";
   if (/Safari\//.test(ua) && !/Chrome\//.test(ua)) return "safari";
-  if (/Firefox\//.test(ua))                       return "firefox";
+  if (/Firefox\//.test(ua))                         return "firefox";
+  return "other";
+}
+
+function detectOS(): OSType {
+  if (typeof navigator === "undefined") return "other";
+  const ua = navigator.userAgent;
+  if (/Windows/.test(ua))  return "windows";
+  if (/Mac OS X/.test(ua)) return "mac";
   return "other";
 }
 
@@ -121,6 +130,7 @@ export default function DictationDemo() {
   const [errorMsg,    setErrorMsg]    = useState("");
   const [transcript,  setTranscript]  = useState("");
   const [browser,     setBrowser]     = useState<BrowserType>("other");
+  const [os,          setOs]          = useState<OSType>("other");
   const [copied,      setCopied]      = useState(false);
 
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
@@ -153,13 +163,15 @@ export default function DictationDemo() {
     } catch (err) {
       const msg = String(err);
       if (
-        msg.includes("NotAllowed") ||
-        msg.includes("Permission")  ||
-        msg.includes("denied")      ||
-        msg.includes("NotFoundError")
+        msg.includes("NotAllowed")   ||
+        msg.includes("Permission")   ||
+        msg.includes("denied")       ||
+        msg.includes("NotFound")     ||
+        msg.includes("NotReadable")     // Windows OS-niveau blokering: "Could not start audio source"
       ) {
         // ── State B: adgang afvist → vis browser-specifik vejledning ──────────
         setBrowser(detectBrowser());
+        setOs(detectOS());
         setDemoState("permission-denied");
       } else {
         setErrorMsg(msg);
@@ -358,7 +370,7 @@ export default function DictationDemo() {
                   <ol className={s.deniedSteps}>
                     <li>Klik på <strong>🔒</strong> til venstre i adresselinjen</li>
                     <li>Klik på <strong>Mikrofon</strong> → vælg <strong>Tillad</strong></li>
-                    <li>Genindlæs siden og klik &quot;Prøv igen&quot; herunder</li>
+                    <li>Klik <strong>Prøv igen</strong> herunder</li>
                   </ol>
                   <div className={s.settingsBlock}>
                     <span className={s.settingsLabel}>
@@ -375,6 +387,26 @@ export default function DictationDemo() {
                       </button>
                     </div>
                   </div>
+                  {os === "windows" && (
+                    <div className={s.windowsNote}>
+                      <p className={s.windowsNoteLabel}>
+                        Browseren har tilladelse, men Windows blokerer stadig?
+                      </p>
+                      <ol className={s.deniedSteps}>
+                        <li>
+                          <kbd>⊞ Win</kbd> → <strong>Indstillinger</strong> →{" "}
+                          <strong>Privatliv og sikkerhed</strong> → <strong>Mikrofon</strong>
+                        </li>
+                        <li>
+                          Slå <strong>Giv apps adgang til din mikrofon</strong> <strong>til</strong>
+                        </li>
+                        <li>
+                          Slå <strong>Giv desktopapps adgang til din mikrofon</strong> <strong>til</strong>
+                        </li>
+                        <li>Prøv igen herunder — eller genstart Chrome hvis fejlen fortsætter</li>
+                      </ol>
+                    </div>
+                  )}
                 </div>
               )}
 
@@ -385,7 +417,7 @@ export default function DictationDemo() {
                   <ol className={s.deniedSteps}>
                     <li>Klik på <strong>🔒</strong> til venstre i adresselinjen</li>
                     <li>Klik på <strong>Mikrofon</strong> → vælg <strong>Tillad</strong></li>
-                    <li>Genindlæs siden og klik &quot;Prøv igen&quot; herunder</li>
+                    <li>Klik <strong>Prøv igen</strong> herunder</li>
                   </ol>
                   <div className={s.settingsBlock}>
                     <span className={s.settingsLabel}>
@@ -402,6 +434,26 @@ export default function DictationDemo() {
                       </button>
                     </div>
                   </div>
+                  {os === "windows" && (
+                    <div className={s.windowsNote}>
+                      <p className={s.windowsNoteLabel}>
+                        Browseren har tilladelse, men Windows blokerer stadig?
+                      </p>
+                      <ol className={s.deniedSteps}>
+                        <li>
+                          <kbd>⊞ Win</kbd> → <strong>Indstillinger</strong> →{" "}
+                          <strong>Privatliv og sikkerhed</strong> → <strong>Mikrofon</strong>
+                        </li>
+                        <li>
+                          Slå <strong>Giv apps adgang til din mikrofon</strong> <strong>til</strong>
+                        </li>
+                        <li>
+                          Slå <strong>Giv desktopapps adgang til din mikrofon</strong> <strong>til</strong>
+                        </li>
+                        <li>Prøv igen herunder — eller genstart Edge hvis fejlen fortsætter</li>
+                      </ol>
+                    </div>
+                  )}
                 </div>
               )}
 

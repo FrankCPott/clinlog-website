@@ -424,6 +424,23 @@
   cursor: default;
 }
 
+/* Windows OS-level block note */
+.windowsNote {
+  margin-top: 16px;
+  padding-top: 14px;
+  border-top: 1px solid rgba(22, 36, 58, 0.08);
+}
+.windowsNoteLabel {
+  font-size: 12px;
+  font-weight: 600;
+  color: #8B7536;
+  background: #FFF8E7;
+  border: 1px solid #E8D08A;
+  border-radius: 4px;
+  padding: 6px 10px;
+  margin: 0 0 10px;
+}
+
 /* Action buttons row */
 .deniedActions {
   display: flex;
