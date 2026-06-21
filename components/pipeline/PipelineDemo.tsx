@@ -320,29 +320,57 @@ function SectionSkeleton({ filled }: { filled: Set<string> }) {
   );
 }
 
-// ── PipelineDemoCard — scroll-triggered, til brug i page.tsx ─────────────────
+// ── PipelineDemoCard — click-to-play + link til /demo, til brug i page.tsx ────
 //
-// IntersectionObserver (tærskel 30%) starter autoPlay første gang kortet
-// ruller ind i viewporten. Derefter looper PipelineDemo selv.
+// Viser en "Se det i aktion"-placeholder indtil brugeren klikker.
+// Klik starter animationen. Nedenunder er der altid et link til /demo
+// så brugeren kan prøve diktering selv.
 
 export function PipelineDemoCard() {
-  const ref                    = useRef<HTMLDivElement>(null);
-  const [hasEntered, setHasEntered] = useState(false);
-
-  useEffect(() => {
-    const el = ref.current;
-    if (!el) return;
-    const observer = new IntersectionObserver(
-      ([entry]) => { if (entry.isIntersecting) setHasEntered(true); },
-      { threshold: 0.3 },
-    );
-    observer.observe(el);
-    return () => observer.disconnect();
-  }, []);
+  const [started, setStarted] = useState(false);
 
   return (
-    <div ref={ref} className="border-t border-[rgba(22,36,58,0.10)] px-5 pt-4 pb-3">
-      <PipelineDemo autoPlay={hasEntered} loop slim />
+    <div className="border-t border-[rgba(22,36,58,0.10)]">
+
+      {/* Placeholder / animation-område */}
+      <div className="px-5 pt-4 pb-1">
+        {!started ? (
+          /* Idle-tilstand: klik for at starte */
+          <button
+            onClick={() => setStarted(true)}
+            className="w-full flex flex-col items-center gap-2 py-6 rounded-lg
+                       bg-[#F0EDE6] hover:bg-[#E8E4DC] transition-colors duration-200
+                       text-[#4A5568] cursor-pointer border-0 group"
+            aria-label="Se pipeline-animationen"
+          >
+            <span className="text-2xl group-hover:scale-110 transition-transform duration-200">
+              ▶
+            </span>
+            <span className="text-xs font-medium text-[#8B9A8C]">
+              Se diktering → note i aktion
+            </span>
+          </button>
+        ) : (
+          <PipelineDemo autoPlay loop slim />
+        )}
+      </div>
+
+      {/* Link til den interaktive demo — altid synlig */}
+      <div className="px-5 pb-4 pt-2">
+        <a
+          href="/demo"
+          className="flex items-center gap-1.5 text-xs font-semibold text-[#3B7A9E]
+                     hover:text-[#5B9BC0] transition-colors duration-150"
+        >
+          Prøv diktering selv
+          <svg viewBox="0 0 16 16" fill="none" className="w-3.5 h-3.5" aria-hidden="true">
+            <path d="M3 8H13M13 8L9 4M13 8L9 12"
+              stroke="currentColor" strokeWidth="1.5"
+              strokeLinecap="round" strokeLinejoin="round"/>
+          </svg>
+        </a>
+      </div>
+
     </div>
   );
 }
