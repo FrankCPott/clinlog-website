@@ -3,14 +3,12 @@
 /**
  * DictationDemo — offentlig dikterings-demo på clinlog.dk/demo
  *
- * Flow:
- *   1. Disclaimer modal → bruger accepterer
- *   2. Mikrofon-adgang via getUserMedia()
- *   3. Optagelse via MediaRecorder (max 60 s, auto-stop)
- *   4. Web Audio API: decode → resample til 16 kHz mono → WAV
- *   5. POST base64-WAV til demo-transcribe-corti Edge Function
- *   6. POST transskript til demo-structure-corti Edge Function
- *   7. Vis transskript + strukturerede sektioner + CTA
+ * Mikrofon-tilladelsesflow (FASE 2b — 3 states):
+ *   A. awaiting-permission  — vist mens browser-dialog afventer svar
+ *   B. permission-denied    — afvist; viser browser-specifik vejledning + retry
+ *   C. recording/…          — tilladt; fortsætter til eksisterende optagelsesflow
+ *
+ * Øvrige states: idle → uploading → structuring → done / error / rate_limited
  *
  * ⚠️ DISCLAIMER-TEKST: UDKAST — Frank Pott skal godkende den endelige ordlyd
  *    før funktionen sættes i produktion (jf. FASE 0, punkt 5).
@@ -32,23 +30,38 @@ function edgeFn(name: string) {
 
 type DemoState =
   | "idle"
+  | "awaiting-permission"
+  | "permission-denied"
   | "recording"
   | "uploading"
   | "structuring"
   | "done"
   | "error"
-  | "rate_limited"
-  | "mic_denied";
+  | "rate_limited";
+
+type BrowserType = "chrome" | "edge" | "safari" | "firefox" | "other";
 
 interface DemoResult {
   transcript: string;
   sections:   Record<string, string>;
 }
 
+// ── Browser-detektering ───────────────────────────────────────────────────────
+
+function detectBrowser(): BrowserType {
+  if (typeof navigator === "undefined") return "other";
+  const ua = navigator.userAgent;
+  if (/Edg\//.test(ua))                           return "edge";
+  if (/Chrome\//.test(ua) && !/Edg\//.test(ua))  return "chrome";
+  if (/Safari\//.test(ua) && !/Chrome\//.test(ua)) return "safari";
+  if (/Firefox\//.test(ua))                       return "firefox";
+  return "other";
+}
+
 // ── WAV-encoder (browser-side) ────────────────────────────────────────────────
 //
 // Konverterer Float32 PCM (fra Web Audio API ved 16 kHz mono) til
-// en WAV-fil som Uint8Array — samme format som transcribe-corti forventer.
+// en WAV-fil som Uint8Array — samme format som demo-transcribe-corti forventer.
 
 function encodeWav(pcmFloat32: Float32Array, sampleRate: number): Uint8Array {
   const numSamples = pcmFloat32.length;
@@ -65,18 +78,18 @@ function encodeWav(pcmFloat32: Float32Array, sampleRate: number): Uint8Array {
     for (let i = 0; i < str.length; i++) view.setUint8(offset + i, str.charCodeAt(i));
   };
   setStr(0,  "RIFF");
-  view.setUint32(4,  byteLength - 8,     true);
+  view.setUint32(4,  byteLength - 8,   true);
   setStr(8,  "WAVE");
   setStr(12, "fmt ");
-  view.setUint32(16, 16,                 true);  // PCM chunk size
-  view.setUint16(20, 1,                  true);  // PCM format
-  view.setUint16(22, 1,                  true);  // mono
-  view.setUint32(24, sampleRate,         true);
-  view.setUint32(28, sampleRate * 2,     true);  // byte rate
-  view.setUint16(32, 2,                  true);  // block align
-  view.setUint16(34, 16,                 true);  // bits per sample
+  view.setUint32(16, 16,               true);  // PCM chunk size
+  view.setUint16(20, 1,                true);  // PCM format
+  view.setUint16(22, 1,                true);  // mono
+  view.setUint32(24, sampleRate,       true);
+  view.setUint32(28, sampleRate * 2,   true);  // byte rate
+  view.setUint16(32, 2,                true);  // block align
+  view.setUint16(34, 16,               true);  // bits per sample
   setStr(36, "data");
-  view.setUint32(40, int16.byteLength,   true);
+  view.setUint32(40, int16.byteLength, true);
 
   const pcmBytes = new Uint8Array(buffer, 44);
   pcmBytes.set(new Uint8Array(int16.buffer));
@@ -100,120 +113,146 @@ function uint8ToBase64(bytes: Uint8Array): string {
 // ── Komponenten ───────────────────────────────────────────────────────────────
 
 export default function DictationDemo() {
-  const [demoState,    setDemoState]    = useState<DemoState>("idle");
-  const [showModal,    setShowModal]    = useState(true);
-  const [accepted,     setAccepted]     = useState(false);
-  const [secondsLeft,  setSecondsLeft]  = useState(60);
-  const [result,       setResult]       = useState<DemoResult | null>(null);
-  const [errorMsg,     setErrorMsg]     = useState("");
-  const [transcript,   setTranscript]   = useState("");
+  const [demoState,   setDemoState]   = useState<DemoState>("idle");
+  const [showModal,   setShowModal]   = useState(true);
+  const [accepted,    setAccepted]    = useState(false);
+  const [secondsLeft, setSecondsLeft] = useState(60);
+  const [result,      setResult]      = useState<DemoResult | null>(null);
+  const [errorMsg,    setErrorMsg]    = useState("");
+  const [transcript,  setTranscript]  = useState("");
+  const [browser,     setBrowser]     = useState<BrowserType>("other");
+  const [copied,      setCopied]      = useState(false);
 
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const chunksRef        = useRef<Blob[]>([]);
   const timerRef         = useRef<ReturnType<typeof setInterval> | null>(null);
   const streamRef        = useRef<MediaStream | null>(null);
 
-  // ── Start optagelse ─────────────────────────────────────────────────────────
+  // ── Kopiér settings-URL til udklipsholder ───────────────────────────────────
+
+  const copySettingsUrl = useCallback(async (url: string) => {
+    try {
+      await navigator.clipboard.writeText(url);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2500);
+    } catch {
+      // Clipboard API ikke tilgængelig
+    }
+  }, []);
+
+  // ── Start optagelse (3-state permission flow) ────────────────────────────────
 
   const startRecording = useCallback(async () => {
+
+    // ── State A: vis interstitial mens browser-dialog afventer ────────────────
+    setDemoState("awaiting-permission");
+
+    let stream: MediaStream;
     try {
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      streamRef.current = stream;
-
-      const recorder   = new MediaRecorder(stream);
-      mediaRecorderRef.current = recorder;
-      chunksRef.current        = [];
-
-      recorder.ondataavailable = (e) => {
-        if (e.data.size > 0) chunksRef.current.push(e.data);
-      };
-
-      recorder.onstop = async () => {
-        // Stop timer
-        if (timerRef.current) clearInterval(timerRef.current);
-        stream.getTracks().forEach(t => t.stop());
-        setDemoState("uploading");
-
-        try {
-          // Decode audio → 16 kHz mono Float32 PCM via Web Audio API
-          const mimeType   = recorder.mimeType || "audio/webm";
-          const audioBlob  = new Blob(chunksRef.current, { type: mimeType });
-          const arrayBuf   = await audioBlob.arrayBuffer();
-
-          // AudioContext med sampleRate=16000 resamplet automatisk
-          const audioCtx   = new AudioContext({ sampleRate: 16000 });
-          const audioBuffer = await audioCtx.decodeAudioData(arrayBuf);
-          await audioCtx.close();
-
-          // Mix til mono (tag kanal 0)
-          const pcmFloat32 = audioBuffer.getChannelData(0);
-          const wavBytes = encodeWav(pcmFloat32, 16000);
-          const base64   = uint8ToBase64(wavBytes);
-
-          // POST til demo-transcribe-corti
-          const tResp = await fetch(edgeFn("demo-transcribe-corti"), {
-            method:  "POST",
-            headers: {
-              "Authorization": `Bearer ${SUPABASE_ANON_KEY}`,
-              "Content-Type":  "application/json",
-            },
-            body: JSON.stringify({ audioBase64: base64 }),
-          });
-
-          if (tResp.status === 429) { setDemoState("rate_limited"); return; }
-          if (!tResp.ok) throw new Error(`Transskription fejlede (${tResp.status})`);
-
-          const { text } = await tResp.json() as { text: string };
-          setTranscript(text);
-          setDemoState("structuring");
-
-          // POST til demo-structure-corti
-          const sResp = await fetch(edgeFn("demo-structure-corti"), {
-            method:  "POST",
-            headers: {
-              "Authorization": `Bearer ${SUPABASE_ANON_KEY}`,
-              "Content-Type":  "application/json",
-            },
-            body: JSON.stringify({ text }),
-          });
-
-          if (sResp.status === 429) { setDemoState("rate_limited"); return; }
-          if (!sResp.ok) throw new Error(`Strukturering fejlede (${sResp.status})`);
-
-          const { sections } = await sResp.json() as { sections: Record<string, string> };
-          setResult({ transcript: text, sections });
-          setDemoState("done");
-
-        } catch (err) {
-          setErrorMsg(String(err));
-          setDemoState("error");
-        }
-      };
-
-      // Auto-stop ved 60 sekunder
-      let secs = 60;
-      setSecondsLeft(secs);
-      timerRef.current = setInterval(() => {
-        secs -= 1;
-        setSecondsLeft(secs);
-        if (secs <= 0) {
-          if (timerRef.current) clearInterval(timerRef.current);
-          recorder.stop();
-        }
-      }, 1000);
-
-      recorder.start(1000); // dataavailable hvert sekund
-      setDemoState("recording");
-
+      stream = await navigator.mediaDevices.getUserMedia({ audio: true });
     } catch (err) {
       const msg = String(err);
-      if (msg.includes("NotAllowed") || msg.includes("Permission")) {
-        setDemoState("mic_denied");
+      if (
+        msg.includes("NotAllowed") ||
+        msg.includes("Permission")  ||
+        msg.includes("denied")      ||
+        msg.includes("NotFoundError")
+      ) {
+        // ── State B: adgang afvist → vis browser-specifik vejledning ──────────
+        setBrowser(detectBrowser());
+        setDemoState("permission-denied");
       } else {
         setErrorMsg(msg);
         setDemoState("error");
       }
+      return;
     }
+
+    // ── State C: adgang givet → start optagelse ────────────────────────────────
+    streamRef.current        = stream;
+    const recorder           = new MediaRecorder(stream);
+    mediaRecorderRef.current = recorder;
+    chunksRef.current        = [];
+
+    recorder.ondataavailable = (e) => {
+      if (e.data.size > 0) chunksRef.current.push(e.data);
+    };
+
+    recorder.onstop = async () => {
+      if (timerRef.current) clearInterval(timerRef.current);
+      stream.getTracks().forEach(t => t.stop());
+      setDemoState("uploading");
+
+      try {
+        // Decode audio → 16 kHz mono Float32 PCM via Web Audio API
+        const mimeType    = recorder.mimeType || "audio/webm";
+        const audioBlob   = new Blob(chunksRef.current, { type: mimeType });
+        const arrayBuf    = await audioBlob.arrayBuffer();
+
+        // AudioContext med sampleRate=16000 resampter automatisk
+        const audioCtx    = new AudioContext({ sampleRate: 16000 });
+        const audioBuffer = await audioCtx.decodeAudioData(arrayBuf);
+        await audioCtx.close();
+
+        // Mix til mono (tag kanal 0)
+        const pcmFloat32 = audioBuffer.getChannelData(0);
+        const wavBytes   = encodeWav(pcmFloat32, 16000);
+        const base64     = uint8ToBase64(wavBytes);
+
+        // POST til demo-transcribe-corti
+        const tResp = await fetch(edgeFn("demo-transcribe-corti"), {
+          method:  "POST",
+          headers: {
+            "Authorization": `Bearer ${SUPABASE_ANON_KEY}`,
+            "Content-Type":  "application/json",
+          },
+          body: JSON.stringify({ audioBase64: base64 }),
+        });
+
+        if (tResp.status === 429) { setDemoState("rate_limited"); return; }
+        if (!tResp.ok) throw new Error(`Transskription fejlede (${tResp.status})`);
+
+        const { text } = await tResp.json() as { text: string };
+        setTranscript(text);
+        setDemoState("structuring");
+
+        // POST til demo-structure-corti
+        const sResp = await fetch(edgeFn("demo-structure-corti"), {
+          method:  "POST",
+          headers: {
+            "Authorization": `Bearer ${SUPABASE_ANON_KEY}`,
+            "Content-Type":  "application/json",
+          },
+          body: JSON.stringify({ text }),
+        });
+
+        if (sResp.status === 429) { setDemoState("rate_limited"); return; }
+        if (!sResp.ok) throw new Error(`Strukturering fejlede (${sResp.status})`);
+
+        const { sections } = await sResp.json() as { sections: Record<string, string> };
+        setResult({ transcript: text, sections });
+        setDemoState("done");
+
+      } catch (err) {
+        setErrorMsg(String(err));
+        setDemoState("error");
+      }
+    };
+
+    // Auto-stop ved 60 sekunder
+    let secs = 60;
+    setSecondsLeft(secs);
+    timerRef.current = setInterval(() => {
+      secs -= 1;
+      setSecondsLeft(secs);
+      if (secs <= 0) {
+        if (timerRef.current) clearInterval(timerRef.current);
+        recorder.stop();
+      }
+    }, 1000);
+
+    recorder.start(1000); // dataavailable hvert sekund
+    setDemoState("recording");
   }, []);
 
   // ── Stop optagelse manuelt ──────────────────────────────────────────────────
@@ -234,6 +273,7 @@ export default function DictationDemo() {
     setTranscript("");
     setErrorMsg("");
     setSecondsLeft(60);
+    setCopied(false);
   }, []);
 
   // ── Render ──────────────────────────────────────────────────────────────────
@@ -248,7 +288,7 @@ export default function DictationDemo() {
             <div className={s.modalIcon} aria-hidden="true">🎙️</div>
             <h2 className={s.modalTitle}>Prøv ClinLog-dikterings&shy;demo</h2>
 
-            {/* ⚠️ UDKAST — disclaimer-tekst skal godkendes af Frank Pott inden go-live */}
+            {/* ⚠️ UDKAST — tekst skal godkendes af Frank Pott inden go-live */}
             <div className={s.disclaimer}>
               <p><strong>Brug kun en opdigtet, fiktiv patientcase.</strong></p>
               <p>Indsæt ikke rigtige patientnavne, CPR-numre, sygehusnumre eller andre personoplysninger — ikke engang anonymiserede.</p>
@@ -272,7 +312,7 @@ export default function DictationDemo() {
       {accepted && (
         <>
 
-          {/* idle */}
+          {/* ── idle ── */}
           {demoState === "idle" && (
             <div className={s.stage}>
               <button className={s.micBtn} onClick={startRecording} aria-label="Start optagelse">
@@ -283,7 +323,143 @@ export default function DictationDemo() {
             </div>
           )}
 
-          {/* recording */}
+          {/* ── State A: awaiting-permission ── */}
+          {demoState === "awaiting-permission" && (
+            <div className={s.stage}>
+              <div className={s.permissionWaiting} aria-hidden="true">🎙️</div>
+              <p className={s.stateLabel}>Vent et øjeblik…</p>
+              <p className={s.hint}>
+                Din browser beder nu om adgang til mikrofonen.
+              </p>
+              <p className={s.hintSmall}>
+                Klik <strong>Tillad</strong> i pop-up&apos;en for at starte optagelsen.
+              </p>
+            </div>
+          )}
+
+          {/* ── State B: permission-denied ── */}
+          {demoState === "permission-denied" && (
+            <div className={s.deniedWrap}>
+
+              <div className={s.deniedHeader}>
+                <span className={s.deniedIconLg} aria-hidden="true">🎤</span>
+                <div>
+                  <p className={s.stateLabel}>Mikrofon-adgang afvist</p>
+                  <p className={s.deniedSub}>
+                    Tillad mikrofon for denne side og prøv igen.
+                  </p>
+                </div>
+              </div>
+
+              {/* Chrome */}
+              {browser === "chrome" && (
+                <div className={s.deniedCard}>
+                  <p className={s.deniedBrowserPill}>Google Chrome</p>
+                  <ol className={s.deniedSteps}>
+                    <li>Klik på <strong>🔒</strong> til venstre i adresselinjen</li>
+                    <li>Klik på <strong>Mikrofon</strong> → vælg <strong>Tillad</strong></li>
+                    <li>Genindlæs siden og klik &quot;Prøv igen&quot; herunder</li>
+                  </ol>
+                  <div className={s.settingsBlock}>
+                    <span className={s.settingsLabel}>
+                      Alternativt — kopiér og indsæt i et nyt Chrome-vindue:
+                    </span>
+                    <div className={s.settingsUrlRow}>
+                      <code className={s.settingsUrl}>chrome://settings/content/microphone</code>
+                      <button
+                        className={copied ? s.copyBtnDone : s.copyBtn}
+                        onClick={() => copySettingsUrl("chrome://settings/content/microphone")}
+                        aria-label="Kopiér Chrome-indstillingslink"
+                      >
+                        {copied ? "✓ Kopieret" : "Kopiér"}
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Edge */}
+              {browser === "edge" && (
+                <div className={s.deniedCard}>
+                  <p className={s.deniedBrowserPill}>Microsoft Edge</p>
+                  <ol className={s.deniedSteps}>
+                    <li>Klik på <strong>🔒</strong> til venstre i adresselinjen</li>
+                    <li>Klik på <strong>Mikrofon</strong> → vælg <strong>Tillad</strong></li>
+                    <li>Genindlæs siden og klik &quot;Prøv igen&quot; herunder</li>
+                  </ol>
+                  <div className={s.settingsBlock}>
+                    <span className={s.settingsLabel}>
+                      Alternativt — kopiér og indsæt i et nyt Edge-vindue:
+                    </span>
+                    <div className={s.settingsUrlRow}>
+                      <code className={s.settingsUrl}>edge://settings/content/microphone</code>
+                      <button
+                        className={copied ? s.copyBtnDone : s.copyBtn}
+                        onClick={() => copySettingsUrl("edge://settings/content/microphone")}
+                        aria-label="Kopiér Edge-indstillingslink"
+                      >
+                        {copied ? "✓ Kopieret" : "Kopiér"}
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Safari */}
+              {browser === "safari" && (
+                <div className={s.deniedCard}>
+                  <p className={s.deniedBrowserPill}>Safari</p>
+                  <ol className={s.deniedSteps}>
+                    <li>Gå til <strong>Safari</strong>-menuen → <strong>Indstillinger</strong> <kbd>⌘,</kbd></li>
+                    <li>Vælg fanen <strong>Websteder</strong> → <strong>Mikrofon</strong></li>
+                    <li>Find <strong>clinlog.dk</strong> i listen → sæt til <strong>Tillad</strong></li>
+                    <li>Genindlæs siden og klik &quot;Prøv igen&quot; herunder</li>
+                  </ol>
+                </div>
+              )}
+
+              {/* Firefox */}
+              {browser === "firefox" && (
+                <div className={s.deniedCard}>
+                  <p className={s.deniedBrowserPill}>Firefox</p>
+                  <ol className={s.deniedSteps}>
+                    <li>Klik på <strong>🔒</strong>-ikonet til venstre i adresselinjen</li>
+                    <li>Klik på pilen ved siden af <strong>Tilladelser</strong></li>
+                    <li>Under <strong>Brug mikrofon</strong> — fjern &quot;Blokér&quot;</li>
+                    <li>Klik &quot;Prøv igen&quot; herunder</li>
+                  </ol>
+                </div>
+              )}
+
+              {/* Other / unknown browser */}
+              {browser === "other" && (
+                <div className={s.deniedCard}>
+                  <ol className={s.deniedSteps}>
+                    <li>Åbn browserens indstillinger for webstedstilladelser</li>
+                    <li>Find <strong>clinlog.dk</strong> og tillad <strong>Mikrofon</strong></li>
+                    <li>Genindlæs siden og prøv igen</li>
+                  </ol>
+                </div>
+              )}
+
+              <div className={s.deniedActions}>
+                <button className={s.retryBtn} onClick={startRecording}>
+                  Prøv igen
+                </button>
+                <button className={s.resetBtn} onClick={reset}>
+                  Tilbage
+                </button>
+              </div>
+
+              <p className={s.deniedFallback}>
+                Virker det stadig ikke?{" "}
+                <a href="mailto:pott@clinlog.dk">Skriv til pott@clinlog.dk</a>
+              </p>
+
+            </div>
+          )}
+
+          {/* ── recording ── */}
           {demoState === "recording" && (
             <div className={s.stage}>
               <button className={`${s.micBtn} ${s.micBtnActive}`} onClick={stopRecording} aria-label="Stop optagelse">
@@ -297,7 +473,7 @@ export default function DictationDemo() {
             </div>
           )}
 
-          {/* uploading */}
+          {/* ── uploading ── */}
           {demoState === "uploading" && (
             <div className={s.stage}>
               <div className={s.spinner} aria-hidden="true" />
@@ -306,7 +482,7 @@ export default function DictationDemo() {
             </div>
           )}
 
-          {/* structuring */}
+          {/* ── structuring ── */}
           {demoState === "structuring" && (
             <div className={s.stage}>
               {transcript && (
@@ -320,7 +496,7 @@ export default function DictationDemo() {
             </div>
           )}
 
-          {/* done */}
+          {/* ── done ── */}
           {demoState === "done" && result && (
             <div className={s.resultWrap}>
               <div className={s.resultMeta}>
@@ -357,7 +533,7 @@ export default function DictationDemo() {
             </div>
           )}
 
-          {/* rate_limited */}
+          {/* ── rate_limited ── */}
           {demoState === "rate_limited" && (
             <div className={s.stage}>
               <p className={s.stateLabel}>Mange prøver demoen lige nu</p>
@@ -366,19 +542,7 @@ export default function DictationDemo() {
             </div>
           )}
 
-          {/* mic_denied */}
-          {demoState === "mic_denied" && (
-            <div className={s.stage}>
-              <p className={s.stateLabel}>Mikrofon-adgang afvist</p>
-              <p className={s.hint}>
-                Tillad mikrofon-adgang i browseren og prøv igen.
-                I Chrome: klik på hængelåsikonet øverst til venstre i adresselinjen.
-              </p>
-              <button className={s.resetBtn} onClick={reset}>Prøv igen</button>
-            </div>
-          )}
-
-          {/* error */}
+          {/* ── error ── */}
           {demoState === "error" && (
             <div className={s.stage}>
               <p className={s.stateLabel}>Noget gik galt</p>
