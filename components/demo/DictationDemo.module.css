@@ -148,6 +148,12 @@
 }
 @keyframes spin { to { transform: rotate(360deg); } }
 
+/* ── Pipeline-status wrapper (uploading / anonymising / structuring) ─────── */
+.pipelineStage {
+  width: 100%;
+  max-width: 400px;
+}
+
 /* ── Transcript preview (under structuring) ──────────────────────────────── */
 .transcriptPreview {
   background: #F7F5F0;

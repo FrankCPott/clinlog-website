@@ -41,7 +41,7 @@ function usePrefersReducedMotion(): boolean {
 
 // ── Typer ─────────────────────────────────────────────────────────────────────
 
-type PipelinePhase =
+export type PipelinePhase =
   | 'idle'
   | 'recording'
   | 'transcribing'
@@ -295,10 +295,16 @@ function PulseDots() {
 
 // ── SectionSkeleton ───────────────────────────────────────────────────────────
 
-function SectionSkeleton({ filled }: { filled: Set<string> }) {
+function SectionSkeleton({
+  filled,
+  sections = SECTIONS,
+}: {
+  filled:     Set<string>;
+  sections?:  string[];
+}) {
   return (
     <div className="mt-3 space-y-2">
-      {SECTIONS.map((key) => {
+      {sections.map((key) => {
         const isFilled = filled.has(key);
         return (
           <div key={key} className="flex items-center gap-2">
@@ -316,6 +322,56 @@ function SectionSkeleton({ filled }: { filled: Set<string> }) {
           </div>
         );
       })}
+    </div>
+  );
+}
+
+// ── PipelineStatus — eksternt styret, til brug i DictationDemo ───────────────
+//
+// Modtager `phase` og `filledSections` udefra — ingen egne timers.
+// Bruges i /demo under transcribing → anonymising → structuring → done.
+//
+// Brug:
+//   <PipelineStatus phase="transcribing" sections={['ANAMNESE', 'OBJEKTIVT', ...]} />
+//   <PipelineStatus phase="structuring"  sections={DEMO_SECTIONS} filledSections={filledSections} />
+
+export interface PipelineStatusProps {
+  phase:            PipelinePhase;
+  /** 0..1 — bruges kun i 'recording'-fasen (waveform) */
+  audioLevel?:      number;
+  /** Sektioner der er udfyldt (vises grønne). Default: tom Set */
+  filledSections?:  Set<string>;
+  /** Sektionsliste — default er de 10 ICU-sektioner.
+   *  Demo-siden sender ['ANAMNESE', 'OBJEKTIVT', 'VURDERING', 'PLAN']. */
+  sections?:        string[];
+}
+
+export function PipelineStatus({
+  phase,
+  audioLevel    = 0,
+  filledSections = new Set<string>(),
+  sections      = SECTIONS,
+}: PipelineStatusProps) {
+  return (
+    <div className="w-full">
+      <PhaseHeader phase={phase} />
+
+      {phase === 'recording' && <Waveform level={audioLevel} />}
+
+      {(phase === 'transcribing' || phase === 'anonymising') && (
+        <div className="py-4">
+          <PulseDots />
+          {phase === 'anonymising' && (
+            <p className="mt-3 text-center text-xs text-[#8B9A8C]">
+              Fjerner CPR, navne og kontaktoplysninger
+            </p>
+          )}
+        </div>
+      )}
+
+      {(phase === 'structuring' || phase === 'done') && (
+        <SectionSkeleton filled={filledSections} sections={sections} />
+      )}
     </div>
   );
 }

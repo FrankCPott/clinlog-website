@@ -14,8 +14,9 @@
  *    før funktionen sættes i produktion (jf. FASE 0, punkt 5).
  */
 
-import { useRef, useState, useCallback } from "react";
+import { useRef, useState, useCallback, useEffect } from "react";
 import s from "./DictationDemo.module.css";
+import { PipelineStatus } from "@/components/pipeline/PipelineDemo";
 
 // ── Supabase Edge Function URL ─────────────────────────────────────────────────
 
@@ -33,11 +34,15 @@ type DemoState =
   | "awaiting-permission"
   | "permission-denied"
   | "recording"
-  | "uploading"
-  | "structuring"
+  | "uploading"      // venter på transcription (viser 'transcribing' i pipeline)
+  | "anonymising"    // kort visuel pause — Corti anonymiserer internt
+  | "structuring"    // venter på structuring + fylder skeleton-sektioner
   | "done"
   | "error"
   | "rate_limited";
+
+// Sektionerne som demo-structure-corti returnerer, i displayrækkefølge
+const DEMO_SECTIONS = ["ANAMNESE", "OBJEKTIVT", "VURDERING", "PLAN"];
 
 type BrowserType = "chrome" | "edge" | "safari" | "firefox" | "other";
 type OSType      = "windows" | "mac" | "other";
@@ -129,10 +134,16 @@ export default function DictationDemo() {
   const [result,      setResult]      = useState<DemoResult | null>(null);
   const [errorMsg,    setErrorMsg]    = useState("");
   const [transcript,  setTranscript]  = useState("");
+  const [filledSections, setFilledSections] = useState<Set<string>>(new Set());
   const [browser,          setBrowser]          = useState<BrowserType>("other");
   const [os,               setOs]               = useState<OSType>("other");
   const [copied,           setCopied]           = useState(false);
   const [permissionErrDetail, setPermissionErrDetail] = useState("");
+
+  // Ryd filledSections ved reset til idle (useEffect holder styr på livscyklus)
+  useEffect(() => {
+    if (demoState === "idle") setFilledSections(new Set());
+  }, [demoState]);
 
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const chunksRef        = useRef<Blob[]>([]);
@@ -245,6 +256,10 @@ export default function DictationDemo() {
 
         const { text } = await tResp.json() as { text: string };
         setTranscript(text);
+
+        // Vis 'anonymising' kort — Corti anonymiserer internt, vi viser det visuelt
+        setDemoState("anonymising");
+        await new Promise<void>(r => setTimeout(r, 1400));
         setDemoState("structuring");
 
         // POST til demo-structure-corti
@@ -261,6 +276,15 @@ export default function DictationDemo() {
         if (!sResp.ok) throw new Error(`Strukturering fejlede (${sResp.status})`);
 
         const { sections } = await sResp.json() as { sections: Record<string, string> };
+
+        // Fyld skeleton-sektioner én ad gangen, derefter skift til done
+        DEMO_SECTIONS.forEach((key, i) => {
+          setTimeout(() => {
+            setFilledSections(prev => new Set(prev).add(key));
+          }, i * 220);
+        });
+        await new Promise<void>(r => setTimeout(r, DEMO_SECTIONS.length * 220 + 700));
+
         setResult({ transcript: text, sections });
         setDemoState("done");
 
@@ -556,26 +580,28 @@ export default function DictationDemo() {
             </div>
           )}
 
-          {/* ── uploading ── */}
+          {/* ── uploading → transcribing ── */}
           {demoState === "uploading" && (
-            <div className={s.stage}>
-              <div className={s.spinner} aria-hidden="true" />
-              <p className={s.stateLabel}>Transskriberer…</p>
-              <p className={s.hintSmall}>Sender til Corti — typisk 5–15 sekunder</p>
+            <div className={s.pipelineStage}>
+              <PipelineStatus phase="transcribing" sections={DEMO_SECTIONS} />
             </div>
           )}
 
-          {/* ── structuring ── */}
+          {/* ── anonymising — Corti anonymiserer internt, vi viser det visuelt ── */}
+          {demoState === "anonymising" && (
+            <div className={s.pipelineStage}>
+              <PipelineStatus phase="anonymising" sections={DEMO_SECTIONS} />
+            </div>
+          )}
+
+          {/* ── structuring — skeleton fylder op i takt med setFilledSections ── */}
           {demoState === "structuring" && (
-            <div className={s.stage}>
-              {transcript && (
-                <div className={s.transcriptPreview}>
-                  <div className={s.previewLabel}>Transskript</div>
-                  <p>{transcript}</p>
-                </div>
-              )}
-              <div className={s.spinner} aria-hidden="true" />
-              <p className={s.stateLabel}>Strukturerer…</p>
+            <div className={s.pipelineStage}>
+              <PipelineStatus
+                phase="structuring"
+                sections={DEMO_SECTIONS}
+                filledSections={filledSections}
+              />
             </div>
           )}
 

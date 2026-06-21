@@ -1,7 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
 import s from "./hub.module.css";
-import { PipelineDemoCard } from "@/components/pipeline/PipelineDemo";
 
 const ArrowRight = () => (
   <svg viewBox="0 0 16 16" fill="none" aria-hidden="true">
@@ -130,8 +129,6 @@ export default function HubPage() {
                 />
                 <div className={s.cardShotOverlay} />
               </div>
-              {/* Pipeline-demo — vises mellem screenshot og tekst */}
-              <PipelineDemoCard />
               <div className={s.cardBody}>
                 <div className={s.cardTag}>Intensive care</div>
                 <h3>ClinLog ICU</h3>

@@ -1,5 +1,8 @@
 "use client";
 
+// Siden er fuldt session-afhængig — ingen statisk prerendering
+export const dynamic = "force-dynamic";
+
 import { useEffect, useState } from "react";
 import type { Session } from "@supabase/supabase-js";
 import { supabase } from "@/lib/supabase";
