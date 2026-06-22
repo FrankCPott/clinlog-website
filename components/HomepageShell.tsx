@@ -250,6 +250,7 @@ export default function HomepageShell({ locale }: Props) {
       <footer className={s.siteFooter}>
         <div className={s.siteFooterInner}>
           <Link href="/" className={s.logo} style={{ fontSize: 16 }}>
+            <LogoMark className={s.logoMarkSm} />
             Clin<span className={s.logAccent}>Log</span>
           </Link>
           <div>{t.footerCopyright}</div>

@@ -121,7 +121,7 @@ const translations: Record<Locale, HomeTranslations> = {
     clinLabel: "For den individuelle kliniker",
     clinText: "Tidlig adgang til ClinLog ICU, klar til brug denne uge.",
     requestAccess: "Anmod om adgang",
-    footerCopyright: "ClinLog ApS · Danmark · pott@clinlog.dk",
+    footerCopyright: "Clin-Log ApS · Danmark · pott@clinlog.dk",
   },
 
   /* ── ENGLISH ── */
@@ -192,7 +192,7 @@ const translations: Record<Locale, HomeTranslations> = {
     clinLabel: "For individual clinicians",
     clinText: "Early access to ClinLog ICU, ready to use this week.",
     requestAccess: "Request access",
-    footerCopyright: "ClinLog ApS · Denmark · pott@clinlog.dk",
+    footerCopyright: "Clin-Log ApS · Denmark · pott@clinlog.dk",
   },
 
   /* ── DEUTSCH ── */
@@ -263,7 +263,7 @@ const translations: Record<Locale, HomeTranslations> = {
     clinLabel: "Für einzelne Kliniker",
     clinText: "Früher Zugang zu ClinLog ICU, sofort einsatzbereit.",
     requestAccess: "Zugang anfragen",
-    footerCopyright: "ClinLog ApS · Dänemark · pott@clinlog.dk",
+    footerCopyright: "Clin-Log ApS · Dänemark · pott@clinlog.dk",
   },
 };
 
