@@ -20,17 +20,6 @@ const PulseIcon = () => (
   </svg>
 );
 
-const organs = [
-  { key: "CNS",  label: "Neurologi" },
-  { key: "RESP", label: "Respiratorisk" },
-  { key: "CIRK", label: "Cirkulatorisk" },
-  { key: "GI",   label: "Gastrointestinalt" },
-  { key: "NYRE", label: "Nyrefunktion" },
-  { key: "MED",  label: "Medicin" },
-  { key: "INF",  label: "Infektion" },
-  { key: "PLAN", label: "Plan" },
-];
-
 export default function IcuWorkflowPage() {
   return (
     <div className={s.root}>
@@ -56,10 +45,10 @@ export default function IcuWorkflowPage() {
             <em>struktureret stuegangsnotat</em>
           </h1>
           <p className={s.heroSub}>
-            ClinLog ICU henter patientdata direkte fra Sundhedsplatformens{" "}
-            <code>.ALLPATIENTDATA</code>-Smartphrase, parser dem automatisk i
-            relevante organsystemer og kombinerer dem med din diktering —
-            til et komplet, struktureret notat klar til kopiering.
+            ClinLog ICU henter patientdata direkte fra Sundhedsplatformen via en
+            tilpasset Smartphrase, parser dem automatisk i relevante organsystemer
+            og kombinerer dem med din diktering — til et komplet, struktureret
+            notat klar til kopiering.
           </p>
           <Link href="/icu/app" className={s.heroCta}>
             Log ind i appen →
@@ -70,156 +59,101 @@ export default function IcuWorkflowPage() {
       {/* ── WORKFLOW STEPS ── */}
       <section className={s.steps}>
 
-        {/* ── Trin 1 ── */}
+        {/* ── Trin 1: SP-data via Smartphrase ── */}
         <div className={`${s.step} ${s.stepAlt}`}>
           <div className={s.stepInner}>
             <div className={s.stepContent}>
               <div className={s.stepNum}>Trin 01</div>
-              <h2>Kopier .ALLPATIENTDATA fra SP</h2>
+              <h2>SP-data til ClinLog via Smartphrase</h2>
               <p>
-                Brug Sundhedsplatformens <strong>.ALLPATIENTDATA</strong>-Smartphrase
-                i patientens journal. Kopier hele blokken og indsæt den i ClinLog ICU.
-                Ingen teknisk integration — det tager fem sekunder.
+                Via en tilpasset Smartphrase kopieres alle relevante aktuelle data
+                (uden personhenførbar identifikation) til ClinLog — det tager 5 sekunder.
               </p>
             </div>
             <div className={s.stepVisual}>
-              <div className={s.spMockup}>
-                <div className={s.spMockupBar}>
-                  <div className={s.spMockupDot} />
-                  <div className={s.spMockupDot} />
-                  <div className={s.spMockupDot} />
-                  <span>Sundhedsplatformen · .ALLPATIENTDATA</span>
+              <div className={s.spScreenshots}>
+                <div className={s.spScreenItem}>
+                  <Image
+                    src="/screenshots/sp_vitals.png"
+                    alt="Sundhedsplatformen — observationer: blodtryk, puls, temperatur, saturation"
+                    width={638}
+                    height={155}
+                    style={{ width: "100%", height: "auto", display: "block" }}
+                  />
                 </div>
-                <div className={s.spMockupBody}>
-                  <div className={s.spLine}>
-                    <span className={s.spKey}>CPR:</span> ██████-████
+                <div className={s.spScreenRow}>
+                  <div className={s.spScreenItem}>
+                    <Image
+                      src="/screenshots/sp_lab.png"
+                      alt="Sundhedsplatformen — laboratorieværdier: hæmatologi, elektrolytter, koagulation"
+                      width={638}
+                      height={490}
+                      style={{ width: "100%", height: "auto", display: "block" }}
+                    />
                   </div>
-                  <div className={s.spLine}>
-                    <span className={s.spKey}>BT:</span> 128/82 mmHg · HF: 94/min
+                  <div className={s.spScreenItem}>
+                    <Image
+                      src="/screenshots/sp_results.png"
+                      alt="Sundhedsplatformen — resultatgennemgang med parakliniske systemer"
+                      width={810}
+                      height={630}
+                      style={{ width: "100%", height: "auto", display: "block" }}
+                    />
                   </div>
-                  <div className={s.spLine}>
-                    <span className={s.spKey}>SAT:</span> 96% (O₂ 2 L/min)
-                  </div>
-                  <div className={s.spLine}>
-                    <span className={s.spKey}>Temp:</span> 38.4°C · RR: 22/min
-                  </div>
-                  <div className={s.spDivider} />
-                  <div className={s.spLine}>
-                    <span className={s.spKey}>Lkc:</span> 14.2 · CRP: 87 · Krea: 112
-                  </div>
-                  <div className={s.spLine}>
-                    <span className={s.spKey}>Hgb:</span> 6.8 mmol/L · Na: 138
-                  </div>
-                  <div className={s.spDivider} />
-                  <div className={s.spLine}>
-                    <span className={s.spKey}>Medicin:</span> Meropenem 2 g × 3 · Furix 40 mg...
-                  </div>
-                  <div className={s.spLine}>
-                    <span className={s.spKey}>Obs:</span> Intuberet, VAP-protokol dag 3
-                  </div>
-                </div>
-                <div className={s.spMockupCopy}>
-                  <span>⌘C  Kopier · Indsæt i ClinLog ICU</span>
                 </div>
               </div>
             </div>
           </div>
         </div>
 
-        {/* ── Trin 2 ── */}
+        {/* ── Trin 2: Parsing + data i appen + diktering ── */}
         <div className={s.step}>
           <div className={s.stepInner}>
             <div className={s.stepContent}>
               <div className={s.stepNum}>Trin 02</div>
-              <h2>Automatisk parsing i organsystemer</h2>
+              <h2>Strukturerede data og diktering i appen</h2>
               <p>
                 ClinLog parser dataene automatisk og kategoriserer dem i de klinisk
-                relevante organsystemer. Ingen manuel sortering — det sker på sekunder,
-                klar som struktureret datagrundlag til stuegangsrunden.
+                relevante organsystemer — CNS, respiratorisk, cirkulatorisk,
+                gastrointestinalt og øvrige. De strukturerede SP-data vises som
+                datagrundlag i appen, klar som reference inden og under dikteringen.
+                Lægen dikterer stuegangsnotatet direkte — ClinLog transskriberer,
+                anonymiserer og kombinerer diktaten med SP-dataene.
               </p>
             </div>
             <div className={s.stepVisual}>
-              <div className={s.organGrid}>
-                {organs.map(o => (
-                  <div key={o.key} className={s.organChip}>
-                    <span className={s.organKey}>{o.key}</span>
-                    <span className={s.organLabel}>{o.label}</span>
-                  </div>
-                ))}
+              <div className={s.phoneWrap}>
+                <div className={s.phoneFrame}>
+                  <Image
+                    src="/screenshots/app_dictate.png"
+                    alt="ClinLog ICU appen under diktering — strukturerede SP-data og optagelse"
+                    width={1080}
+                    height={2340}
+                    style={{ width: "100%", height: "auto", display: "block" }}
+                  />
+                </div>
               </div>
             </div>
           </div>
         </div>
 
-        {/* ── Trin 3 ── */}
+        {/* ── Trin 3: Færdigt notat ── */}
         <div className={`${s.step} ${s.stepAlt}`}>
           <div className={s.stepInner}>
             <div className={s.stepContent}>
               <div className={s.stepNum}>Trin 03</div>
-              <h2>Strukturerede SP-data som datagrundlag</h2>
+              <h2>Struktureret notat klar til kopi</h2>
               <p>
-                De parsede data vises i appen som et struktureret datagrundlag —
-                vitale værdier, laboratorieresultater og aktuelle observationer.
-                Lægen har overblikket klar, inden dikteringen starter.
+                Det færdige notat — SP-data og diktat samlet i afdelingens format —
+                kopieres direkte ind i patientjournalen i Sundhedsplatformen.
+                2 tastetryk. Færdig.
               </p>
             </div>
             <div className={s.stepVisual}>
               <div className={s.screenshotFrame}>
                 <Image
                   src="/icu_shot.jpg"
-                  alt="ClinLog ICU appen med struktureret SP-datagrundlag"
-                  fill
-                  style={{ objectFit: "cover", objectPosition: "top center" }}
-                  sizes="(max-width: 860px) 100vw, 50vw"
-                />
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* ── Trin 4 ── */}
-        <div className={s.step}>
-          <div className={s.stepInner}>
-            <div className={s.stepContent}>
-              <div className={s.stepNum}>Trin 04</div>
-              <h2>Dikter stuegangsnotatet</h2>
-              <p>
-                Dikter stuegangsnotatet direkte i appen — præcis som du altid ville
-                have gjort det. ClinLog transskriberer talen, anonymiserer og
-                kombinerer diktaten med de aktuelle SP-data.
-              </p>
-            </div>
-            <div className={s.stepVisual}>
-              <div className={s.screenshotFrame}>
-                <Image
-                  src="/screenshots/screen1.png"
-                  alt="ClinLog ICU — dikteringsskærm"
-                  fill
-                  style={{ objectFit: "cover", objectPosition: "top center" }}
-                  sizes="(max-width: 860px) 100vw, 50vw"
-                />
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* ── Trin 5 ── */}
-        <div className={`${s.step} ${s.stepAlt}`}>
-          <div className={s.stepInner}>
-            <div className={s.stepContent}>
-              <div className={s.stepNum}>Trin 05</div>
-              <h2>Struktureret notat klar til kopi</h2>
-              <p>
-                Det færdige notat — SP-data og diktat samlet i afdelingens format —
-                kopieres direkte ind i patientjournalen i Sundhedsplatformen.
-                Ét tryk. Færdig.
-              </p>
-            </div>
-            <div className={s.stepVisual}>
-              <div className={s.screenshotFrame}>
-                <Image
-                  src="/screenshots/screen2.png"
-                  alt="Struktureret stuegangsnotat klar til kopiering til SP"
+                  alt="ClinLog ICU — struktureret stuegangsnotat klar til kopiering til SP"
                   fill
                   style={{ objectFit: "cover", objectPosition: "top center" }}
                   sizes="(max-width: 860px) 100vw, 50vw"
