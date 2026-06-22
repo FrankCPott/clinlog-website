@@ -299,32 +299,62 @@ function PulseDots() {
 }
 
 // ── TranscribingWaveform ──────────────────────────────────────────────────────
-// Animeret lydbølge vist under transskribering — 20 søjler der pulserer
-// med varierende hastighed og forsinkelse, som en EQ-visualisering.
-// Kører rent i CSS via inline keyframe — ingen JS-timers.
+// Progresscirkel + lydbølge vist under transskribering.
+//
+// Cirklen animerer fra 0 → ~85 % over 14 s med aftagende hastighed
+// (cubic-bezier), så den aldrig selvstændigt fuldfører — den venter på at
+// faseskiftet sker. Søjlerne pulserer organisk i stagger.
+// Alt kører i CSS via én inline <style> — ingen JS-timers.
 
-const WAVE_KEYFRAME = `
+const RING_R    = 24;
+const RING_CIRC = 2 * Math.PI * RING_R; // ≈ 150.8
+
+const TRANSCRIBING_KEYFRAMES = `
   @keyframes clinlog-wavebar {
     0%, 100% { height: 3px;  opacity: 0.45; }
-    50%       { height: 26px; opacity: 1;    }
+    50%       { height: 24px; opacity: 1;    }
+  }
+  @keyframes clinlog-ring {
+    from { stroke-dashoffset: ${RING_CIRC.toFixed(1)}; }
+    to   { stroke-dashoffset: ${(RING_CIRC * 0.15).toFixed(1)}; }
   }
 `;
 
 function TranscribingWaveform() {
   const BARS = 20;
-  // Fast seed pr. bar — forskellig max-højde og hastighed for organisk udseende
   const seeds = useRef(
     Array.from({ length: BARS }, (_, i) => ({
-      duration: 0.65 + (i % 7) * 0.11,   // 0.65–1.31 s
-      delay:    (i * 0.055).toFixed(2),   // stagger fra venstre
-      maxH:     14 + (i % 5) * 3,         // 14–26 px maks-højde
+      duration: 0.65 + (i % 7) * 0.11,
+      delay:    (i * 0.055).toFixed(2),
     }))
   );
 
   return (
     <>
-      <style>{WAVE_KEYFRAME}</style>
-      <div className="flex items-end justify-center gap-[3px] h-10 mt-3 mb-1">
+      <style>{TRANSCRIBING_KEYFRAMES}</style>
+
+      {/* Fremskridtscirkel */}
+      <div className="flex justify-center mt-2 mb-0">
+        <svg width="64" height="64" viewBox="0 0 64 64" aria-hidden="true">
+          {/* Spor */}
+          <circle cx="32" cy="32" r={RING_R}
+            fill="none" stroke="#EFEBE2" strokeWidth="5" />
+          {/* Fremskridtsbue */}
+          <circle cx="32" cy="32" r={RING_R}
+            fill="none" stroke="#3B7A9E" strokeWidth="5"
+            strokeLinecap="round"
+            strokeDasharray={RING_CIRC.toFixed(1)}
+            strokeDashoffset={RING_CIRC.toFixed(1)}
+            transform="rotate(-90 32 32)"
+            style={{
+              animation: `clinlog-ring 14s cubic-bezier(0.35, 0, 0.55, 1) forwards`,
+            }}
+          />
+        </svg>
+      </div>
+
+      {/* Lydbølge */}
+      <div className="flex items-end justify-center gap-[3px] h-8 mt-1 mb-1">
         {seeds.current.map((s, i) => (
           <div
             key={i}
@@ -333,7 +363,6 @@ function TranscribingWaveform() {
               animation: `clinlog-wavebar ${s.duration}s ease-in-out infinite`,
               animationDelay: `${s.delay}s`,
               minHeight: 3,
-              maxHeight: s.maxH,
             }}
           />
         ))}
