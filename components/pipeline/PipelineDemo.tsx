@@ -202,14 +202,18 @@ export function PipelineDemo({
         </>
       )}
 
-      {(phase === 'transcribing' || phase === 'anonymising') && (
+      {phase === 'transcribing' && (
+        <div className="py-2">
+          <TranscribingWaveform />
+        </div>
+      )}
+
+      {phase === 'anonymising' && (
         <div className="py-4">
           <PulseDots />
-          {phase === 'anonymising' && (
-            <p className="mt-3 text-center text-xs text-[#8B9A8C]">
-              Fjerner CPR, navne og kontaktoplysninger
-            </p>
-          )}
+          <p className="mt-3 text-center text-xs text-[#8B9A8C]">
+            Fjerner CPR, navne og kontaktoplysninger
+          </p>
         </div>
       )}
 
@@ -275,6 +279,7 @@ function Waveform({ level }: { level: number }) {
 
 // ── PulseDots ─────────────────────────────────────────────────────────────────
 // Keyframe 'clinlog-pulse' er defineret i app/globals.css
+// Bruges kun til anonymising-fasen.
 
 function PulseDots() {
   return (
@@ -290,6 +295,50 @@ function PulseDots() {
         />
       ))}
     </div>
+  );
+}
+
+// ── TranscribingWaveform ──────────────────────────────────────────────────────
+// Animeret lydbølge vist under transskribering — 20 søjler der pulserer
+// med varierende hastighed og forsinkelse, som en EQ-visualisering.
+// Kører rent i CSS via inline keyframe — ingen JS-timers.
+
+const WAVE_KEYFRAME = `
+  @keyframes clinlog-wavebar {
+    0%, 100% { height: 3px;  opacity: 0.45; }
+    50%       { height: 26px; opacity: 1;    }
+  }
+`;
+
+function TranscribingWaveform() {
+  const BARS = 20;
+  // Fast seed pr. bar — forskellig max-højde og hastighed for organisk udseende
+  const seeds = useRef(
+    Array.from({ length: BARS }, (_, i) => ({
+      duration: 0.65 + (i % 7) * 0.11,   // 0.65–1.31 s
+      delay:    (i * 0.055).toFixed(2),   // stagger fra venstre
+      maxH:     14 + (i % 5) * 3,         // 14–26 px maks-højde
+    }))
+  );
+
+  return (
+    <>
+      <style>{WAVE_KEYFRAME}</style>
+      <div className="flex items-end justify-center gap-[3px] h-10 mt-3 mb-1">
+        {seeds.current.map((s, i) => (
+          <div
+            key={i}
+            className="w-[3px] rounded-full bg-[#3B7A9E]"
+            style={{
+              animation: `clinlog-wavebar ${s.duration}s ease-in-out infinite`,
+              animationDelay: `${s.delay}s`,
+              minHeight: 3,
+              maxHeight: s.maxH,
+            }}
+          />
+        ))}
+      </div>
+    </>
   );
 }
 
@@ -358,14 +407,18 @@ export function PipelineStatus({
 
       {phase === 'recording' && <Waveform level={audioLevel} />}
 
-      {(phase === 'transcribing' || phase === 'anonymising') && (
+      {phase === 'transcribing' && (
+        <div className="py-2">
+          <TranscribingWaveform />
+        </div>
+      )}
+
+      {phase === 'anonymising' && (
         <div className="py-4">
           <PulseDots />
-          {phase === 'anonymising' && (
-            <p className="mt-3 text-center text-xs text-[#8B9A8C]">
-              Fjerner CPR, navne og kontaktoplysninger
-            </p>
-          )}
+          <p className="mt-3 text-center text-xs text-[#8B9A8C]">
+            Fjerner CPR, navne og kontaktoplysninger
+          </p>
         </div>
       )}
 
