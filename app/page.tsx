@@ -44,7 +44,7 @@ export default function HubPage() {
               <li><a href="#diary">Clinical Diary</a></li>
             </ul>
           </nav>
-          <Link href="/icu" className={s.headerCta}>Log in</Link>
+          <Link href="/icu/app" className={s.headerCta}>Log in</Link>
         </div>
       </header>
 
@@ -258,7 +258,7 @@ export default function HubPage() {
             <a href="mailto:pott@clinlog.dk" className={s.btnPrimary}>
               Request access
             </a>
-            <Link href="/icu" className={s.btnGhost}>Log in</Link>
+            <Link href="/icu/app" className={s.btnGhost}>Log in</Link>
           </div>
         </div>
       </section>
