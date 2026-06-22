@@ -140,6 +140,9 @@ export default function HubPage() {
                 <Link href="/icu" className={s.cardLink}>
                   Explore ICU <ArrowRight />
                 </Link>
+                <Link href="/demo" className={s.cardDemoLink}>
+                  Try the dictation demo <ArrowRight />
+                </Link>
                 <div className={s.cardStatus}>Active development</div>
               </div>
             </div>
