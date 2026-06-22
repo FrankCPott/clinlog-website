@@ -55,7 +55,10 @@
   text-decoration: none;
   color: var(--paper);
 }
+/* Legacy bare-line icon (still used in ICU page via its own CSS module) */
 .pulseIcon { width: 22px; height: 16px; }
+/* Boxed ECG logo mark used on the hub homepage */
+.logoMark { width: 36px; height: 36px; flex-shrink: 0; }
 .logAccent { color: var(--clinical-blue-bright); font-style: italic; font-weight: 500; }
 .mainNav {
   display: flex;
@@ -73,6 +76,31 @@
   border-bottom: 1px solid transparent;
 }
 .mainNav a:hover { opacity: 1; border-bottom-color: var(--clinical-blue-bright); }
+
+/* Right side of header: lang picker + CTA */
+.headerRight {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+.langPicker {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+.langBtn {
+  font-size: 18px;
+  line-height: 1;
+  opacity: 0.48;
+  transition: opacity 0.18s, transform 0.18s;
+  text-decoration: none;
+  display: inline-block;
+  padding: 2px 4px;
+  border-radius: 3px;
+}
+.langBtn:hover { opacity: 0.82; transform: scale(1.1); }
+.langBtnActive { opacity: 1; }
+
 .headerCta {
   font-size: 13.5px;
   font-weight: 600;
@@ -86,9 +114,10 @@
 .headerCta:hover { background: var(--clinical-blue-bright); color: var(--paper); }
 
 /* ── HERO ── */
+/* Background is now the "Log" blue (#5B9BC0) instead of dark navy */
 .hero {
-  background: var(--navy);
-  color: var(--paper);
+  background: var(--clinical-blue-bright);
+  color: var(--ink);
   position: relative;
   overflow: hidden;
   padding: 88px 32px 110px;
@@ -104,7 +133,7 @@
   font-size: 12.5px;
   letter-spacing: 0.12em;
   text-transform: uppercase;
-  color: var(--sage);
+  color: rgba(22,36,58,0.65);
   margin-bottom: 22px;
   display: flex;
   align-items: center;
@@ -114,8 +143,8 @@
   content: '';
   width: 7px; height: 7px;
   border-radius: 50%;
-  background: var(--sage);
-  box-shadow: 0 0 0 3px rgba(139,154,140,0.2);
+  background: rgba(22,36,58,0.65);
+  box-shadow: 0 0 0 3px rgba(22,36,58,0.12);
 }
 .heroHeadline {
   font-family: var(--f-serif);
@@ -128,18 +157,19 @@
 }
 .heroHeadline em {
   font-style: italic;
-  color: var(--clinical-blue-bright);
+  color: var(--navy);
   font-weight: 500;
 }
 .heroSub {
   font-size: 18px;
-  color: rgba(247,245,240,0.72);
+  color: rgba(22,36,58,0.72);
   max-width: 560px;
   line-height: 1.6;
   margin-bottom: 40px;
 }
 .heroActions { display: flex; gap: 16px; flex-wrap: wrap; }
 
+/* ── BUTTONS (base — used in footer CTA on dark bg) ── */
 .btnPrimary {
   background: var(--clinical-blue);
   color: var(--paper);
@@ -166,7 +196,13 @@
 }
 .btnGhost:hover { border-color: rgba(247,245,240,0.6); background: rgba(247,245,240,0.05); }
 
-/* Vital trace EKG-animation */
+/* Hero button overrides — inverted for light blue background */
+.hero .btnPrimary { background: var(--navy); }
+.hero .btnPrimary:hover { background: rgba(11,25,41,0.82); transform: translateY(-1px); }
+.hero .btnGhost { border-color: rgba(22,36,58,0.28); color: var(--ink); }
+.hero .btnGhost:hover { border-color: rgba(22,36,58,0.55); background: rgba(22,36,58,0.05); }
+
+/* Vital trace EKG-animation (dark lines on light blue hero) */
 .vitalTrace {
   position: absolute;
   bottom: 0; left: 0; right: 0;
@@ -177,18 +213,18 @@
 .vitalTrace svg { width: 100%; height: 100%; display: block; }
 .traceLine {
   fill: none;
-  stroke: var(--clinical-blue-bright);
+  stroke: var(--navy);
   stroke-width: 2;
-  opacity: 0.55;
+  opacity: 0.28;
   stroke-dasharray: 2000;
   stroke-dashoffset: 2000;
   animation: drawTrace 4.5s ease-out forwards 0.3s;
 }
 .traceLineSecondary {
   fill: none;
-  stroke: var(--pulse-red);
+  stroke: var(--navy);
   stroke-width: 1.5;
-  opacity: 0.35;
+  opacity: 0.12;
   stroke-dasharray: 2000;
   stroke-dashoffset: 2000;
   animation: drawTrace 4.5s ease-out forwards 0.8s;
@@ -261,8 +297,9 @@
   grid-template-columns: repeat(3, 1fr);
   gap: 28px;
 }
+/* Cards use the "Log" blue (#5B9BC0) as background — adapted for light bg */
 .productCard {
-  background: var(--navy);
+  background: var(--clinical-blue-bright);
   border-radius: 6px;
   overflow: hidden;
   display: flex;
@@ -274,6 +311,7 @@
   transform: translateY(-4px);
   box-shadow: 0 16px 40px rgba(11,25,41,0.18);
 }
+/* Kept for backward compat in case any page still references this class */
 .productCardDiary { background: var(--navy-card); opacity: 0.92; }
 .cardShot {
   height: 200px;
@@ -312,20 +350,20 @@
   font-size: 11px;
   letter-spacing: 0.1em;
   text-transform: uppercase;
-  color: var(--sage);
+  color: rgba(11,25,41,0.6);
   margin-bottom: 10px;
 }
 .cardTagAkut { color: var(--pulse-red); opacity: 0.85; }
 .productCard h3 {
   font-family: var(--f-serif);
   font-size: 23px;
-  color: var(--paper);
+  color: var(--navy);
   font-weight: 600;
   margin-bottom: 10px;
 }
 .productCard .desc {
   font-size: 14.5px;
-  color: rgba(247,245,240,0.62);
+  color: rgba(11,25,41,0.7);
   line-height: 1.6;
   margin-bottom: 22px;
   flex: 1;
@@ -333,7 +371,7 @@
 .cardLink {
   font-size: 13.5px;
   font-weight: 600;
-  color: var(--clinical-blue-bright);
+  color: var(--navy);
   display: inline-flex;
   align-items: center;
   gap: 6px;
@@ -344,7 +382,7 @@
 .cardDemoLink {
   font-size: 12.5px;
   font-weight: 500;
-  color: rgba(247,245,240,0.55);
+  color: rgba(11,25,41,0.55);
   display: inline-flex;
   align-items: center;
   gap: 5px;
@@ -352,7 +390,7 @@
   margin-top: 10px;
   transition: color 0.2s;
 }
-.cardDemoLink:hover { color: rgba(247,245,240,0.85); }
+.cardDemoLink:hover { color: rgba(11,25,41,0.88); }
 .cardDemoLink svg { width: 12px; height: 12px; transition: transform 0.2s; }
 .cardDemoLink:hover svg { transform: translateX(3px); }
 .cardStatus {
@@ -360,7 +398,7 @@
   font-size: 10.5px;
   letter-spacing: 0.06em;
   text-transform: uppercase;
-  color: rgba(247,245,240,0.4);
+  color: rgba(11,25,41,0.45);
   margin-top: 14px;
 }
 
@@ -473,4 +511,5 @@
   .trust { padding: 64px 20px; }
   .footerCta { padding: 64px 20px; }
   .headerInner { padding: 16px 20px; }
+  .langPicker { gap: 0; }
 }

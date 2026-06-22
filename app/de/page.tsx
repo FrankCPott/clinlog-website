@@ -2,9 +2,9 @@ import type { Metadata } from "next";
 import HomepageShell from "@/components/HomepageShell";
 
 export const metadata: Metadata = {
-  title: "ClinLog — Klinisk software til strukturerede notater",
+  title: "ClinLog — Klinische Software für strukturierte Dokumentation",
   description:
-    "Dikter din stuegang. ClinLog strukturerer den i dit afdelings noteformat — klar til kopiering til patientjournalen.",
+    "Diktieren Sie Ihre Visite. ClinLog strukturiert sie in das Notizformat Ihrer Abteilung — bereit zur Übertragung in die Patientenakte.",
   alternates: {
     languages: {
       da: "https://clinlog.dk/",
@@ -15,5 +15,5 @@ export const metadata: Metadata = {
 };
 
 export default function Page() {
-  return <HomepageShell locale="da" />;
+  return <HomepageShell locale="de" />;
 }
