@@ -63,7 +63,7 @@ const translations: Record<Locale, HomeTranslations> = {
     eyebrow: "Bygget af kliniker, til stuegangsrunden",
     heroHeadline1: "Klinisk software til",
     heroHeadlineEm: "strukturerede notater",
-    heroHeadline2: "for dit speciale.",
+    heroHeadline2: "for dit speciale",
     heroSub:
       "Dikter din stuegang. ClinLog strukturerer den i afdelingens noteformat — klar til kopiering til patientjournalen.",
     exploreSuite: "Udforsk produkterne",
@@ -80,7 +80,7 @@ const translations: Record<Locale, HomeTranslations> = {
       "ClinLog er udviklet uafhængigt af hospitalsIT, som kommercielt klinisk software beregnet til evaluering og implementering af den enkelte afdeling.",
 
     theSuite: "Produktsuite",
-    suiteHeading: "Tre produkter, én struktureringsmotor.",
+    suiteHeading: "Tre produkter, én struktureringsmotor",
 
     icuTag: "Intensiv medicin",
     icuDesc:
@@ -101,7 +101,7 @@ const translations: Record<Locale, HomeTranslations> = {
     customExplore: "Kontakt os",
     customStatus: "Forespørg",
 
-    trustHeading: "Datasikkerhed som kliniske data fortjener.",
+    trustHeading: "Datasikkerhed som kliniske data fortjener",
     gdprLabel: "GDPR by design",
     gdprText:
       "Al behandling sker på EU-infrastruktur under databehandleraftaler tilpasset sundhedsvæsenet. Notater gemmes aldrig længere end nødvendigt.",
@@ -115,7 +115,7 @@ const translations: Record<Locale, HomeTranslations> = {
     controlText:
       "Hvert struktureret notat gennemses af dig inden det overføres til journalen. ClinLog assisterer med dokumentationen — den kliniske vurdering er din.",
 
-    ctaHeading: "Se det i praksis.",
+    ctaHeading: "Se det i praksis",
     deptLabel: "For din afdeling",
     deptText: "Live gennemgang på en reel stuegang, med dit eget noteformat.",
     clinLabel: "For den individuelle kliniker",
@@ -134,7 +134,7 @@ const translations: Record<Locale, HomeTranslations> = {
     eyebrow: "Built by clinicians, for the ward",
     heroHeadline1: "Clinical software for",
     heroHeadlineEm: "structured notes",
-    heroHeadline2: "in your specialty.",
+    heroHeadline2: "in your specialty",
     heroSub:
       "Dictate your ward round. ClinLog structures it into your department's note format — ready to copy into the patient record.",
     exploreSuite: "Explore the suite",
@@ -151,7 +151,7 @@ const translations: Record<Locale, HomeTranslations> = {
       "ClinLog is developed independently of any hospital IT department, as commercial clinical software intended for evaluation and adoption by individual departments.",
 
     theSuite: "The suite",
-    suiteHeading: "Three tools, one structuring engine.",
+    suiteHeading: "Three tools, one structuring engine",
 
     icuTag: "Intensive care",
     icuDesc:
@@ -172,7 +172,7 @@ const translations: Record<Locale, HomeTranslations> = {
     customExplore: "Contact us",
     customStatus: "Enquire",
 
-    trustHeading: "Data handled the way clinical data should be.",
+    trustHeading: "Data handled the way clinical data should be",
     gdprLabel: "GDPR by design",
     gdprText:
       "All processing runs on EU infrastructure under data processing agreements built for healthcare. Notes are never stored longer than necessary to reach the patient record.",
@@ -186,7 +186,7 @@ const translations: Record<Locale, HomeTranslations> = {
     controlText:
       "Every structured note is shown for review before it reaches the record. ClinLog assists documentation — it doesn't replace clinical judgement.",
 
-    ctaHeading: "See it in practice.",
+    ctaHeading: "See it in practice",
     deptLabel: "For your department",
     deptText: "Live walkthrough on a real ward round, with your own note format.",
     clinLabel: "For individual clinicians",
@@ -205,7 +205,7 @@ const translations: Record<Locale, HomeTranslations> = {
     eyebrow: "Von Klinikern entwickelt, für die Visite",
     heroHeadline1: "Klinische Software für",
     heroHeadlineEm: "strukturierte Notizen",
-    heroHeadline2: "in Ihrer Fachrichtung.",
+    heroHeadline2: "in Ihrer Fachrichtung",
     heroSub:
       "Diktieren Sie Ihre Visite. ClinLog strukturiert sie in das Notizformat Ihrer Abteilung — bereit zur Übertragung in die Patientenakte.",
     exploreSuite: "Produkte entdecken",
@@ -222,7 +222,7 @@ const translations: Record<Locale, HomeTranslations> = {
       "ClinLog wird unabhängig von Krankenhaus-IT-Abteilungen als kommerzielle klinische Software entwickelt, die zur Bewertung und Einführung durch einzelne Abteilungen bestimmt ist.",
 
     theSuite: "Produktpalette",
-    suiteHeading: "Drei Werkzeuge, eine Strukturierungs-Engine.",
+    suiteHeading: "Drei Werkzeuge, eine Strukturierungs-Engine",
 
     icuTag: "Intensivmedizin",
     icuDesc:
@@ -243,7 +243,7 @@ const translations: Record<Locale, HomeTranslations> = {
     customExplore: "Kontakt aufnehmen",
     customStatus: "Anfragen",
 
-    trustHeading: "Datensicherheit, wie klinische Daten es verdienen.",
+    trustHeading: "Datensicherheit, wie klinische Daten es verdienen",
     gdprLabel: "DSGVO by Design",
     gdprText:
       "Alle Verarbeitungen laufen auf EU-Infrastruktur unter Datenverarbeitungsverträgen für das Gesundheitswesen. Notizen werden nie länger als nötig gespeichert.",
@@ -257,7 +257,7 @@ const translations: Record<Locale, HomeTranslations> = {
     controlText:
       "Jede strukturierte Notiz wird vor der Übertragung zur Überprüfung angezeigt. ClinLog unterstützt die Dokumentation — es ersetzt nicht das klinische Urteil.",
 
-    ctaHeading: "In der Praxis erleben.",
+    ctaHeading: "In der Praxis erleben",
     deptLabel: "Für Ihre Abteilung",
     deptText: "Live-Demonstration einer echten Visite mit Ihrem eigenen Notizformat.",
     clinLabel: "Für einzelne Kliniker",
