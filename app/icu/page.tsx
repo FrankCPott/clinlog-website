@@ -125,7 +125,7 @@ export default function IcuWorkflowPage() {
               <div className={s.phoneWrap}>
                 <div className={s.phoneFrame}>
                   <Image
-                    src="/screenshots/app_dictate.png"
+                    src="/screenshots/app_dictate.jpg"
                     alt="ClinLog ICU appen under diktering — strukturerede SP-data og optagelse"
                     width={1080}
                     height={2340}
