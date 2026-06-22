@@ -4,6 +4,7 @@ import Link from "next/link";
 import s from "@/app/hub.module.css";
 import type { Locale } from "@/lib/i18n/home";
 import t_all from "@/lib/i18n/home";
+import { LogoMark } from "@/components/SiteLogo";
 
 /* ── Icons ── */
 const ArrowRight = () => (
@@ -12,20 +13,6 @@ const ArrowRight = () => (
       d="M3 8H13M13 8L9 4M13 8L9 12"
       stroke="currentColor"
       strokeWidth="1.5"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    />
-  </svg>
-);
-
-/* Boxed ECG logo mark */
-const LogoMark = ({ className }: { className?: string }) => (
-  <svg className={className} viewBox="0 0 40 40" fill="none" aria-hidden="true">
-    <rect width="40" height="40" rx="8" fill="#5B9BC0" />
-    <path
-      d="M6 20H13L16 9L21 31L25 20H34"
-      stroke="white"
-      strokeWidth="3"
       strokeLinecap="round"
       strokeLinejoin="round"
     />

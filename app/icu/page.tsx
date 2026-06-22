@@ -1,24 +1,13 @@
 import Image from "next/image";
 import Link from "next/link";
 import s from "./icu.module.css";
+import { LogoMark } from "@/components/SiteLogo";
 
 export const metadata = {
   title: "ClinLog ICU — Workflow",
   description:
     "Fra .ALLPATIENTDATA i Sundhedsplatformen til struktureret stuegangsnotat på få minutter.",
 };
-
-const PulseIcon = () => (
-  <svg className={s.logoIcon} viewBox="0 0 24 16" fill="none" aria-hidden="true">
-    <path
-      d="M0 8H6L8 2L12 14L15 8H24"
-      stroke="#5B9BC0"
-      strokeWidth="1.6"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    />
-  </svg>
-);
 
 export default function IcuWorkflowPage() {
   return (
@@ -28,9 +17,11 @@ export default function IcuWorkflowPage() {
       <header className={s.header}>
         <div className={s.headerInner}>
           <Link href="/" className={s.logo}>
-            <PulseIcon />
-            Clin<span className={s.accent}>Log</span>{" "}
-            <span className={s.icuBadge}>ICU</span>
+            <LogoMark className={s.logoMark} />
+            <span>
+              Clin<span className={s.accent}>Log</span>{" "}
+              <span className={s.icuBadge}>ICU</span>
+            </span>
           </Link>
           <Link href="/icu/app" className={s.headerCta}>Log ind</Link>
         </div>
@@ -219,9 +210,10 @@ export default function IcuWorkflowPage() {
       <footer className={s.footer}>
         <div className={s.footerInner}>
           <Link href="/" className={s.footerLogo}>
-            Clin<span className={s.accent}>Log</span>
+            <LogoMark className={s.logoMarkSm} />
+            <span>Clin<span className={s.accent}>Log</span></span>
           </Link>
-          <div>ClinLog ApS · Denmark · pott@clinlog.dk</div>
+          <div>Clin-Log ApS · Denmark · pott@clinlog.dk</div>
         </div>
       </footer>
 

@@ -445,9 +445,10 @@
 .trustPoint p { font-size: 14.5px; color: var(--ink-soft); line-height: 1.65; }
 
 /* ── FOOTER CTA ── */
+/* Background matches hero and cards: the "Log" blue */
 .footerCta {
-  background: var(--navy);
-  color: var(--paper);
+  background: var(--clinical-blue-bright);
+  color: var(--ink);
   padding: 96px 32px;
   text-align: center;
 }
@@ -456,11 +457,12 @@
   font-family: var(--f-serif);
   font-size: 36px;
   font-weight: 600;
+  color: var(--navy);
   margin-bottom: 18px;
   line-height: 1.2;
 }
 .footerCtaInner p {
-  color: rgba(247,245,240,0.65);
+  color: rgba(22,36,58,0.72);
   font-size: 16px;
   margin-bottom: 36px;
   line-height: 1.6;
@@ -475,11 +477,17 @@
   text-align: left;
 }
 .footerCtaTrustPoint {
-  border-left: 2px solid var(--clinical-blue-bright);
+  border-left: 2px solid rgba(22,36,58,0.35);
   padding-left: 20px;
 }
-.footerCtaTrustPoint .ptLabel { color: var(--clinical-blue-bright); }
-.footerCtaTrustPoint p { color: rgba(247,245,240,0.65); font-size: 14.5px; line-height: 1.65; }
+.footerCtaTrustPoint .ptLabel { color: rgba(22,36,58,0.75); }
+.footerCtaTrustPoint p { color: rgba(22,36,58,0.72); font-size: 14.5px; line-height: 1.65; }
+
+/* Footer CTA button overrides for light blue background */
+.footerCta .btnPrimary { background: var(--navy); }
+.footerCta .btnPrimary:hover { background: rgba(11,25,41,0.82); transform: translateY(-1px); }
+.footerCta .btnGhost { border-color: rgba(22,36,58,0.28); color: var(--ink); }
+.footerCta .btnGhost:hover { border-color: rgba(22,36,58,0.55); background: rgba(22,36,58,0.05); }
 
 /* ── SITE FOOTER ── */
 .siteFooter {

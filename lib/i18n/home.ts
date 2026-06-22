@@ -63,19 +63,19 @@ const translations: Record<Locale, HomeTranslations> = {
     eyebrow: "Bygget af kliniker, til stuegangsrunden",
     heroHeadline1: "Klinisk software til",
     heroHeadlineEm: "strukturerede notater",
-    heroHeadline2: "i din specialitet.",
+    heroHeadline2: "for dit speciale.",
     heroSub:
-      "Dikter din stuegang. ClinLog strukturerer den i dit afdelings noteformat — klar til kopiering til patientjournalen.",
+      "Dikter din stuegang. ClinLog strukturerer den i afdelingens noteformat — klar til kopiering til patientjournalen.",
     exploreSuite: "Udforsk produkterne",
     howData: "Datasikkerhed",
 
     howItWorks: "Sådan virker det",
     narrativeP1:
-      "Inden stuegangsrunden trækker du patientens aktuelle status fra Sundhedsplatformen. ClinLog læser den og holder den klar — vitale, laboratoriesvar, medicin — det øjeblik du begynder at diktere.",
+      "Inden stuegangsrunden trækker du patientens aktuelle status fra Sundhedsplatformen. ClinLog læser den og holder den klar — vitalparametre, laboratoriesvar, medicin — det øjeblik du begynder at diktere.",
     narrativeP2:
       "Du taler stuegangsrunden præcis som du plejer: CNS, respiration, cirkulation og videre. ClinLog kombinerer det du siger med patientkonteksten og strukturerer begge dele i afdelingens noteformat.",
     narrativeP3:
-      "Det strukturerede notat vises klar til gennemgang — og kopieres direkte til Sundhedsplatformen.",
+      "Det strukturerede notat er klar til gennemgang — og kopieres direkte til Sundhedsplatformen.",
     narrativeSmall:
       "ClinLog er udviklet uafhængigt af hospitalsIT, som kommercielt klinisk software beregnet til evaluering og implementering af den enkelte afdeling.",
 
@@ -113,7 +113,7 @@ const translations: Record<Locale, HomeTranslations> = {
       "Patientidentificerende oplysninger fjernes inden notet behandles eller gemmes — anonymisering er et fast første skridt, ikke en option.",
     controlLabel: "Du beholder kontrollen",
     controlText:
-      "Hvert struktureret notat gennemses af dig inden det overføres til journalen. ClinLog assisterer dokumentationen — den kliniske vurdering er din.",
+      "Hvert struktureret notat gennemses af dig inden det overføres til journalen. ClinLog assisterer med dokumentationen — den kliniske vurdering er din.",
 
     ctaHeading: "Se det i praksis.",
     deptLabel: "For din afdeling",

@@ -9,6 +9,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import DictationDemo from "@/components/demo/DictationDemo";
 import s from "./demo.module.css";
+import { LogoMark } from "@/components/SiteLogo";
 
 export const metadata: Metadata = {
   title: "Prøv diktering — ClinLog Demo",
@@ -24,7 +25,8 @@ export default function DemoPage() {
       {/* ── Header ── */}
       <header className={s.header}>
         <Link href="/" className={s.logo}>
-          Clin<span className={s.accent}>Log</span>
+          <LogoMark className={s.logoMark} />
+          <span>Clin<span className={s.accent}>Log</span></span>
         </Link>
         <span className={s.badge}>Demo</span>
       </header>

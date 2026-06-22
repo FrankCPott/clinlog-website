@@ -48,8 +48,10 @@
   text-decoration: none;
   color: #F7F5F0;
 }
-.logoIcon { width: 22px; height: 16px; }
-.accent { color: var(--blue-bright); font-style: italic; font-weight: 500; }
+.logoIcon  { width: 22px; height: 16px; }
+.logoMark  { width: 36px; height: 36px; flex-shrink: 0; }
+.logoMarkSm{ width: 26px; height: 26px; flex-shrink: 0; }
+.accent { color: var(--blue-bright); }
 .icuBadge {
   font-family: var(--font-mono), monospace;
   font-size: 11px;
@@ -475,6 +477,9 @@
   font-weight: 600;
   color: rgba(247,245,240,0.7);
   text-decoration: none;
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
 /* ── RESPONSIVE ── */

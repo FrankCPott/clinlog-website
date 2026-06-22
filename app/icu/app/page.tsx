@@ -9,6 +9,7 @@ import { supabase } from "@/lib/supabase";
 import LoginForm from "@/components/LoginForm";
 import NoteViewer from "@/components/NoteViewer";
 import SpPasteView from "@/components/SpPasteView";
+import { LogoMark } from "@/components/SiteLogo";
 
 type Tab = "notater" | "sp";
 
@@ -37,10 +38,13 @@ export default function IcuApp() {
       <header className="bg-[#1e2a3a] px-5 flex items-center justify-between flex-shrink-0">
         {/* Logo + tabs on one row */}
         <div className="flex items-center gap-6">
-          <span className="text-white font-semibold text-xl tracking-tight py-3.5">
-            Clin<span className="text-blue-400">Log</span>{" "}
-            <span className="text-white">ICU</span>
-          </span>
+          <div className="flex items-center gap-2.5 py-3.5">
+            <LogoMark className="w-8 h-8 flex-shrink-0" />
+            <span className="text-white font-semibold text-xl tracking-tight">
+              Clin<span className="text-[#5B9BC0]">Log</span>{" "}
+              <span className="text-white">ICU</span>
+            </span>
+          </div>
 
           {session && (
             <nav className="flex items-center gap-0.5 h-full">
