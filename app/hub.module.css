@@ -61,7 +61,7 @@
 .logoMark { width: 36px; height: 36px; flex-shrink: 0; }
 /* Boxed ECG logo mark — footer size */
 .logoMarkSm { width: 26px; height: 26px; flex-shrink: 0; }
-.logAccent { color: var(--clinical-blue-bright); font-style: italic; font-weight: 500; }
+.logAccent { color: var(--clinical-blue-bright); }
 .mainNav {
   display: flex;
   gap: 36px;
@@ -91,17 +91,17 @@
   gap: 2px;
 }
 .langBtn {
-  font-size: 18px;
-  line-height: 1;
-  opacity: 0.48;
+  display: inline-flex;
+  align-items: center;
+  opacity: 0.52;
   transition: opacity 0.18s, transform 0.18s;
   text-decoration: none;
-  display: inline-block;
-  padding: 2px 4px;
+  padding: 2px 3px;
   border-radius: 3px;
 }
-.langBtn:hover { opacity: 0.82; transform: scale(1.1); }
+.langBtn:hover { opacity: 0.88; transform: scale(1.1); }
 .langBtnActive { opacity: 1; }
+.flagIcon { display: block; width: 22px; height: 15px; }
 
 .headerCta {
   font-size: 13.5px;
@@ -365,7 +365,7 @@
 }
 .productCard .desc {
   font-size: 14.5px;
-  color: rgba(247,245,240,0.8);
+  color: var(--navy);
   line-height: 1.6;
   margin-bottom: 22px;
   flex: 1;

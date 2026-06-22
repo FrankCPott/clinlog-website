@@ -18,14 +18,9 @@ const ArrowRight = () => (
   </svg>
 );
 
-/* Boxed ECG logo mark — matches the ICU app icon style */
+/* Boxed ECG logo mark */
 const LogoMark = ({ className }: { className?: string }) => (
-  <svg
-    className={className}
-    viewBox="0 0 40 40"
-    fill="none"
-    aria-hidden="true"
-  >
+  <svg className={className} viewBox="0 0 40 40" fill="none" aria-hidden="true">
     <rect width="40" height="40" rx="8" fill="#5B9BC0" />
     <path
       d="M6 20H13L16 9L21 31L25 20H34"
@@ -37,15 +32,53 @@ const LogoMark = ({ className }: { className?: string }) => (
   </svg>
 );
 
+/* ── Flag SVGs — proper country flags with rounded corners via clipPath ── */
+const DkFlag = () => (
+  <svg viewBox="0 0 28 21" className={s.flagIcon} aria-hidden="true">
+    <defs><clipPath id="dk-r"><rect width="28" height="21" rx="3"/></clipPath></defs>
+    <g clipPath="url(#dk-r)">
+      <rect width="28" height="21" fill="#C60C30"/>
+      <rect x="9" width="5" height="21" fill="white"/>
+      <rect y="8" width="28" height="5" fill="white"/>
+    </g>
+  </svg>
+);
+
+const GbFlag = () => (
+  <svg viewBox="0 0 28 21" className={s.flagIcon} aria-hidden="true">
+    <defs><clipPath id="gb-r"><rect width="28" height="21" rx="3"/></clipPath></defs>
+    <g clipPath="url(#gb-r)">
+      <rect width="28" height="21" fill="#012169"/>
+      {/* White saltire */}
+      <path d="M0,0 L28,21 M28,0 L0,21" stroke="white" strokeWidth="5"/>
+      {/* Red saltire */}
+      <path d="M0,0 L28,21 M28,0 L0,21" stroke="#C8102E" strokeWidth="3"/>
+      {/* White cross */}
+      <rect x="11" width="6" height="21" fill="white"/>
+      <rect y="7.5" width="28" height="6" fill="white"/>
+      {/* Red cross */}
+      <rect x="12.5" width="3" height="21" fill="#C8102E"/>
+      <rect y="9" width="28" height="3" fill="#C8102E"/>
+    </g>
+  </svg>
+);
+
+const DeFlag = () => (
+  <svg viewBox="0 0 28 21" className={s.flagIcon} aria-hidden="true">
+    <defs><clipPath id="de-r"><rect width="28" height="21" rx="3"/></clipPath></defs>
+    <g clipPath="url(#de-r)">
+      <rect width="28" height="7" fill="#000000"/>
+      <rect y="7" width="28" height="7" fill="#DD0000"/>
+      <rect y="14" width="28" height="7" fill="#FFCE00"/>
+    </g>
+  </svg>
+);
+
 /* ── Props ── */
-interface Props {
-  locale: Locale;
-}
+interface Props { locale: Locale; }
 
 export default function HomepageShell({ locale }: Props) {
   const t = t_all[locale];
-
-  /* Build lang-button class string */
   const langCls = (l: Locale) =>
     `${s.langBtn}${locale === l ? ` ${s.langBtnActive}` : ""}`;
 
@@ -55,9 +88,12 @@ export default function HomepageShell({ locale }: Props) {
       {/* ══ HEADER ══ */}
       <header className={s.header}>
         <div className={s.headerInner}>
+
+          {/* Logo — text wrapped in one span so flex gap only applies
+              between the icon and the word, not inside the word itself */}
           <Link href="/" className={s.logo}>
             <LogoMark className={s.logoMark} />
-            Clin<span className={s.logAccent}>Log</span>
+            <span>Clin<span className={s.logAccent}>Log</span></span>
           </Link>
 
           <nav>
@@ -70,9 +106,9 @@ export default function HomepageShell({ locale }: Props) {
 
           <div className={s.headerRight}>
             <div className={s.langPicker}>
-              <Link href="/"    className={langCls("da")} title="Dansk">🇩🇰</Link>
-              <Link href="/en"  className={langCls("en")} title="English">🇬🇧</Link>
-              <Link href="/de"  className={langCls("de")} title="Deutsch">🇩🇪</Link>
+              <Link href="/"   className={langCls("da")} title="Dansk">   <DkFlag /></Link>
+              <Link href="/en" className={langCls("en")} title="English">  <GbFlag /></Link>
+              <Link href="/de" className={langCls("de")} title="Deutsch">  <DeFlag /></Link>
             </div>
             <Link href="/icu/app" className={s.headerCta}>{t.logIn}</Link>
           </div>
@@ -178,7 +214,7 @@ export default function HomepageShell({ locale }: Props) {
               </div>
             </div>
 
-            {/* ClinLog Custom — replaces Clinical Diary */}
+            {/* ClinLog Custom */}
             <div className={s.productCard} id="custom">
               <div className={s.cardShot}>
                 <div className={s.placeholderShot}>ClinLog Custom</div>
@@ -251,7 +287,7 @@ export default function HomepageShell({ locale }: Props) {
         <div className={s.siteFooterInner}>
           <Link href="/" className={s.logo} style={{ fontSize: 16 }}>
             <LogoMark className={s.logoMarkSm} />
-            Clin<span className={s.logAccent}>Log</span>
+            <span>Clin<span className={s.logAccent}>Log</span></span>
           </Link>
           <div>{t.footerCopyright}</div>
         </div>
