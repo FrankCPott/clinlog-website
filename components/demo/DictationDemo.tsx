@@ -130,7 +130,7 @@ export default function DictationDemo() {
   const [demoState,   setDemoState]   = useState<DemoState>("idle");
   const [showModal,   setShowModal]   = useState(true);
   const [accepted,    setAccepted]    = useState(false);
-  const [secondsLeft, setSecondsLeft] = useState(60);
+  const [secondsLeft, setSecondsLeft] = useState(30);
   const [result,      setResult]      = useState<DemoResult | null>(null);
   const [errorMsg,    setErrorMsg]    = useState("");
   const [transcript,  setTranscript]  = useState("");
@@ -294,8 +294,8 @@ export default function DictationDemo() {
       }
     };
 
-    // Auto-stop ved 60 sekunder
-    let secs = 60;
+    // Auto-stop ved 30 sekunder
+    let secs = 30;
     setSecondsLeft(secs);
     timerRef.current = setInterval(() => {
       secs -= 1;
@@ -328,7 +328,7 @@ export default function DictationDemo() {
     setTranscript("");
     setErrorMsg("");
     setPermissionErrDetail("");
-    setSecondsLeft(60);
+    setSecondsLeft(30);
     setCopied(false);
   }, []);
 
@@ -375,7 +375,7 @@ export default function DictationDemo() {
                 <span className={s.micIcon} aria-hidden="true">🎙️</span>
               </button>
               <p className={s.hint}>Klik for at starte — dikter en kort, opdigtet patientcase</p>
-              <p className={s.hintSmall}>Maks 60 sekunder</p>
+              <p className={s.hintSmall}>Maks 30 sekunder</p>
             </div>
           )}
 

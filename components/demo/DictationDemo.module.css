@@ -203,6 +203,8 @@
   color: #4A5568;
   line-height: 1.6;
   margin: 0;
+  user-select: none;
+  -webkit-user-select: none;
 }
 
 /* Structured sections */
@@ -239,6 +241,8 @@
   line-height: 1.7;
   margin: 0;
   white-space: pre-wrap;
+  user-select: none;
+  -webkit-user-select: none;
 }
 
 /* CTA */

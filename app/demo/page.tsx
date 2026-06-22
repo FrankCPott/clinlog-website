@@ -34,11 +34,11 @@ export default function DemoPage() {
         <div className={s.introInner}>
           <div className={s.eyebrow}>Prøv det selv</div>
           <h1 className={s.headline}>
-            Fra diktering til<br />struktureret note på sekunder.
+            Fra diktering til<br />struktureret note på få minutter
           </h1>
           <p className={s.sub}>
             Dikter en kort, <strong>opdigtet</strong> patientcase herunder.
-            ClinLog transskriberer, anonymiserer og strukturerer den i realtid.
+            ClinLog transskriberer, anonymiserer og strukturerer notatet
           </p>
         </div>
       </section>
