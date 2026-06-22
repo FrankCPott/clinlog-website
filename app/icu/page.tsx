@@ -76,8 +76,9 @@ export default function IcuWorkflowPage() {
                   <Image
                     src="/screenshots/sp_vitals.png"
                     alt="Sundhedsplatformen — observationer: blodtryk, puls, temperatur, saturation"
-                    width={638}
-                    height={155}
+                    width={631}
+                    height={222}
+                    priority
                     style={{ width: "100%", height: "auto", display: "block" }}
                   />
                 </div>
@@ -86,8 +87,9 @@ export default function IcuWorkflowPage() {
                     <Image
                       src="/screenshots/sp_lab.png"
                       alt="Sundhedsplatformen — laboratorieværdier: hæmatologi, elektrolytter, koagulation"
-                      width={638}
-                      height={490}
+                      width={433}
+                      height={576}
+                      priority
                       style={{ width: "100%", height: "auto", display: "block" }}
                     />
                   </div>
@@ -95,8 +97,9 @@ export default function IcuWorkflowPage() {
                     <Image
                       src="/screenshots/sp_results.png"
                       alt="Sundhedsplatformen — resultatgennemgang med parakliniske systemer"
-                      width={810}
-                      height={630}
+                      width={822}
+                      height={655}
+                      priority
                       style={{ width: "100%", height: "auto", display: "block" }}
                     />
                   </div>
@@ -127,8 +130,9 @@ export default function IcuWorkflowPage() {
                   <Image
                     src="/screenshots/app_dictate.jpg"
                     alt="ClinLog ICU appen under diktering — strukturerede SP-data og optagelse"
-                    width={1080}
-                    height={2340}
+                    width={923}
+                    height={1999}
+                    priority
                     style={{ width: "100%", height: "auto", display: "block" }}
                   />
                 </div>
@@ -155,6 +159,7 @@ export default function IcuWorkflowPage() {
                   src="/icu_shot.jpg"
                   alt="ClinLog ICU — struktureret stuegangsnotat klar til kopiering til SP"
                   fill
+                  priority
                   style={{ objectFit: "cover", objectPosition: "top center" }}
                   sizes="(max-width: 860px) 100vw, 50vw"
                 />
