@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Privatlivspolitik — ClinLog ICU</title>
+  <meta name="description" content="Privatlivspolitik for ClinLog ICU — faglig refleksionsapp til intensivklinikere." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,opsz,wght@0,8..60,300..900;1,8..60,300..900&family=Geist:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="tokens.css" />
+  <link rel="stylesheet" href="page.css" />
+  <link rel="icon" href="favicon.ico" sizes="any" />
+</head>
+<body>
+  <a href="#main" class="skip-link">Spring til indhold</a>
+
+  <!-- Nav -->
+  <nav class="page-nav" aria-label="Primær navigation">
+    <a href="/" class="page-nav-logo" aria-label="ClinLog forside">
+      <div class="page-nav-logo-icon">
+        <svg width="20" height="20" viewBox="0 0 22 22" fill="none" aria-hidden="true">
+          <polyline points="1,11 5,11 7,11 8.5,5 10.5,17 12.5,9 14,11 17,11 21,11"
+            stroke="#ffffff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+      <span class="page-nav-wordmark">Clin<span>Log</span></span>
+    </a>
+    <ul class="page-nav-links" role="list">
+      <li><a href="/#features">Funktioner</a></li>
+      <li><a href="/#about">Om ClinLog</a></li>
+      <li><a href="kontakt.html">Kontakt</a></li>
+    </ul>
+  </nav>
+
+  <!-- Hero -->
+  <div class="page-hero" role="banner">
+    <h1>Privatlivspolitik — ClinLog ICU</h1>
+    <p class="page-meta">Sidst opdateret: 20. maj 2026</p>
+  </div>
+
+  <!-- Indhold -->
+  <main id="main">
+    <div class="prose">
+
+      <div class="callout">
+        <p><strong>Kort version:</strong> ClinLog ICU indsamler kun de data der er nødvendige for at levere tjenesten. Appen er forbeholdt uddannede intensivklinikere og kræver manuel godkendelse. Kliniske noter anonymiseres lokalt på din enhed inden de sendes til AI-behandling. Du kan til enhver tid slette din konto og alle tilknyttede data.</p>
+      </div>
+
+      <h2>1. Dataansvarlig</h2>
+      <p>
+        ClinLog ICU er udviklet og drives af Frank Pott.<br>
+        Kontakt vedrørende databeskyttelse: <a href="mailto:frank.pott@gmail.com">frank.pott@gmail.com</a>
+      </p>
+
+      <h2>2. Hvem kan bruge appen</h2>
+      <p>
+        ClinLog ICU er udelukkende beregnet til uddannede sundhedsprofessionelle med klinisk erfaring fra intensivmedicin. Adgang kræver manuel godkendelse af administrator. Appen er et <strong>lærings- og refleksionsværktøj til faglig udvikling (CPD)</strong> — den erstatter ikke klinisk vurdering og yder ikke diagnostisk rådgivning.
+      </p>
+
+      <h2>3. Hvilke data indsamles</h2>
+
+      <h3>3.1 Kontooplysninger</h3>
+      <ul>
+        <li>E-mailadresse og navn ved oprettelse — bruges udelukkende til autentificering og godkendelsesproces.</li>
+        <li>Godkendelsesstatus (afventer / godkendt / afvist).</li>
+      </ul>
+
+      <h3>3.2 Kliniske noter</h3>
+      <ul>
+        <li>Tekst du indtaster eller dikterer i appen, opbevares lokalt på din enhed og i din personlige konto.</li>
+        <li>Inden noter sendes til AI-behandling, anonymiseres de automatisk — potentielt personhenførbare oplysninger (navne, datoer, stednavne) erstattes lokalt.</li>
+        <li>Vi indsamler <strong>ikke</strong> patientidentifikation, CPR-numre eller andre direkte identifikatorer.</li>
+      </ul>
+
+      <h3>3.3 Faglige refleksioner</h3>
+      <ul>
+        <li>AI-genererede faglige refleksioner baseret på anonymiserede noter gemmes i din personlige arkivdatabase.</li>
+        <li>Refleksionerne er private og tilgås kun af dig.</li>
+      </ul>
+
+      <h3>3.4 Billeder</h3>
+      <ul>
+        <li>Billeder du vælger at tilknytte en refleksion, uploades til krypteret Supabase-lagring knyttet til din konto.</li>
+        <li>Du har eksplicit ansvaret for at billeder ikke indeholder genkendelige ansigter, navne eller andre patientidentifikatorer. Appen advarer herom.</li>
+        <li>Billeder er private og tilgås kun af dig.</li>
+      </ul>
+
+      <h3>3.5 Brugsdata</h3>
+      <ul>
+        <li>Tidspunkt for oprettelse og arkivering af noter og refleksioner.</li>
+        <li>Ingen adfærdsanalyse, annoncering eller tracking-cookies.</li>
+      </ul>
+
+      <h2>4. Opbevaring og sikkerhed</h2>
+      <ul>
+        <li><strong>Database:</strong> Supabase (PostgreSQL), hostet på AWS eu-west-1 (Irland) — inden for EU/EØS.</li>
+        <li><strong>Billedlagring:</strong> Supabase Storage, samme region. Adgang kræver gyldig session-token.</li>
+        <li><strong>Kryptering:</strong> Al datatransport sker via TLS 1.3. Data at rest er krypteret (AES-256).</li>
+        <li><strong>Adgangskontrol:</strong> Row Level Security (RLS) i Supabase sikrer at du kun kan tilgå dine egne data.</li>
+        <li><strong>Opbevaringsperiode:</strong> Data bevares så længe din konto er aktiv. Ved kontosletning slettes alle data (noter, refleksioner, billeder) inden for 30 dage.</li>
+      </ul>
+
+      <h2>5. AI-behandling</h2>
+      <p>
+        Anonymiserede kliniske noter sendes til Anthropic (Claude API) med henblik på generering af strukturerede faglige refleksioner. Der sendes <strong>aldrig</strong> personidentificerbare oplysninger til AI-tjenester.
+      </p>
+      <ul>
+        <li><strong>Anthropic:</strong> Zero Data Retention-aftale. Data bruges ikke til træning af modeller.</li>
+        <li>AI-genererede refleksioner er mærket tydeligt som AI-assisteret indhold og er udelukkende til faglig refleksion — ikke klinisk beslutningsstøtte.</li>
+      </ul>
+
+      <h2>6. Datadeling</h2>
+      <p>Vi deler <strong>aldrig</strong> dine data med tredjeparter til kommercielle formål. Der er ingen community-deling i ClinLog ICU — alle noter og refleksioner er private.</p>
+      <p>Underdatabehandlere:</p>
+      <ul>
+        <li><strong>Supabase Inc.</strong> — database, autentificering og billedlagring. DPA indgået, EU Standard Contractual Clauses.</li>
+        <li><strong>Anthropic PBC</strong> — AI-refleksionsgenerering, kun anonymiserede noter. Zero Data Retention.</li>
+      </ul>
+
+      <h2>7. Dine rettigheder (GDPR)</h2>
+      <p>Du har ret til:</p>
+      <ul>
+        <li><strong>Indsigt:</strong> Modtage en kopi af alle data vi opbevarer om dig.</li>
+        <li><strong>Berigtigelse:</strong> Rette fejlagtige oplysninger.</li>
+        <li><strong>Sletning:</strong> Slette din konto direkte i appen (Indstillinger → Slet konto) eller ved at kontakte os. Alle data slettes inden for 30 dage.</li>
+        <li><strong>Portabilitet:</strong> Eksportere dine refleksioner som PDF.</li>
+        <li><strong>Indsigelse:</strong> Gøre indsigelse mod behandling af dine data.</li>
+      </ul>
+      <p>
+        Send din anmodning til: <a href="mailto:frank.pott@gmail.com">frank.pott@gmail.com</a><br>
+        Vi svarer inden 30 dage. Du kan også klage til <a href="https://www.datatilsynet.dk" target="_blank" rel="noopener">Datatilsynet</a>.
+      </p>
+
+      <h2>8. Adgang til enhedens funktioner</h2>
+      <ul>
+        <li><strong>Fotobibliotek:</strong> Bruges udelukkende til at tilknytte billeder til dine refleksioner. Der foretages ingen automatisk scanning eller upload.</li>
+        <li><strong>Mikrofon:</strong> Bruges til diktering af kliniske noter, hvis du vælger denne funktion. Lydoptagelser behandles lokalt eller via voice-to-text og gemmes ikke som lydfiler.</li>
+      </ul>
+
+      <h2>9. Cookies og lokal lagring</h2>
+      <p>Appen bruger kun nødvendigt lokalt lager (AsyncStorage) til at bevare din session-token. Der bruges ingen tracking-cookies eller analytics.</p>
+
+      <h2>10. Ændringer til denne politik</h2>
+      <p>
+        Væsentlige ændringer annonceres i appen og pr. e-mail mindst 14 dage inden de træder i kraft.
+        Den seneste version findes altid på <a href="https://clinlog.dk/privatlivspolitik-icu.html">clinlog.dk/privatlivspolitik-icu.html</a>.
+      </p>
+
+      <h2>11. Kontakt</h2>
+      <p>
+        Spørgsmål om datasikkerhed eller persondata:<br>
+        <a href="mailto:frank.pott@gmail.com">frank.pott@gmail.com</a>
+      </p>
+
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer class="page-footer">
+    <ul class="page-footer-links" role="list">
+      <li><a href="/">Forside</a></li>
+      <li><a href="privatlivspolitik.html">Privatlivspolitik (ClinLog)</a></li>
+      <li><a href="privatlivspolitik-icu.html" aria-current="page">Privatlivspolitik (ClinLog ICU)</a></li>
+      <li><a href="vilkar.html">Vilkår</a></li>
+      <li><a href="kontakt.html">Kontakt</a></li>
+    </ul>
+    <p>© <script>document.write(new Date().getFullYear())</script> ClinLog · clinlog.dk · Bygget i Danmark</p>
+  </footer>
+
+</body>
+</html>
