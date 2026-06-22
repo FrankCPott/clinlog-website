@@ -316,7 +316,7 @@ const TRANSCRIBING_KEYFRAMES = `
   }
   @keyframes clinlog-ring {
     from { stroke-dashoffset: ${RING_CIRC.toFixed(1)}; }
-    to   { stroke-dashoffset: ${(RING_CIRC * 0.15).toFixed(1)}; }
+    to   { stroke-dashoffset: ${(RING_CIRC * 0.05).toFixed(1)}; }
   }
 `;
 
@@ -347,7 +347,7 @@ function TranscribingWaveform() {
             strokeDashoffset={RING_CIRC.toFixed(1)}
             transform="rotate(-90 32 32)"
             style={{
-              animation: `clinlog-ring 14s cubic-bezier(0.35, 0, 0.55, 1) forwards`,
+              animation: `clinlog-ring 25s cubic-bezier(0.35, 0, 0.55, 1) forwards`,
             }}
           />
         </svg>
